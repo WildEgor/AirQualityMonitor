@@ -1,0 +1,17 @@
+{
+    "name": "AirQualityMonitor",
+    "about": "Умный монитор качества воздуха",
+    "version": "1.0",
+    "notes": "",
+    "builds": [
+      {
+        "chipFamily": "ESP32",
+        "parts": [
+          {
+            "path": "https://raw.githubusercontent.com/WildEgor/AirQualityMonitor/main/bin/firmware.bin",
+            "offset": 0
+          }
+        ]
+      }
+    ]
+  }

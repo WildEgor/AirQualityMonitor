@@ -1,2 +1,2 @@
 # AirQualityMonitor
-TODO
+Умный монитор качества воздуха
