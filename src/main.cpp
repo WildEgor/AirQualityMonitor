@@ -2,29 +2,40 @@
 #include <Looper.h>
 #include "db.h"
 #include "settings.h"
-#include "wifi_checker.h"
+#include "wifi_conn.h"
+#include "mqtt_conn.h"
+#include "sensors/co2.h"
+#include "sensors/sensor_base.h"
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
   Serial.println("setup...");
 
-  // Initialize database first
   SettingsDB* sdb = new SettingsDB();
   sdb->setup();
   sdb->addLoop();
 
-  // Initialize WiFi second
-  WiFiChecker* wifi = new WiFiChecker();
+  WiFiConn* wifi = new WiFiConn();
   wifi->setup(*sdb);
   wifi->addLoop();
 
-  // Wait for WiFi to initialize
-  delay(1000);
+  delay(1000); // hmmm
 
-  // Initialize settings last, after WiFi is ready
+  MQTTConn* mqtt = new MQTTConn();
+  mqtt->setup(*sdb);
+  mqtt->addLoop();
+
+  CO2Sensor* co2 = new CO2Sensor(1000);
+
+  SensorContainer* sensors = new SensorContainer();
+  sensors->addSensor(co2->getType(), co2);
+  
+  CO2Publisher* co2p = new CO2Publisher(5000, *co2, *mqtt);
+  co2p->addLoop();
+
   Settings* sett = new Settings();
-  sett->setup(*sdb, *wifi);
+  sett->setup(*sdb, *wifi, *mqtt, *sensors);
   sett->addLoop();
 }
 

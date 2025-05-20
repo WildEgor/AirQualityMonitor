@@ -2,19 +2,22 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "db.h"
+#include "config.h"
 
-class WiFiChecker : public LoopTickerBase {
+#define CONN_RETRY_COUNT 20
+
+class WiFiConn : public LoopTickerBase {
 public:
-    WiFiChecker() : _wifi_ok(false), _db(nullptr), _needs_init(true) {}
+    WiFiConn() : LoopTickerBase(), _wifi_ok(false), _db(nullptr), _needs_init(true) {}
 
     void setup(SettingsDB& dbWrapper) {
         _db = &dbWrapper.getDB();
-        wifi_init();
+        initWiFi();
     }
 
-    void exec() override {
-    }
+    void exec() override {}
 
+    // connect only if password set
     void connect() {
         if (_db && (*_db)[kk::wifi_ssid].length() && !_wifi_ok) {
             Serial.println("connect to wifi...");
@@ -22,8 +25,12 @@ public:
         }
     }
 
+    WiFiClass getClient() {
+        return WiFi;
+    }
+
 private:
-    void wifi_init() {
+    void initWiFi() {
         Serial.println("init wifi...");
 
         // First disconnect and reset WiFi
@@ -35,9 +42,7 @@ private:
         WiFi.mode(WIFI_AP_STA);
         
         // Configure AP
-        const char* ap_ssid = "AirQualityMonitor AP";
-        const char* ap_pass = "admin";
-        WiFi.softAP(ap_ssid, ap_pass);
+        WiFi.softAP(AP_NAME, AP_PASS);
         
         Serial.print("AP IP address: ");
         Serial.println(WiFi.softAPIP());
@@ -54,26 +59,25 @@ private:
     void connectToWiFi(const String& ssid, const String& pass) {
         if (ssid.length() == 0) return;
         
-        Serial.print("Connecting to ");
+        Serial.print("connecting to ");
         Serial.println(ssid);
         
         WiFi.begin(ssid.c_str(), pass.c_str());
         
-        // Wait for connection with timeout
-        int timeout = 0;
-        while (WiFi.status() != WL_CONNECTED && timeout < 20) {
+        int retries = 0;
+        while (WiFi.status() != WL_CONNECTED && retries < CONN_RETRY_COUNT) {
             delay(500);
             Serial.print(".");
-            timeout++;
+            retries++;
         }
         Serial.println();
         
         if (WiFi.status() == WL_CONNECTED) {
-            Serial.print("Connected! IP address: ");
+            Serial.print("wifi ok! IP address: ");
             Serial.println(WiFi.localIP());
             _wifi_ok = true;
         } else {
-            Serial.println("Connection failed!");
+            Serial.println("wifi error! connection failed!");
             _wifi_ok = false;
         }
     }
