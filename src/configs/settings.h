@@ -1,9 +1,9 @@
 #pragma once
 #include <SettingsGyver.h>
 #include "config.h"
-#include "db.h"
-#include "wifi_conn.h"
-#include "mqtt_conn.h"
+#include "db/settings_db.h"
+#include "connections/wifi_conn.h"
+#include "connections/mqtt_conn.h"
 #include "sensors/co2.h"
 #include "sensors/sensor_base.h"
 

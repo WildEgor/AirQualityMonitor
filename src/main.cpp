@@ -1,11 +1,15 @@
 #include "Arduino.h"
 #include <Looper.h>
-#include "db.h"
-#include "settings.h"
-#include "wifi_conn.h"
-#include "mqtt_conn.h"
+#include "db/settings_db.h"
+#include "configs/settings.h"
+#include "connections/wifi_conn.h"
+#include "connections/mqtt_conn.h"
+#include "connections/ntp_conn.h"
 #include "sensors/co2.h"
 #include "sensors/sensor_base.h"
+#include "hmi/display.h"
+#include "controllers/rgb.h"
+#include "model/co2_data.h"
 
 void setup() {
   Serial.begin(115200);
@@ -20,23 +24,36 @@ void setup() {
   wifi->setup(*sdb);
   wifi->addLoop();
 
-  delay(1000); // hmmm
+  NTPConn* ntp = new NTPConn();
+  ntp->setup();
+  ntp->addLoop();
 
   MQTTConn* mqtt = new MQTTConn();
-  mqtt->setup(*sdb);
+  mqtt->setup(*sdb, *wifi);
   mqtt->addLoop();
 
   CO2Sensor* co2 = new CO2Sensor(1000);
+  co2->enableTest();
+  CO2Publisher* co2p = new CO2Publisher(5000, *co2, *mqtt);
+  co2p->addLoop();
 
   SensorContainer* sensors = new SensorContainer();
   sensors->addSensor(co2->getType(), co2);
-  
-  CO2Publisher* co2p = new CO2Publisher(5000, *co2, *mqtt);
-  co2p->addLoop();
 
   Settings* sett = new Settings();
   sett->setup(*sdb, *wifi, *mqtt, *sensors);
   sett->addLoop();
+
+  Display* display = new Display(50, *co2);
+  display->setup();
+  display->addLoop();
+
+  RGBLine* rgb = new RGBLine(5000);
+  rgb->setup();
+  rgb->setUpdaterCb([co2]() -> uint16_t {
+    return co2->getCO2();
+  });
+  rgb->addLoop();
 }
 
 void loop() {

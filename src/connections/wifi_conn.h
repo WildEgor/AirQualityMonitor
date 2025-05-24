@@ -1,36 +1,40 @@
 #pragma once
 #include <Arduino.h>
 #include <WiFi.h>
-#include "db.h"
-#include "config.h"
-
-#define CONN_RETRY_COUNT 20
+#include "db/settings_db.h"
+#include "configs/config.h"
 
 class WiFiConn : public LoopTickerBase {
 public:
-    WiFiConn() : LoopTickerBase(), _wifi_ok(false), _db(nullptr), _needs_init(true) {}
+    WiFiConn() : LoopTickerBase(), _wifi_ok(false), _db(nullptr) {}
 
-    void setup(SettingsDB& dbWrapper) {
-        _db = &dbWrapper.getDB();
-        initWiFi();
+    void setup(SettingsDB& settingsDb) {
+        _db = &settingsDb.getDB();
+        _initWiFi();
     }
 
-    void exec() override {}
+    void exec() override {
+       if (WiFi.status() == WL_CONNECTED) {
+          return;
+       }
+
+       connect();
+    }
 
     // connect only if password set
     void connect() {
-        if (_db && (*_db)[kk::wifi_ssid].length() && !_wifi_ok) {
+        if (!isConnected() && (*_db)[kk::wifi_ssid].length()) {
             Serial.println("connect to wifi...");
-            connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
+            _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
         }
     }
 
-    WiFiClass getClient() {
-        return WiFi;
+    bool isConnected() {
+        return _wifi_ok;
     }
 
 private:
-    void initWiFi() {
+    void _initWiFi() {
         Serial.println("init wifi...");
 
         // First disconnect and reset WiFi
@@ -48,15 +52,15 @@ private:
         Serial.println(WiFi.softAPIP());
         
         // Try to connect to saved network if available
-        if (_db && (*_db)[kk::wifi_ssid].length()) {
+        if ((*_db)[kk::wifi_ssid].length()) {
             Serial.println("connect wifi...");
-            connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
+            _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
         }
         
         Serial.println("init wifi ok!");
     }
 
-    void connectToWiFi(const String& ssid, const String& pass) {
+    void _connectToWiFi(const String& ssid, const String& pass) {
         if (ssid.length() == 0) return;
         
         Serial.print("connecting to ");
@@ -65,8 +69,12 @@ private:
         WiFi.begin(ssid.c_str(), pass.c_str());
         
         int retries = 0;
-        while (WiFi.status() != WL_CONNECTED && retries < CONN_RETRY_COUNT) {
-            delay(500);
+        while (WiFi.status() != WL_CONNECTED && retries < WIFI_CONN_RETRY_COUNT) {
+            if (WIFI_CONN_RETRY_TIMEOUT >= 500) {
+                delay(WIFI_CONN_RETRY_TIMEOUT);
+            }else {
+                delay(500);         
+            }
             Serial.print(".");
             retries++;
         }
@@ -83,6 +91,5 @@ private:
     }
 
     bool _wifi_ok;
-    bool _needs_init;
     GyverDBFile* _db;
 };

@@ -2,7 +2,7 @@
 #include <GyverDBFile.h>
 #include <LittleFS.h>
 #include <Looper.h>
-#include "config.h"
+#include "configs/config.h"
 
 enum kk : size_t {
     wifi_ssid,
@@ -36,10 +36,11 @@ public:
         }
 
         _db.begin();
+        // _db.reset();
 
         // ============================== WIFI ==============================
-        _db.init(kk::wifi_ssid, "");
-        _db.init(kk::wifi_pass, "");
+        _db.init(kk::wifi_ssid, WIFI_SSID);
+        _db.init(kk::wifi_pass, WIFI_PASS);
 
         // ============================== MQTT ==============================
         _db.init(kk::mqtt_enabled, true);
@@ -51,6 +52,8 @@ public:
         // ============================== CO2 ==============================
         _db.init(kk::co2_measure_prd, 60);
         _db.init(kk::co2_pub_prd, 60);
+
+        _db.dump(Serial);
 
         Serial.println("db ok!");
     }

@@ -10,7 +10,7 @@ public:
 
     virtual void setup() = 0;
     virtual void exec() override = 0;
-    virtual bool isInitialized() const { return _is_initialized; }
+    virtual bool getIsInitialized() const { return _is_initialized; }
     virtual void copyState(const SensorBase& other) = 0;
 
     virtual void updateInterval(uint32_t new_ms) {
