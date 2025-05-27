@@ -16,3 +16,7 @@
 
 #define RGB_PIN         6
 #define RGB_NUMPIXELS   8 // Number of LEDs in the strip. Min: 1, Max: 255
+
+#define MS_100 100
+#define SEC_1 1000
+#define SEC_5 5000

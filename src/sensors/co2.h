@@ -1,13 +1,13 @@
 #pragma once
 #include <Arduino.h>
 #include <Wire.h>
-#include <SparkFunCCS811.h>
+#include <SparkFunCCS811.h>     
 #include "sensor_base.h"
 #include "connections/mqtt_conn.h"
 #include "model/co2_data.h"
+#include "db/settings_db.h"
 
-#define CCS811_ADDR 0x5B //Default I2C Address
-//#define CCS811_ADDR 0x5A //Alternate I2C Address
+#define CCS811_ADDR 0x5A // Default I2C Address. Alternate 0x5B
 
 class CO2Sensor : public SensorBase {
 public:
@@ -152,4 +152,85 @@ private:
     bool _enabled;
     String _co2_topic = "common/aqm/co2";
     String _tvoc_topic = "common/aqm/tvoc";
+};
+
+struct ColorThreshold {
+    uint16_t threshold;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
+class CO2Scale {
+public:
+    // singleton
+    static CO2Scale& getInstance() {
+        static CO2Scale instance;
+        return instance;
+    }
+
+    void init(GyverDBFile* db) {
+        _db = db;
+        _initScales();
+    }
+
+    void getColor(uint16_t value, uint8_t& r, uint8_t& g, uint8_t& b) {       
+        const ColorThreshold* scale;
+        size_t scale_size;
+        
+        if ((*_db)[kk::co2_scale_type].toString() == "DEFAULT") {
+            scale = _default_scale;
+            scale_size = 5;
+        } else {
+            scale = _easy_scale;
+            scale_size = 3;
+        }
+        
+        for (size_t i = 0; i < scale_size; i++) {
+            if (value <= scale[i].threshold) {
+                r = scale[i].r;
+                g = scale[i].g;
+                b = scale[i].b;
+                return;
+            }
+        }
+        
+        r = scale[scale_size - 1].r;
+        g = scale[scale_size - 1].g;
+        b = scale[scale_size - 1].b;
+    }
+
+    float getMin() {
+        return _min;
+    }
+
+    float getMax() {
+        return _max;
+    }
+
+private:
+    CO2Scale() = default;
+    ~CO2Scale() = default;
+    CO2Scale(const CO2Scale&) = delete;
+    CO2Scale& operator=(const CO2Scale&) = delete;
+
+    void _initScales() {
+        // Initialize the DEFAULT scale (5 colors)
+        _default_scale[0] = {600,  0,   255, 0};     // Excellent - Green
+        _default_scale[1] = {800,  0,   255, 128};   // Good - Light Green
+        _default_scale[2] = {1000, 255, 255, 0};     // Fair - Yellow
+        _default_scale[3] = {1500, 255, 128, 0};     // Poor - Orange
+        _default_scale[4] = {8000, 255, 0,   0};     // Unhealthy - Red
+
+        // Initialize the EASY scale (3 colors)
+        _easy_scale[0] = {600,  0,   255, 0};     // Excellent - Green
+        _easy_scale[1] = {1500, 255, 255, 0};     // Poor - Yellow
+        _easy_scale[2] = {8000, 255, 0,   0};     // Unhealthy - Red
+    }
+
+    GyverDBFile* _db;
+    ColorThreshold _default_scale[5];
+    ColorThreshold _easy_scale[3];
+    float _min = 400.0f;
+    float _max = 8000.0f;
 };

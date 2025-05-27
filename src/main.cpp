@@ -13,7 +13,8 @@
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
+  delay(SEC_1);
+
   Serial.println("setup...");
 
   SettingsDB* sdb = new SettingsDB();
@@ -32,9 +33,9 @@ void setup() {
   mqtt->setup(*sdb, *wifi);
   mqtt->addLoop();
 
-  CO2Sensor* co2 = new CO2Sensor(1000);
+  CO2Sensor* co2 = new CO2Sensor(SEC_1);
   co2->enableTest();
-  CO2Publisher* co2p = new CO2Publisher(5000, *co2, *mqtt);
+  CO2Publisher* co2p = new CO2Publisher(SEC_5, *co2, *mqtt);
   co2p->addLoop();
 
   SensorContainer* sensors = new SensorContainer();
@@ -44,11 +45,11 @@ void setup() {
   sett->setup(*sdb, *wifi, *mqtt, *sensors);
   sett->addLoop();
 
-  Display* display = new Display(50, *co2);
+  Display* display = new Display(MS_100, *co2);
   display->setup();
   display->addLoop();
 
-  RGBLine* rgb = new RGBLine(5000);
+  RGBController* rgb = new RGBController(SEC_5, *sdb);
   rgb->setup();
   rgb->setUpdaterCb([co2]() -> uint16_t {
     return co2->getCO2();

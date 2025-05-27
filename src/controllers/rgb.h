@@ -2,14 +2,17 @@
 #include <Adafruit_NeoPixel.h>
 #include "controller_base.h"
 #include "configs/config.h"
+#include "sensors/co2.h"
 
-class RGBLine : public ControllerBase {
+class RGBController : public ControllerBase {
 public:
     using UpdaterCallback = std::function<uint16_t()>;
 
-    RGBLine(uint32_t ms) 
+    RGBController(uint32_t ms, SettingsDB& settingsDb) 
         : ControllerBase(ms), _pin(RGB_PIN), _num_leds(RGB_NUMPIXELS), _leds(nullptr) {
         _is_initialized = false;
+        _db = &settingsDb.getDB();
+        _co2_scale = &CO2Scale::getInstance();
     }
     
     void setup() override {
@@ -21,6 +24,8 @@ public:
         _leds->begin();
         _leds->clear();
 
+        _co2_scale->init(_db);
+
         _is_initialized = true;
     }
 
@@ -31,31 +36,20 @@ public:
     void exec() override {
         if (!_is_initialized) {
             setup();
+            return;
         }
 
         if (_u_cb) {
             uint16_t co2_value = _u_cb();
-            renderLevel(co2_value, 400.0f, 8000.0f);
+            renderLevel(co2_value, _co2_scale->getMin(), _co2_scale->getMax());
         }
     }
 
     void renderLevel(float value, float min, float max) {
         if (_num_leds <= 0 || !_is_initialized || _leds == nullptr) return;
         
-        float normalized = (value - min) / (max - min);
-        normalized = constrain(normalized, 0.0f, 1.0f);
-        
         uint8_t r, g, b;
-        
-        if (normalized < 0.5f) {
-            r = 255 * (normalized * 2);
-            g = 255;
-            b = 0;
-        } else {
-            r = 255;
-            g = 255 * (2 - normalized * 2);
-            b = 0;
-        }
+        _co2_scale->getColor(value, r, g, b);
         
         for (int i = 0; i < _num_leds; i++) {
             _leds->setPixelColor(i, r, g, b);
@@ -72,7 +66,7 @@ public:
     }
 
     void copyState(const ControllerBase& other) override {
-        const RGBLine& rgb_other = static_cast<const RGBLine&>(other);
+        const RGBController& rgb_other = static_cast<const RGBController&>(other);
         _pin = rgb_other._pin;
         _num_leds = rgb_other._num_leds;
         _is_initialized = rgb_other._is_initialized;
@@ -82,7 +76,7 @@ public:
         return "rgb";
     }
 
-    ~RGBLine() {
+    ~RGBController() {
         if (_leds != nullptr) {
             delete _leds;
             _leds = nullptr;
@@ -93,5 +87,7 @@ private:
     uint8_t _pin;
     uint8_t _num_leds;
     Adafruit_NeoPixel* _leds;
+    GyverDBFile* _db;
     UpdaterCallback _u_cb;
+    CO2Scale* _co2_scale;
 };

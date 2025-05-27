@@ -14,7 +14,25 @@ enum kk : size_t {
     mqtt_pass,
     co2_measure_prd,
     co2_pub_prd,
+    co2_scale_type,
 };
+
+/** CO2 scales for RGB and gauge
+ * DEFAULT
+ * 5 - Unhealty >1500
+ * 4 - Poor 1000 - 1500
+ * 3 - Fair 800 - 1000
+ * 2 - Good 600-800
+ * 1 - Excelent <600
+ * 
+ * EASY
+ * 3 - Unhealty >1500
+ * 2 - Poor 600-1500
+ * 1 - Excelent <600
+ * 
+ * CUSTOM not supported yet
+ */
+String co2_scale_types = "DEFAULT;EASY";
 
 class SettingsDB : public LoopTickerBase {
 public:
@@ -52,6 +70,7 @@ public:
         // ============================== CO2 ==============================
         _db.init(kk::co2_measure_prd, 60);
         _db.init(kk::co2_pub_prd, 60);
+        _db.init(kk::co2_scale_type, "DEFAULT");
 
         _db.dump(Serial);
 
