@@ -1,0 +1,77 @@
+#include "rgb.h"
+
+RGBController::RGBController(uint32_t ms, SettingsDB& settingsDb)
+    : ControllerBase(ms),
+      _pin(RGB_PIN),
+      _num_leds(RGB_NUMPIXELS),
+      _leds(nullptr),
+      _db(&settingsDb.getDB()),
+      _co2_scale(&CO2Scale::getInstance()),
+      _is_initialized(false) {}
+
+RGBController::~RGBController() {
+    if (_leds != nullptr) {
+        delete _leds;
+        _leds = nullptr;
+    }
+}
+
+void RGBController::setup() {
+    if (_leds != nullptr) {
+        delete _leds;
+    }
+
+    _leds = new Adafruit_NeoPixel(_num_leds, _pin, NEO_GRB + NEO_KHZ800);
+    _leds->begin();
+    _leds->clear();
+
+    _co2_scale->init(_db);
+    _is_initialized = true;
+}
+
+void RGBController::setUpdaterCb(UpdaterCallback cb) {
+    _u_cb = cb;
+}
+
+void RGBController::exec() {
+    if (!_is_initialized) {
+        setup();
+        return;
+    }
+
+    if (_u_cb) {
+        uint16_t co2_value = _u_cb();
+        renderLevel(co2_value, _co2_scale->getMin(), _co2_scale->getMax());
+    }
+}
+
+void RGBController::renderLevel(float value, float min, float max) {
+    if (_num_leds <= 0 || !_is_initialized || _leds == nullptr) return;
+
+    uint8_t r, g, b;
+    _co2_scale->getColor(value, r, g, b);
+
+    for (int i = 0; i < _num_leds; i++) {
+        _leds->setPixelColor(i, r, g, b);
+    }
+
+    _leds->show();
+}
+
+void RGBController::clear() {
+    if (_leds != nullptr) {
+        _leds->clear();
+        _leds->show();
+    }
+}
+
+void RGBController::copyState(const ControllerBase& other) {
+    const RGBController& rgb_other = static_cast<const RGBController&>(other);
+    _pin = rgb_other._pin;
+    _num_leds = rgb_other._num_leds;
+    _is_initialized = rgb_other._is_initialized;
+}
+
+const char* RGBController::getType() const {
+    return "rgb";
+}
