@@ -123,6 +123,30 @@ void CO2Scale::init(GyverDBFile* db) {
     _initScales();
 }
 
+void CO2Scale::getScale(uint16_t& rs, uint16_t& re, uint16_t& os, uint16_t& oe, uint16_t& ys, uint16_t& ye, uint16_t& gs, uint16_t& ge) {
+    if ((*_db)[kk::co2_scale_type].toString() == "DEFAULT") {
+        rs = 75;
+        re = 100;
+        os = 50;
+        oe = 75;
+        ys = 25;
+        ye = 50;
+        gs = 0;
+        ge = 25;
+    } else {
+        rs = 66;
+        re = 100;
+        os = -1;
+        oe = -1;
+        ys = 33;
+        ye = 66;
+        gs = 0;
+        ge = 33;
+    }
+
+    return;
+}
+
 void CO2Scale::getColor(uint16_t value, uint8_t& r, uint8_t& g, uint8_t& b) {
     const ColorThreshold* scale;
     size_t size;

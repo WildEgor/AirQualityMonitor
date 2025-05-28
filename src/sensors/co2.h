@@ -65,6 +65,7 @@ public:
 
     void init(GyverDBFile* db);
     void getColor(uint16_t value, uint8_t& r, uint8_t& g, uint8_t& b);
+    void getScale(uint16_t& rs, uint16_t& re, uint16_t& os, uint16_t& oe, uint16_t& ys, uint16_t& ye, uint16_t& gs, uint16_t& ge);
 
     float getMin();
     float getMax();

@@ -45,7 +45,7 @@ void setup() {
   sett->setup(*sdb, *wifi, *mqtt, *sensors);
   sett->addLoop();
 
-  Display* display = new Display(MS_100, *co2);
+  Display* display = new Display(MS_100, *sdb, *co2);
   display->setup();
   display->addLoop();
 
