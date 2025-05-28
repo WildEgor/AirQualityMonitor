@@ -17,73 +17,15 @@ enum kk : size_t {
     co2_scale_type,
 };
 
-/** CO2 scales for RGB and gauge
- * DEFAULT
- * 5 - Unhealty >1500
- * 4 - Poor 1000 - 1500
- * 3 - Fair 800 - 1000
- * 2 - Good 600-800
- * 1 - Excelent <600
- * 
- * EASY
- * 3 - Unhealty >1500
- * 2 - Poor 600-1500
- * 1 - Excelent <600
- * 
- * CUSTOM not supported yet
- */
-String co2_scale_types = "DEFAULT;EASY";
+extern String co2_scale_types;
 
 class SettingsDB : public LoopTickerBase {
 public:
-    SettingsDB() : LoopTickerBase(), _db(&LittleFS, "/settings.db") {}
+    SettingsDB();
 
-    void setup() {
-        Serial.println("init db...");
-        bool fsInitialized = true;
-
-        #ifdef ESP32
-            fsInitialized = LittleFS.begin(true);
-        #else
-            fsInitialized = LittleFS.begin();
-        #endif
-
-        if (!fsInitialized) {
-            Serial.println("init littlefs failed");
-            return;
-        }
-
-        _db.begin();
-        // _db.reset();
-
-        // ============================== WIFI ==============================
-        _db.init(kk::wifi_ssid, WIFI_SSID);
-        _db.init(kk::wifi_pass, WIFI_PASS);
-
-        // ============================== MQTT ==============================
-        _db.init(kk::mqtt_enabled, true);
-        _db.init(kk::mqtt_server, MQTT_SERVER);
-        _db.init(kk::mqtt_port, MQTT_PORT);
-        _db.init(kk::mqtt_username, MQTT_USERNAME);
-        _db.init(kk::mqtt_pass, MQTT_PASS);
-
-        // ============================== CO2 ==============================
-        _db.init(kk::co2_measure_prd, 60);
-        _db.init(kk::co2_pub_prd, 60);
-        _db.init(kk::co2_scale_type, "DEFAULT");
-
-        _db.dump(Serial);
-
-        Serial.println("db ok!");
-    }
-
-    void exec() override {
-        _db.tick();
-    }
-
-    GyverDBFile& getDB() {
-        return _db;
-    }
+    void setup();
+    void exec() override;
+    GyverDBFile& getDB();
 
 private:
     GyverDBFile _db;
