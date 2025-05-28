@@ -5,37 +5,15 @@
 
 class NTPConn : public LoopTickerBase {
 public:
-    NTPConn() : LoopTickerBase() {}
+    NTPConn();
 
-    void setup() {
-        NTP.begin(3); // TODO: use settings_db to get timezone
+    void setup();
+    void exec() override;
 
-        NTP.onError([]() {
-            Serial.println(NTP.readError());
-            Serial.print("online: ");
-            Serial.println(NTP.online());
-        });
-
-        NTP.onSecond([]() {});
-
-        _is_initialized = true;
-    }
-
-    void exec() override {
-        if (NTP.tick()) {
-            _ms = NTP.ms();
-        }
-    }
-
-    bool getIsInitialized() {
-        return _is_initialized;
-    }
-    uint16_t getMs() {
-        return _ms;
-    }
+    bool getIsInitialized();
+    uint16_t getMs();
 
 private:
     uint16_t _ms;
     bool _is_initialized;
 };
-
