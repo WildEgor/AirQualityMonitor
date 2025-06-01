@@ -1,14 +1,17 @@
 # AirQualityMonitor
-Smart air quality monitor based on ESP32 and CCS811.
+
+A smart air quality monitor based on ESP32 and CCS811 sensor
 
 ## Features
-1) Measure eCO2 level and TVOC;
-2) Publish measured values to MQTT topics;
-3) Show CO2 level at display and RGB led.
+
+1. Measures eCO₂ and TVOC levels  
+2. Publishes the data to MQTT topics  
+3. Displays CO₂ levels on a screen and via an RGB LED
 
 ## Links
-- [Source code](/src/)
-- [Schema](/resources/)
-![](/resources/air_quality_monitor_scheme.png)
-- [3D model](/3dprint/)
-![air_quality_case](/resources/air_quality_case.png)
+
+- [Source Code](/src/)
+- [Wiring Diagram](/resources/)  
+  ![](/resources/air_quality_monitor_scheme.png)
+- [3D Printed Case](/3dprint/)  
+  ![Air Quality Case](/resources/air_quality_case.png)
