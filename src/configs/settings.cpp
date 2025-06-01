@@ -60,6 +60,7 @@ void Settings::build(sets::Builder& b) {
             sets::Group g(b, "Датчик");
             b.Time(kk::co2_measure_prd, "Период измерений");
             b.Time(kk::co2_pub_prd, "Период публикаций");
+            b.Number(kk::co2_danger_lvl, "Значение тревоги", nullptr, 0, 8000);
             b.Select(kk::co2_scale_type, "Тип шкалы CO2", co2_scale_types);
             b.Button(SH("co2_save"), "Сохранить");
         }

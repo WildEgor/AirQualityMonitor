@@ -77,6 +77,7 @@ void CO2Sensor::_check_test_data() {
 }
 
 void CO2Sensor::_pub_event() {
+    Serial.println("publish co2_data");
     Looper.sendEvent("co2_data", &_co2_data);
 }
 
@@ -175,6 +176,14 @@ void CO2Scale::getColor(uint16_t value, uint8_t& r, uint8_t& g, uint8_t& b) {
 
 float CO2Scale::getMin() { return _min; }
 float CO2Scale::getMax() { return _max; }
+bool CO2Scale::needAlarm(uint16_t value) { 
+    float co2_lvl = (*_db)[kk::co2_danger_lvl].toFloat();
+    if (co2_lvl <= 0) {
+        return false;
+    }
+
+    return value >= co2_lvl + 100; 
+}
 
 void CO2Scale::_initScales() {
     _default_scale[0] = {600,  0,   255, 0};

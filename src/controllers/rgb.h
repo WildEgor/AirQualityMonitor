@@ -29,4 +29,7 @@ private:
     UpdaterCallback _u_cb;
     CO2Scale* _co2_scale;
     bool _is_initialized;
+    bool _blink;
+    uint16_t _default_period;
+    uint16_t _curr_period;
 };

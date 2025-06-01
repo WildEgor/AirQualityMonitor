@@ -16,6 +16,7 @@ enum kk : size_t {
     co2_measure_prd,
     co2_pub_prd,
     co2_scale_type,
+    co2_danger_lvl,
 };
 
 extern String co2_scale_types;

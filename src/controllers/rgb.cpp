@@ -26,6 +26,7 @@ void RGBController::setup() {
     _leds->clear();
 
     _co2_scale->init(_db);
+    _default_period = this->getPeriod();
     _is_initialized = true;
 }
 
@@ -34,6 +35,8 @@ void RGBController::setUpdaterCb(UpdaterCallback cb) {
 }
 
 void RGBController::exec() {
+    _curr_period = this->getPeriod();
+
     if (!_is_initialized) {
         setup();
         return;
@@ -41,6 +44,24 @@ void RGBController::exec() {
 
     if (_u_cb) {
         uint16_t co2_value = _u_cb();
+
+        if (_co2_scale->needAlarm(co2_value)) {
+            if (_curr_period != SEC_1) {
+                this->updateInterval(SEC_1);
+            }
+
+            if (_blink) {
+                _blink = false;
+                clear();
+                return;
+            }
+        } else {
+            if (_curr_period != _default_period) {
+                this->updateInterval(_default_period);
+            }
+        }
+
+        _blink = true;
         renderLevel(co2_value, _co2_scale->getMin(), _co2_scale->getMax());
     }
 }

@@ -69,6 +69,7 @@ public:
 
     float getMin();
     float getMax();
+    bool needAlarm(uint16_t value);
 
 private:
     CO2Scale();

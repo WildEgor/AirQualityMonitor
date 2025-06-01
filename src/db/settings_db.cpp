@@ -38,6 +38,7 @@ void SettingsDB::setup() {
     _db.init(kk::co2_measure_prd, 60);
     _db.init(kk::co2_pub_prd, 60);
     _db.init(kk::co2_scale_type, "DEFAULT");
+    _db.init(kk::co2_danger_lvl, 1200);
 
     _db.dump(Serial);
 
