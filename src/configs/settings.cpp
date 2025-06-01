@@ -57,7 +57,7 @@ void Settings::build(sets::Builder& b) {
             b.Button(SH("mqtt_save"), "Подключить");
         }
         {
-            sets::Group g(b, "Датчик");
+            sets::Group g(b, "Датчик CO2");
             b.Time(kk::co2_measure_prd, "Период измерений");
             b.Time(kk::co2_pub_prd, "Период публикаций");
             b.Number(kk::co2_danger_lvl, "Значение тревоги", nullptr, 0, 8000);
