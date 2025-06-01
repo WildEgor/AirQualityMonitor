@@ -15,3 +15,6 @@ A smart air quality monitor based on ESP32 and CCS811 sensor
   ![](/resources/air_quality_monitor_scheme.png)
 - [3D Printed Case](/3dprint/)  
   ![Air Quality Case](/resources/air_quality_case.png)
+
+
+> Reduce the model by 10 times before printing!
