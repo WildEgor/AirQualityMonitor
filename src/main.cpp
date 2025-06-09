@@ -33,28 +33,30 @@ void setup() {
   mqtt->setup(*sdb, *wifi);
   mqtt->addLoop();
 
-  CO2Sensor* co2 = new CO2Sensor(SEC_1);
-  co2->enableTest();
+  CO2Sensor* co2 = new CO2Sensor(SEC_5);
+  co2->setup();
+  co2->addLoop();
+
   CO2Publisher* co2p = new CO2Publisher(SEC_5, *co2, *mqtt);
   co2p->addLoop();
 
   SensorContainer* sensors = new SensorContainer();
   sensors->addSensor(co2->getType(), co2);
 
-  Settings* sett = new Settings();
-  sett->setup(*sdb, *wifi, *mqtt, *sensors);
-  sett->addLoop();
-
   Display* display = new Display(MS_100, *sdb, *co2);
   display->setup();
   display->addLoop();
 
-  RGBController* rgb = new RGBController(SEC_5, *sdb);
+  RGBController* rgb = new RGBController(SEC_1, *sdb);
   rgb->setup();
   rgb->setUpdaterCb([co2]() -> uint16_t {
     return co2->getCO2();
   });
   rgb->addLoop();
+
+  Settings* sett = new Settings();
+  sett->setup(*sdb, *wifi, *mqtt, *sensors, *rgb);
+  sett->addLoop();
 }
 
 void loop() {

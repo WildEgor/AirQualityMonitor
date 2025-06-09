@@ -4,6 +4,7 @@ WiFiConn::WiFiConn() : LoopTickerBase(), _wifi_ok(false), _db(nullptr) {}
 
 void WiFiConn::setup(SettingsDB& settingsDb) {
     _db = &settingsDb.getDB();
+    
     _initWiFi();
 }
 

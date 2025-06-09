@@ -23,10 +23,13 @@ void RGBController::setup() {
 
     _leds = new Adafruit_NeoPixel(_num_leds, _pin, NEO_GRB + NEO_KHZ800);
     _leds->begin();
-    _leds->clear();
+    _leds->setBrightness(150);
+    clear();
 
     _co2_scale->init(_db);
     _default_period = this->getPeriod();
+    _enabled = (*_db)[kk::rgb_enabled].toBool();
+
     _is_initialized = true;
 }
 
@@ -66,8 +69,14 @@ void RGBController::exec() {
     }
 }
 
+void RGBController::toggle(bool value) {
+    _enabled = value;
+
+    clear();
+}
+
 void RGBController::renderLevel(float value, float min, float max) {
-    if (_num_leds <= 0 || !_is_initialized || _leds == nullptr) return;
+    if (!_enabled || _num_leds <= 0 || !_is_initialized || _leds == nullptr) return;
 
     uint8_t r, g, b;
     _co2_scale->getColor(value, r, g, b);
@@ -91,6 +100,7 @@ void RGBController::copyState(const ControllerBase& other) {
     _pin = rgb_other._pin;
     _num_leds = rgb_other._num_leds;
     _is_initialized = rgb_other._is_initialized;
+    _enabled = rgb_other._enabled;
 }
 
 const char* RGBController::getType() const {

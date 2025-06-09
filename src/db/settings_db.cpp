@@ -21,7 +21,9 @@ void SettingsDB::setup() {
     }
 
     _db.begin();
-    // _db.reset();
+#ifdef RESET_DB
+    _db.reset();
+#endif
 
     // ============================== WIFI ==============================
     _db.init(kk::wifi_ssid, WIFI_SSID);
@@ -39,6 +41,9 @@ void SettingsDB::setup() {
     _db.init(kk::co2_pub_prd, 60);
     _db.init(kk::co2_scale_type, "DEFAULT");
     _db.init(kk::co2_danger_lvl, 1200);
+
+    // ============================== RGB ==============================
+    _db.init(kk::rgb_enabled, false);
 
     _db.dump(Serial);
 

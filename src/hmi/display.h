@@ -11,27 +11,41 @@ public:
 
     void setup() {
         _co2_scale->init(_db);
+
+        Serial.println("init tft");
+
         _tft.init();
-        _tft.setRotation(1);
-        _tft.fillScreen(TFT_BLACK);
+        _tft.setRotation(0);
+        _tft.fillScreen(TFT_WHITE);
         _tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        _tft.setTextSize(2);
+        _tft.setTextSize(1);
         _tft.setCursor(0, 0);
 
+        Serial.println("init tft ok");
+        
+        Serial.println("init widgets");
+
+        _co2_meter = MeterWidget(&_tft);
         uint16_t rs,re,os,oe,ys,ye,gs,ge;
         _co2_scale->getScale(rs,re,os,oe,ys,ye,gs,ge);
-        
-        _co2_meter = MeterWidget(&_tft);
         _co2_meter.setZones(rs,re,os,oe,ys,ye,gs,ge);
-        _co2_meter.analogMeter(0, 0, 2.0, "pm", "0", "0.5", "1.0", "1.5", "2.0");    // Draw analogue meter at 0, 0
+
+        // TODO: refactor
+        _co2_meter.analogMeter(0, 0, 1500.0, "pm", "400.0", "800.0", "1000.0", "1200.0", "1500.0"); 
+
+        Serial.println("init widgets ok");
     }
 
     void exec() {
-        if (!_co2_sensor.getIsInitialized()) {}
-        float value = 0.00;
+        if (!_co2_sensor.getIsInitialized()) {
+            return;
+        }
+
+        float value = 0.0;
         value = static_cast<float>(_co2_sensor.getCO2());
-        _co2_meter.updateNeedle(value, 0);
-        Serial.println(value);
+        
+        // _co2_meter.updateNeedle(0.0, 0);
+        _co2_meter.updateNeedle(value, 100);
     }
 
 private:

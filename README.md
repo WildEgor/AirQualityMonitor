@@ -8,6 +8,8 @@ A smart air quality monitor based on ESP32 and CCS811 sensor
 2. Publishes the data to MQTT topics  
 3. Displays CO₂ levels on a screen and via an RGB LED
 
+## How to
+
 ## Links
 
 - [Source Code](/src/)
@@ -16,6 +18,5 @@ A smart air quality monitor based on ESP32 and CCS811 sensor
 - [3D Printed Case](/3dprint/)  
   ![Air Quality Case](/resources/air_quality_case.png)
   ![GIF](/resources/air_quality_case.gif)
-
 
 > Reduce the model by 10 times before printing!

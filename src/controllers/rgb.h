@@ -14,6 +14,7 @@ public:
     void setup() override;
     void exec() override;
 
+    void toggle(bool value);
     void setUpdaterCb(UpdaterCallback cb);
     void renderLevel(float value, float min, float max);
     void clear();
@@ -30,6 +31,7 @@ private:
     CO2Scale* _co2_scale;
     bool _is_initialized;
     bool _blink;
+    bool _enabled;
     uint16_t _default_period;
     uint16_t _curr_period;
 };
