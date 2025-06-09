@@ -19,15 +19,13 @@ void NTPConn::setup() {
 }
 
 void NTPConn::exec() {
-    if (NTP.tick()) {
-        _ms = NTP.ms();
+    if (!_is_initialized) {
+        setup();
+        return;
     }
+    if (NTP.tick()) {}
 }
 
-bool NTPConn::getIsInitialized() {
+bool NTPConn::isInitialized() {
     return _is_initialized;
-}
-
-uint16_t NTPConn::getMs() {
-    return _ms;
 }

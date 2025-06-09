@@ -5,12 +5,9 @@ static const char TAG[] = "MQTTConn";
 WiFiClient _espClient;
 PubSubClient _pub_client(_espClient);
 
-MQTTConn::MQTTConn() : LoopTickerBase(), _mqtt_ok(false), _db(nullptr), _needs_init(true) {}
+MQTTConn::MQTTConn(SettingsDB& settingsDb, WiFiConn& wifiConn) : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi(&wifiConn), _mqtt_ok(false), _is_initialized(false) {}
 
-void MQTTConn::setup(SettingsDB& settingsDb, WiFiConn& wifiConn) {
-    _db = &settingsDb.getDB();
-    _wifi = &wifiConn;
-
+void MQTTConn::setup() {
     if (!isEnabled()) return;
 
     Serial.println("init MQTT...");
@@ -22,6 +19,8 @@ void MQTTConn::setup(SettingsDB& settingsDb, WiFiConn& wifiConn) {
         (*_db)[kk::mqtt_pass]);
 
     Serial.println("init MQTT ok!");
+
+    _is_initialized = true;
 }
 
 void MQTTConn::exec() {
@@ -42,7 +41,9 @@ void MQTTConn::exec() {
 
 void MQTTConn::connect() {
     if (!isEnabled()) return;
+
     if (!_wifi->isConnected()) return;
+
     if (!isConnected()) {
         Serial.println("connect to MQTT...");
         _connectToMQTT(
@@ -71,6 +72,10 @@ bool MQTTConn::isEnabled() const {
 
 bool MQTTConn::isConnected() const {
     return _mqtt_ok;
+}
+
+bool MQTTConn::isInitialized() const {
+    return _is_initialized;
 }
 
 void MQTTConn::_connectToMQTT(const String& mqtt_server, uint16_t mqtt_port, const String& mqtt_user, const String& mqtt_password) {

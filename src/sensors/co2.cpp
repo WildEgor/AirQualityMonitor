@@ -38,7 +38,7 @@ const char* CO2Sensor::getType() const {
     return "co2";
 }
 
-bool CO2Sensor::getIsInitialized() const {
+bool CO2Sensor::isInitialized() const {
     return _is_initialized;
 }
 
@@ -96,7 +96,7 @@ CO2Publisher::CO2Publisher(uint32_t ms, CO2Sensor& sensor, MQTTConn& mqtt)
       _co2_topic("common/aqm/co2"), _tvoc_topic("common/aqm/tvoc") {}
 
 void CO2Publisher::exec() {
-    if (!_sensor.getIsInitialized() || !_mqtt.isConnected()) return;
+    if (!_sensor.isInitialized() || !_mqtt.isConnected()) return;
 
     _mqtt.publish(_co2_topic, String(_sensor.getCO2()));
     _mqtt.publish(_tvoc_topic, String(_sensor.getTVOC()));

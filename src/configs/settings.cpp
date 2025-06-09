@@ -2,40 +2,40 @@
 
 static const char TAG[] = "Settings";
 
-Settings::Settings() 
-    : LoopTickerBase(), _wifi_conn(nullptr), _mqtt_conn(nullptr), _sensors(nullptr), _rgb_controller(nullptr), _needs_init(true) {}
-
-void Settings::setup(
+Settings::Settings(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn, 
     MQTTConn& mqttConn, 
     SensorContainer& sensors,
     RGBController& rgbController
-) {
+) 
+    : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi_conn(&wifiConn), _mqtt_conn(&mqttConn), _sensors(&sensors), _rgb_controller(&rgbController), _is_initialized(false) {}
+
+void Settings::setup() {
     Serial.println("init settings...");
-    _db = &settingsDb.getDB();
-    _wifi_conn = &wifiConn;
-    _mqtt_conn = &mqttConn;
-    _sensors = &sensors;
-    _rgb_controller = &rgbController;
+
+    _sett = SettingsGyver("AirQualityMonitor v" F_VERSION, _db);
+    _sett.begin();
+
+    _sett.onUpdate([this](sets::Updater& u) {
+        this->update(u);
+    });
+
+    _sett.onBuild([this](sets::Builder& b) {
+        this->build(b);
+    });
+
+    Serial.println("settings ok!");
+
+    _is_initialized = true;
 }
 
 void Settings::exec() {
-    if (_needs_init) {
-        _sett = SettingsGyver("AirQualityMonitor v" F_VERSION, _db);
-        _sett.begin();
-
-        _sett.onUpdate([this](sets::Updater& u) {
-            this->update(u);
-        });
-
-        _sett.onBuild([this](sets::Builder& b) {
-            this->build(b);
-        });
-        
-        _needs_init = false;
-        Serial.println("settings ok!");
+    if (!_is_initialized) {
+        setup();
+        return;
     }
+
     _sett.tick();
 }
 
@@ -80,24 +80,29 @@ void Settings::build(sets::Builder& b) {
         switch (b.build.id) {
             case SH("wifi_save"):
                 Serial.println("wifi_save pressed");
+
                 if (_db && _db->update()) {
                     _wifi_conn->connect();
-                } else {
-                    Serial.println("db update failed for wifi settings!");
+                    return;
                 }
+
+                Serial.println("db update failed for wifi settings!");
                 break;
                 
             case SH("mqtt_save"):
                 Serial.println("mqtt_save pressed");
+                
                 if (_db && _db->update()) {
                     _mqtt_conn->connect();
-                } else {
-                    Serial.println("db update failed for MQTT settings!");
+                    return;
                 }
+
+                Serial.println("db update failed for MQTT settings!");
                 break;
             
             case SH("co2_save"):
                 Serial.println("co2_save pressed");
+
                 if (_db && _db->update()) {
                     uint32_t new_interval = (*_db)[kk::co2_measure_prd].toInt();
                     if (new_interval > 0 && new_interval < 10000) {
@@ -105,19 +110,20 @@ void Settings::build(sets::Builder& b) {
                     } else {
                         Serial.println("invalid CO2 measurement interval!");
                     }
-                } else {
-                    Serial.println("db update failed for CO2 settings!");
+                    return;
                 }
+
+                Serial.println("db update failed for CO2 settings!");
                 break;
                 
             case SH("rgb_save"):
                 Serial.println("rgb_save pressed");
                 if (_db && _db->update()) {
-                    bool enabled = (*_db)[kk::rgb_enabled].toBool();
-                    _rgb_controller->toggle(enabled);
-                } else {
-                    Serial.println("db update failed for RGB settings!");
+                    _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
+                    return;
                 }
+
+                Serial.println("db update failed for RGB settings!");
                 break;
         }
     }

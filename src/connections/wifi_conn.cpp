@@ -1,17 +1,42 @@
 #include "wifi_conn.h"
 
-WiFiConn::WiFiConn() : LoopTickerBase(), _wifi_ok(false), _db(nullptr) {}
+WiFiConn::WiFiConn(SettingsDB& settingsDb) : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi_ok(false), _is_initialized(false) {}
 
-void WiFiConn::setup(SettingsDB& settingsDb) {
-    _db = &settingsDb.getDB();
-    
-    _initWiFi();
+void WiFiConn::setup() {
+    Serial.println("init wifi...");
+
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
+    delay(100);
+
+    // TODO: need find fix wifi cause no AP available and if connect it crash
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP(AP_NAME, AP_PASS);
+
+    Serial.print("AP IP address: ");
+    Serial.println(WiFi.softAPIP());
+
+    if ((*_db)[kk::wifi_ssid].length()) {
+        Serial.println("connect wifi...");
+        _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
+
+        Serial.println("init wifi ok!");
+        _is_initialized = true;
+    } else {
+        Serial.println("wifi ssid too empty!");
+    }
 }
 
 void WiFiConn::exec() {
+    if (!_is_initialized) {
+        setup();
+        return;
+    }
+
     if (WiFi.status() == WL_CONNECTED) {
         return;
     }
+
     connect();
 }
 
@@ -24,27 +49,6 @@ void WiFiConn::connect() {
 
 bool WiFiConn::isConnected() {
     return _wifi_ok;
-}
-
-void WiFiConn::_initWiFi() {
-    Serial.println("init wifi...");
-
-    WiFi.disconnect(true);
-    WiFi.mode(WIFI_OFF);
-    delay(100);
-
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP(AP_NAME, AP_PASS);
-
-    Serial.print("AP IP address: ");
-    Serial.println(WiFi.softAPIP());
-
-    if ((*_db)[kk::wifi_ssid].length()) {
-        Serial.println("connect wifi...");
-        _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
-    }
-
-    Serial.println("init wifi ok!");
 }
 
 void WiFiConn::_connectToWiFi(const String& ssid, const String& pass) {

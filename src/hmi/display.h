@@ -37,14 +37,13 @@ public:
     }
 
     void exec() {
-        if (!_co2_sensor.getIsInitialized()) {
+        if (!_co2_sensor.isInitialized()) {
             return;
         }
 
         float value = 0.0;
         value = static_cast<float>(_co2_sensor.getCO2());
-        
-        // _co2_meter.updateNeedle(0.0, 0);
+    
         _co2_meter.updateNeedle(value, 100);
     }
 

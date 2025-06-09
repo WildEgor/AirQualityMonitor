@@ -6,18 +6,17 @@
 
 class WiFiConn : public LoopTickerBase {
 public:
-    WiFiConn();
+    WiFiConn(SettingsDB& settingsDb);
 
-    void setup(SettingsDB& settingsDb);
+    void setup();
     void exec() override;
-
     void connect();
     bool isConnected();
 
 private:
-    void _initWiFi();
     void _connectToWiFi(const String& ssid, const String& pass);
 
-    bool _wifi_ok;
     GyverDBFile* _db;
+    bool _wifi_ok;
+    bool _is_initialized;
 };

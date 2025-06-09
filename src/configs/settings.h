@@ -10,12 +10,9 @@
 
 class Settings : public LoopTickerBase {
 public:
-    Settings();
+    Settings(SettingsDB& settingsDb, WiFiConn& wifiConn, MQTTConn& mqttConn, SensorContainer& sensors, RGBController& rgbCtrl);
 
-    // Setup the settings object with necessary wrappers
-    void setup(SettingsDB& settingsDb, WiFiConn& wifiConn, MQTTConn& mqttConn, SensorContainer& sensors, RGBController& rgbCtrl);
-
-    // Override the exec function from LoopTickerBase
+    void setup();
     void exec() override;
 
 private:
@@ -28,5 +25,5 @@ private:
     MQTTConn* _mqtt_conn;
     SensorContainer* _sensors;
     RGBController* _rgb_controller;
-    bool _needs_init;
+    bool _is_initialized;
 };

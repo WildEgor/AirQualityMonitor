@@ -1,8 +1,8 @@
 #pragma once
 
 #define F_VERSION "1.0"
-#define AP_NAME "AQM AP" // Prefix for wi-fi point with settings
-#define AP_PASS "admin"
+#define AP_NAME "AQM_AP" // Prefix for wi-fi point with settings
+#define AP_PASS "adminadmin"
 #define RESET_DB true
 
 #define MQTT_SERVER "m8.wqtt.ru"

@@ -15,12 +15,10 @@ public:
 
     void setup() override;
     void exec() override;
-
     uint16_t getCO2();
     uint16_t getTVOC();
     const char* getType() const override;
-    bool getIsInitialized() const override;
-
+    bool isInitialized() const override;
     void enableTest();
     void copyState(const SensorBase& other) override;
 

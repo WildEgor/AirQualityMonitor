@@ -9,10 +9,8 @@ public:
 
     void setup();
     void exec() override;
-
-    bool getIsInitialized();
-    uint16_t getMs();
-
+    bool isInitialized();
+    
 private:
     uint16_t _ms;
     bool _is_initialized;

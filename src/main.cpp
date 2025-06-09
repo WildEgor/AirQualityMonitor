@@ -1,10 +1,10 @@
 #include "Arduino.h"
 #include <Looper.h>
+
 #include "db/settings_db.h"
 #include "configs/settings.h"
 #include "connections/wifi_conn.h"
 #include "connections/mqtt_conn.h"
-#include "connections/ntp_conn.h"
 #include "sensors/co2.h"
 #include "sensors/sensor_base.h"
 #include "hmi/display.h"
@@ -21,16 +21,12 @@ void setup() {
   sdb->setup();
   sdb->addLoop();
 
-  WiFiConn* wifi = new WiFiConn();
-  wifi->setup(*sdb);
+  WiFiConn* wifi = new WiFiConn(*sdb);
+  wifi->setup();
   wifi->addLoop();
 
-  NTPConn* ntp = new NTPConn();
-  ntp->setup();
-  ntp->addLoop();
-
-  MQTTConn* mqtt = new MQTTConn();
-  mqtt->setup(*sdb, *wifi);
+  MQTTConn* mqtt = new MQTTConn(*sdb, *wifi);
+  mqtt->setup();
   mqtt->addLoop();
 
   CO2Sensor* co2 = new CO2Sensor(SEC_5);
@@ -43,6 +39,7 @@ void setup() {
   SensorContainer* sensors = new SensorContainer();
   sensors->addSensor(co2->getType(), co2);
 
+  // TODO: add show ip to connect
   Display* display = new Display(MS_100, *sdb, *co2);
   display->setup();
   display->addLoop();
@@ -54,8 +51,8 @@ void setup() {
   });
   rgb->addLoop();
 
-  Settings* sett = new Settings();
-  sett->setup(*sdb, *wifi, *mqtt, *sensors, *rgb);
+  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *sensors, *rgb);
+  sett->setup();
   sett->addLoop();
 }
 
