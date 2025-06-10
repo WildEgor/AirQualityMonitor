@@ -7,6 +7,7 @@ Settings::Settings(
     WiFiConn& wifiConn, 
     MQTTConn& mqttConn, 
     SensorContainer& sensors,
+    CO2Publisher& co2Pub,
     RGBController& rgbController,
     Display& display
 ) 
@@ -15,6 +16,7 @@ Settings::Settings(
     _wifi_conn(&wifiConn), 
     _mqtt_conn(&mqttConn),
     _sensors(&sensors), 
+    _co2_pub(&co2Pub),
     _rgb_controller(&rgbController), 
     _display(&display),
     _is_initialized(false) {}
@@ -67,6 +69,8 @@ void Settings::build(sets::Builder& b) {
             b.Number(kk::mqtt_port);
             b.Input(kk::mqtt_username, "user");
             b.Pass(kk::mqtt_pass, "pass");
+            b.Input(kk::mqtt_co2_topic, "Топик co2");
+            b.Input(kk::mqtt_tvoc_topic, "Топик tvoc");
             b.Button(SH("mqtt_save"), "Подключить");
         }
         {
@@ -103,6 +107,13 @@ void Settings::build(sets::Builder& b) {
                 
                 if (_db && _db->update()) {
                     _mqtt_conn->connect();
+
+                    String new_co2_topic = (*_db)[kk::mqtt_co2_topic].toString();
+                    String new_tvoc_topic = (*_db)[kk::mqtt_tvoc_topic].toString();
+                    if (!new_co2_topic.isEmpty() && !new_tvoc_topic.isEmpty()) {
+                        _co2_pub->setTopics(new_co2_topic, new_tvoc_topic);
+                    }
+
                     return;
                 }
 

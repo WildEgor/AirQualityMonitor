@@ -15,6 +15,7 @@ public:
         WiFiConn& wifiConn, 
         MQTTConn& mqttConn, 
         SensorContainer& sensors, 
+        CO2Publisher& co2Pub,
         RGBController& rgbCtrl,
         Display& display
     );
@@ -31,6 +32,7 @@ private:
     WiFiConn* _wifi_conn;
     MQTTConn* _mqtt_conn;
     SensorContainer* _sensors;
+    CO2Publisher* _co2_pub;
     RGBController* _rgb_controller;
     Display* _display;
     bool _is_initialized;

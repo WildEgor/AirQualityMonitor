@@ -35,6 +35,8 @@ void SettingsDB::setup() {
     _db.init(kk::mqtt_port, MQTT_PORT);
     _db.init(kk::mqtt_username, MQTT_USERNAME);
     _db.init(kk::mqtt_pass, MQTT_PASS);
+    _db.init(kk::mqtt_co2_topic, MQTT_DEFAULT_CO2_TOPIC);
+    _db.init(kk::mqtt_tvoc_topic, MQTT_DEFAULT_TVOC_TOPIC);
 
     // ============================== CO2 ==============================
     _db.init(kk::co2_measure_prd, 60);

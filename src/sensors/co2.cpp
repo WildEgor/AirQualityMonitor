@@ -93,7 +93,7 @@ void CO2Sensor::_print_data() {
 
 CO2Publisher::CO2Publisher(uint32_t ms, CO2Sensor& sensor, MQTTConn& mqtt)
     : LoopTimerBase(ms), _sensor(sensor), _mqtt(mqtt), _enabled(true),
-      _co2_topic("common/aqm/co2"), _tvoc_topic("common/aqm/tvoc") {}
+      _co2_topic(MQTT_DEFAULT_CO2_TOPIC), _tvoc_topic(MQTT_DEFAULT_TVOC_TOPIC) {}
 
 void CO2Publisher::exec() {
     if (!_sensor.isInitialized() || !_mqtt.isConnected()) return;
