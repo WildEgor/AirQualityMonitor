@@ -63,10 +63,13 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
   strncpy(ms4, s4, 4);
 
   // Meter outline
-  // ntft->fillRect(x, y, 239, 126, TFT_GREY);
-  ntft->fillRect(x + 5, y + 3, 230, 119, TFT_BLACK);
-
-  ntft->setTextColor(TFT_WHITE);  // Text colour
+  if (!dark_theme) {
+    ntft->fillRect(x + 5, y + 3, 230, 119, TFT_WHITE);
+    ntft->setTextColor(TFT_BLACK);  // Text colour
+  } else {
+    ntft->fillRect(x + 5, y + 3, 230, 119, TFT_BLACK);
+    ntft->setTextColor(TFT_WHITE);  // Text colour
+  }
 
   // Draw ticks every 5 degrees from -50 to +50 degrees (100 deg. FSD swing)
   for (int i = -50; i < 51; i += 5) {
@@ -131,7 +134,11 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
     y1 = y + sy * 100 + 140;
 
     // Draw tick
-    ntft->drawLine(x0, y0, x1, y1, TFT_WHITE);
+    if (!dark_theme) {
+      ntft->drawLine(x0, y0, x1, y1, TFT_BLACK);
+    } else {
+      ntft->drawLine(x0, y0, x1, y1, TFT_WHITE);
+    }
 
     // Check if labels should be drawn, with position tweaks
     if (i % 25 == 0) {
@@ -153,7 +160,13 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
     x0 = x + sx * 100 + 120;
     y0 = y + sy * 100 + 140;
     // Draw scale arc, don't draw the last part
-    if (i < 50) ntft->drawLine(x0, y0, x1, y1, TFT_WHITE);
+    if (i < 50) {
+      if (!dark_theme) {
+        ntft->drawLine(x0, y0, x1, y1, TFT_BLACK);
+      } else {
+        ntft->drawLine(x0, y0, x1, y1, TFT_WHITE);
+      }
+    }
   }
 
   ntft->drawString(mlabel, x + 5 + 230 - 40, y + 119 - 20, 2); // Units at bottom right
@@ -173,10 +186,15 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
 void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
 {
   int value = (val - scaleStart) * factor;
+  char buf[8]; 
+  dtostrf(val, 5, 1, buf);
 
-  ntft->setTextColor(TFT_WHITE, TFT_BLACK);
-  char buf[8]; dtostrf(val, 5, 1, buf);
-  
+  if (!dark_theme) {
+    ntft->setTextColor(TFT_BLACK, TFT_WHITE);
+  } else {
+    ntft->setTextColor(TFT_WHITE, TFT_BLACK);
+  }
+
   // TODO: need fix cause if show 999 after 1000 then 1 still show
   ntft->drawRightString(buf, mx + 50, my + 119 - 20, 2);
 
@@ -199,12 +217,21 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
     float tx = tan((sdeg + 90) * 0.0174532925);
 
     // Erase old needle image
-    ntft->drawLine(mx + 120 + 20 * ltx - 1, my + 140 - 20, mx + osx - 1, my + osy, TFT_BLACK);
-    ntft->drawLine(mx + 120 + 20 * ltx, my + 140 - 20, mx + osx, my + osy, TFT_BLACK);
-    ntft->drawLine(mx + 120 + 20 * ltx + 1, my + 140 - 20, mx + osx + 1, my + osy, TFT_BLACK);
+    if (!dark_theme) {
+      ntft->drawLine(mx + 120 + 20 * ltx - 1, my + 140 - 20, mx + osx - 1, my + osy, TFT_WHITE);
+      ntft->drawLine(mx + 120 + 20 * ltx, my + 140 - 20, mx + osx, my + osy, TFT_WHITE);
+      ntft->drawLine(mx + 120 + 20 * ltx + 1, my + 140 - 20, mx + osx + 1, my + osy, TFT_WHITE);
+
+      ntft->setTextColor(TFT_BLACK);
+    } else {
+      ntft->drawLine(mx + 120 + 20 * ltx - 1, my + 140 - 20, mx + osx - 1, my + osy, TFT_BLACK);
+      ntft->drawLine(mx + 120 + 20 * ltx, my + 140 - 20, mx + osx, my + osy, TFT_BLACK);
+      ntft->drawLine(mx + 120 + 20 * ltx + 1, my + 140 - 20, mx + osx + 1, my + osy, TFT_BLACK);
+
+      ntft->setTextColor(TFT_WHITE);
+    }
 
     // Re-plot text under needle
-    ntft->setTextColor(TFT_WHITE);
     ntft->drawCentreString(mlabel, mx + 120, my + 70, 4); // // Comment out to avoid font 4
 
     // Store new needle end coords for next erase
@@ -240,4 +267,11 @@ void MeterWidget::setZones(uint16_t rs, uint16_t re, uint16_t os, uint16_t oe, u
   yellowEnd = ye - 50;
   greenStart = gs - 50;
   greenEnd = ge - 50;
+}
+
+// #########################################################################
+// Set widget theme
+// #########################################################################
+void MeterWidget::setTheme(bool dark) {
+  dark_theme = dark;
 }

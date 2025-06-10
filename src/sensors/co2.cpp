@@ -12,7 +12,7 @@ void CO2Sensor::setup() {
 
         if (!_init()) return;
 
-        _sensor.setDriveMode(1);
+        _sensor.setDriveMode(3); // 1 - every 1s, 2 - 10s, 3 - 60s measure
     }
 
     _is_initialized = true;

@@ -18,6 +18,7 @@ enum kk : size_t {
     co2_scale_type,
     co2_danger_lvl,
     rgb_enabled,
+    use_dark_theme,
 };
 
 extern String co2_scale_types;

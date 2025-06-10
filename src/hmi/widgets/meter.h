@@ -13,6 +13,8 @@ class MeterWidget
   public:
     MeterWidget(TFT_eSPI* tft);
 
+    // Set widget theme
+    void setTheme(bool dark);
     // Set red, orange, yellow and green start+end zones as a percentage of full scale
     void setZones(uint16_t rs, uint16_t re, uint16_t os, uint16_t oe, uint16_t ys, uint16_t ye, uint16_t gs, uint16_t ge);
     // Draw meter meter at x, y and define full scale range plus the scale labels
@@ -30,6 +32,8 @@ class MeterWidget
     uint16_t osx, osy; // Saved x & y coords of needle end
     int old_analog;    // Value last displayed
     int old_digital;   // Value last displayed
+
+    bool dark_theme;
 
     // x, y coord of top left corner of meter graphic
     uint16_t mx;

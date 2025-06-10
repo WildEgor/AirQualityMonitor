@@ -42,8 +42,9 @@ void SettingsDB::setup() {
     _db.init(kk::co2_scale_type, "DEFAULT");
     _db.init(kk::co2_danger_lvl, 1200);
 
-    // ============================== RGB ==============================
+    // ============================== COMMON ==============================
     _db.init(kk::rgb_enabled, false);
+    _db.init(kk::use_dark_theme, true);
 
     _db.dump(Serial);
 

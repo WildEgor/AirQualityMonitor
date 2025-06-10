@@ -1,3 +1,4 @@
+#pragma once
 #include <Looper.h>
 #include <TFT_eSPI.h>
 #include "widgets/meter.h"
@@ -13,11 +14,12 @@ public:
         _co2_meter(nullptr), 
         _co2_scale(&CO2Scale::getInstance()), 
         _wifi(&wifiConn), 
-        _show_intro(true),
-        _black_theme(true) {}
+        _show_intro(true) {}
 
     void setup() {
         Serial.println("init tft");
+        _dark_theme = (*_db)[kk::use_dark_theme].toBool();
+
         _tft.init();
         _tft.setRotation(0);
         _init_theme(true);
@@ -26,6 +28,8 @@ public:
 
         Serial.println("init widgets");
         _co2_meter = MeterWidget(&_tft);
+        _co2_meter.setTheme(_dark_theme);
+
         uint16_t rs,re,os,oe,ys,ye,gs,ge;
         _co2_scale->init(_db);
         _co2_scale->getScale(rs,re,os,oe,ys,ye,gs,ge);
@@ -36,8 +40,13 @@ public:
     }
 
     void exec() {
-        _print_gauge();
-        _print_ip();
+        _render();
+    }
+
+    void setTheme(bool dark) {
+        _dark_theme = dark;
+        _co2_meter.setTheme(dark);
+        _render();
     }
 
 private:
@@ -49,7 +58,13 @@ private:
     WiFiConn* _wifi;
 
     bool _show_intro;
-    bool _black_theme; // TODO: adapt MeterWidget
+    bool _dark_theme;
+
+    void _render() {
+        _show_intro = true;
+        _print_gauge();
+        _print_ip();
+    }
 
     void _print_ip() {
         if (!_wifi->isConnected()) {
@@ -68,7 +83,7 @@ private:
         
         _tft.setCursor(20, 130);
         _init_theme(false);
-        _tft.println("Admin pannel: http://" + _wifi->ip());
+        _tft.println("Admin panel: http://" + _wifi->ip());
         delay(3000);
 
         _show_intro = false;
@@ -95,16 +110,17 @@ private:
     void _init_theme(bool fill) {
         _tft.setTextSize(1);
 
-        if (!_black_theme) {
-            if (fill) {
-                _tft.fillScreen(TFT_WHITE);
-            }
-            _tft.setTextColor(TFT_BLACK);
-        } else {
+        if (_dark_theme) {
             if (fill) {
                 _tft.fillScreen(TFT_BLACK);
             }
             _tft.setTextColor(TFT_WHITE);
+            return;
         }
+
+        if (fill) {
+            _tft.fillScreen(TFT_WHITE);
+        }
+        _tft.setTextColor(TFT_BLACK);
     }
 };

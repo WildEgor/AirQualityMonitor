@@ -7,9 +7,17 @@ Settings::Settings(
     WiFiConn& wifiConn, 
     MQTTConn& mqttConn, 
     SensorContainer& sensors,
-    RGBController& rgbController
+    RGBController& rgbController,
+    Display& display
 ) 
-    : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi_conn(&wifiConn), _mqtt_conn(&mqttConn), _sensors(&sensors), _rgb_controller(&rgbController), _is_initialized(false) {}
+    : LoopTickerBase(), 
+    _db(&settingsDb.getDB()), 
+    _wifi_conn(&wifiConn), 
+    _mqtt_conn(&mqttConn),
+    _sensors(&sensors), 
+    _rgb_controller(&rgbController), 
+    _display(&display),
+    _is_initialized(false) {}
 
 void Settings::setup() {
     Serial.println("init settings...");
@@ -70,9 +78,10 @@ void Settings::build(sets::Builder& b) {
             b.Button(SH("co2_save"), "Сохранить");
         }
         {
-            sets::Menu m(b, "RGB");
-            b.Switch(kk::rgb_enabled, "Включить");
-            b.Button(SH("rgb_save"), "Сохранить");
+            sets::Menu m(b, "Common");
+            b.Switch(kk::rgb_enabled, "rgb");
+            b.Switch(kk::use_dark_theme, "dark theme");
+            b.Button(SH("common_save"), "Сохранить");
         }
     }
 
@@ -116,14 +125,15 @@ void Settings::build(sets::Builder& b) {
                 Serial.println("db update failed for CO2 settings!");
                 break;
                 
-            case SH("rgb_save"):
-                Serial.println("rgb_save pressed");
+            case SH("common_save"):
+                Serial.println("common_save pressed");
                 if (_db && _db->update()) {
                     _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
+                    _display->setTheme((*_db)[kk::use_dark_theme].toBool());
                     return;
                 }
 
-                Serial.println("db update failed for RGB settings!");
+                Serial.println("db update failed for common settings!");
                 break;
         }
     }

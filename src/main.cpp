@@ -51,7 +51,7 @@ void setup() {
   });
   rgb->addLoop();
 
-  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *sensors, *rgb);
+  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *sensors, *rgb, *display);
   sett->setup();
   sett->addLoop();
 }

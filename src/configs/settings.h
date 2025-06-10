@@ -7,10 +7,17 @@
 #include "sensors/co2.h"
 #include "sensors/sensor_base.h"
 #include "controllers/rgb.h"
+#include "hmi/display.h"
 
 class Settings : public LoopTickerBase {
 public:
-    Settings(SettingsDB& settingsDb, WiFiConn& wifiConn, MQTTConn& mqttConn, SensorContainer& sensors, RGBController& rgbCtrl);
+    Settings(SettingsDB& settingsDb, 
+        WiFiConn& wifiConn, 
+        MQTTConn& mqttConn, 
+        SensorContainer& sensors, 
+        RGBController& rgbCtrl,
+        Display& display
+    );
 
     void setup();
     void exec() override;
@@ -25,5 +32,6 @@ private:
     MQTTConn* _mqtt_conn;
     SensorContainer* _sensors;
     RGBController* _rgb_controller;
+    Display* _display;
     bool _is_initialized;
 };
