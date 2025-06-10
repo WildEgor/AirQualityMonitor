@@ -105,7 +105,7 @@ void Settings::build(sets::Builder& b) {
 
                 if (_db && _db->update()) {
                     uint32_t new_interval = (*_db)[kk::co2_measure_prd].toInt();
-                    if (new_interval > 0 && new_interval < 10000) {
+                    if (new_interval > 0 && new_interval < SEC_30) {
                         _sensors->updateInterval("co2", new_interval);
                     } else {
                         Serial.println("invalid CO2 measurement interval!");

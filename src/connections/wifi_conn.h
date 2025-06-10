@@ -12,6 +12,7 @@ public:
     void exec() override;
     void connect();
     bool isConnected();
+    String ip();
 
 private:
     void _connectToWiFi(const String& ssid, const String& pass);

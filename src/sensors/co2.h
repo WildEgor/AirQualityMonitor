@@ -67,6 +67,7 @@ public:
 
     float getMin();
     float getMax();
+    float getHumanMax();
     bool needAlarm(uint16_t value);
 
 private:
@@ -78,4 +79,5 @@ private:
     ColorThreshold _easy_scale[3];
     float _min = 400.0f;
     float _max = 8000.0f;
+    float _human_max = 1500.0f;
 };

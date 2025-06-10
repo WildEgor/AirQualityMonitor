@@ -176,6 +176,8 @@ void CO2Scale::getColor(uint16_t value, uint8_t& r, uint8_t& g, uint8_t& b) {
 
 float CO2Scale::getMin() { return _min; }
 float CO2Scale::getMax() { return _max; }
+float CO2Scale::getHumanMax() { return _human_max; }
+
 bool CO2Scale::needAlarm(uint16_t value) { 
     float co2_lvl = (*_db)[kk::co2_danger_lvl].toFloat();
     if (co2_lvl <= 0) {

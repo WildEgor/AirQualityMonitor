@@ -19,7 +19,7 @@ void WiFiConn::setup() {
     if ((*_db)[kk::wifi_ssid].length()) {
         Serial.println("connect wifi...");
         _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
-
+        
         Serial.println("init wifi ok!");
         _is_initialized = true;
     } else {
@@ -33,9 +33,7 @@ void WiFiConn::exec() {
         return;
     }
 
-    if (WiFi.status() == WL_CONNECTED) {
-        return;
-    }
+    if (WiFi.status() == WL_CONNECTED) return;
 
     connect();
 }
@@ -48,7 +46,11 @@ void WiFiConn::connect() {
 }
 
 bool WiFiConn::isConnected() {
-    return _wifi_ok;
+    return WiFi.status() == WL_CONNECTED;
+}
+
+String WiFiConn::ip() {
+    return WiFi.localIP().toString();
 }
 
 void WiFiConn::_connectToWiFi(const String& ssid, const String& pass) {

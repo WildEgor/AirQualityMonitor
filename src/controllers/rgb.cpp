@@ -23,7 +23,7 @@ void RGBController::setup() {
 
     _leds = new Adafruit_NeoPixel(_num_leds, _pin, NEO_GRB + NEO_KHZ800);
     _leds->begin();
-    _leds->setBrightness(150);
+    _leds->setBrightness(100);
     clear();
 
     _co2_scale->init(_db);

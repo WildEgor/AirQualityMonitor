@@ -45,6 +45,8 @@ public:
         it->second->removeLoop();
         it->second->setInterval(new_interval);
         it->second->addLoop();
+
+        Serial.printf("sensor %s update interval -> %d\n", name, new_interval);
         
         return true;
     }
