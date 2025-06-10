@@ -2,12 +2,12 @@
 #include <SettingsGyver.h>
 #include "config.h"
 #include "db/settings_db.h"
-#include "connections/wifi_conn.h"
 #include "connections/mqtt_conn.h"
 #include "sensors/co2.h"
 #include "sensors/sensor_base.h"
 #include "controllers/rgb.h"
 #include "hmi/display.h"
+#include "connections/wifi_conn.h"
 
 class Settings : public LoopTickerBase {
 public:

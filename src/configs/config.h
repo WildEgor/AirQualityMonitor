@@ -1,7 +1,7 @@
 #pragma once
 
 #define F_VERSION "1.0"
-#define AP_NAME "AQM_AP" // Prefix for wi-fi point with settings
+#define AP_NAME "AQMAP" // Prefix for wi-fi point with settings
 #define AP_PASS "adminadmin"
 #define RESET_DB true
 

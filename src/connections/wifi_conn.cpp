@@ -5,25 +5,30 @@ WiFiConn::WiFiConn(SettingsDB& settingsDb) : LoopTickerBase(), _db(&settingsDb.g
 void WiFiConn::setup() {
     Serial.println("init wifi...");
 
-    WiFi.disconnect(true);
-    WiFi.mode(WIFI_OFF);
-    delay(100);
+    _wifiConnector = new WiFiConnectorClass(AP_NAME, AP_PASS, 60, true);
 
-    // TODO: need find fix wifi cause no AP available and if connect it crash
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP(AP_NAME, AP_PASS);
+    _wifiConnector->onConnect([this]() {
+        Serial.print("AP IP address: ");
+        Serial.println(WiFi.localIP());
+        _wifi_ok = true;
+    });
 
-    Serial.print("AP IP address: ");
-    Serial.println(WiFi.softAPIP());
+    _wifiConnector->onError([this]() {
+        Serial.println("WiFi error");
+        _wifi_ok = false;
+    });
+    
+    if (!_wifiConnector->connecting()) {
+        if ((*_db)[kk::wifi_ssid].length()) {
+            Serial.println("connect wifi...");
+            _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
+            
+            Serial.println("init wifi ok!");
+        } else {
+            Serial.println("wifi ssid too empty!");
+        }
 
-    if ((*_db)[kk::wifi_ssid].length()) {
-        Serial.println("connect wifi...");
-        _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
-        
-        Serial.println("init wifi ok!");
         _is_initialized = true;
-    } else {
-        Serial.println("wifi ssid too empty!");
     }
 }
 
@@ -33,7 +38,11 @@ void WiFiConn::exec() {
         return;
     }
 
-    if (WiFi.status() == WL_CONNECTED) return;
+    _wifiConnector->tick();
+
+    if (_wifiConnector->connected()) {
+        return;
+    }
 
     connect();
 }
@@ -46,7 +55,7 @@ void WiFiConn::connect() {
 }
 
 bool WiFiConn::isConnected() {
-    return WiFi.status() == WL_CONNECTED;
+    return _wifiConnector->connected();
 }
 
 String WiFiConn::ip() {
@@ -59,10 +68,10 @@ void WiFiConn::_connectToWiFi(const String& ssid, const String& pass) {
     Serial.print("connecting to ");
     Serial.println(ssid);
 
-    WiFi.begin(ssid.c_str(), pass.c_str());
+    _wifiConnector->connect(ssid, pass);
 
     int retries = 0;
-    while (WiFi.status() != WL_CONNECTED && retries < WIFI_CONN_RETRY_COUNT) {
+    while (!_wifiConnector->connected() && retries < WIFI_CONN_RETRY_COUNT) {
         if (WIFI_CONN_RETRY_TIMEOUT >= 500) {
             delay(WIFI_CONN_RETRY_TIMEOUT);
         } else {
@@ -70,15 +79,5 @@ void WiFiConn::_connectToWiFi(const String& ssid, const String& pass) {
         }
         Serial.print(".");
         retries++;
-    }
-    Serial.println();
-
-    if (WiFi.status() == WL_CONNECTED) {
-        Serial.print("wifi ok! IP address: ");
-        Serial.println(WiFi.localIP());
-        _wifi_ok = true;
-    } else {
-        Serial.println("wifi error! connection failed!");
-        _wifi_ok = false;
     }
 }

@@ -3,13 +3,13 @@
 
 #include "db/settings_db.h"
 #include "configs/settings.h"
-#include "connections/wifi_conn.h"
 #include "connections/mqtt_conn.h"
 #include "sensors/co2.h"
 #include "sensors/sensor_base.h"
 #include "hmi/display.h"
 #include "controllers/rgb.h"
 #include "model/co2_data.h"
+#include "connections/wifi_conn.h"
 
 void setup() {
   Serial.begin(115200);

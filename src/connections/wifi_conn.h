@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include <WiFi.h>
+#include <WiFiConnector.h>
 #include "db/settings_db.h"
 #include "configs/config.h"
 
@@ -18,6 +18,7 @@ private:
     void _connectToWiFi(const String& ssid, const String& pass);
 
     GyverDBFile* _db;
+    WiFiConnectorClass* _wifiConnector;
     bool _wifi_ok;
     bool _is_initialized;
 };
