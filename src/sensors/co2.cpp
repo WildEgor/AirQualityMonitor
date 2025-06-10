@@ -38,6 +38,22 @@ const char* CO2Sensor::getType() const {
     return "co2";
 }
 
+float CO2Sensor::getCO2Min() {
+    return 400.0f;
+}
+
+float CO2Sensor::getCO2Max() {
+    return 8192.0f;
+}
+
+float CO2Sensor::getTVOCMin() {
+    return 0.0f;
+}
+
+float CO2Sensor::getTVOCMax() {
+    return 1187.0f;
+}
+
 bool CO2Sensor::isInitialized() const {
     return _is_initialized;
 }
@@ -64,8 +80,22 @@ bool CO2Sensor::_init() {
 void CO2Sensor::_check_data() {
     if (_sensor.dataAvailable()) {
         _sensor.readAlgorithmResults();
+
         _co2_data.co2 = _sensor.getCO2();
+        if (_co2_data.co2 > getCO2Max()) {
+            _co2_data.co2 = getCO2Max();
+        }
+        if (_co2_data.co2 < getCO2Min()) {
+            _co2_data.co2 = getCO2Min();
+        }
+
         _co2_data.tvoc = _sensor.getTVOC();
+        if (_co2_data.tvoc > getTVOCMax()) {
+            _co2_data.tvoc = getTVOCMax();
+        }
+        if (_co2_data.tvoc < getTVOCMin()) {
+            _co2_data.tvoc = getTVOCMin();
+        }
         _print_data();
     }
 }

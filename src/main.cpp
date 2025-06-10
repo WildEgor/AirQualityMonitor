@@ -29,11 +29,11 @@ void setup() {
   mqtt->setup();
   mqtt->addLoop();
 
-  CO2Sensor* co2 = new CO2Sensor(SEC_5);
+  CO2Sensor* co2 = new CO2Sensor(SEC_10);
   co2->setup();
   co2->addLoop();
 
-  CO2Publisher* co2p = new CO2Publisher(SEC_5, *co2, *mqtt);
+  CO2Publisher* co2p = new CO2Publisher(SEC_30, *co2, *mqtt);
   co2p->addLoop();
 
   SensorContainer* sensors = new SensorContainer();

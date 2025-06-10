@@ -39,14 +39,12 @@ void SettingsDB::setup() {
     _db.init(kk::mqtt_tvoc_topic, MQTT_DEFAULT_TVOC_TOPIC);
 
     // ============================== CO2 ==============================
-    _db.init(kk::co2_measure_prd, 60);
-    _db.init(kk::co2_pub_prd, 60);
     _db.init(kk::co2_scale_type, "DEFAULT");
     _db.init(kk::co2_danger_lvl, 1200);
 
     // ============================== COMMON ==============================
-    _db.init(kk::rgb_enabled, false);
-    _db.init(kk::use_dark_theme, true);
+    _db.init(kk::rgb_enabled, !USE_DARK_THEME);
+    _db.init(kk::use_dark_theme, USE_DARK_THEME);
 
     _db.dump(Serial);
 

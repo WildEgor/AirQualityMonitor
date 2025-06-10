@@ -1,9 +1,10 @@
 #pragma once
 
 #define F_VERSION "1.0"
-#define AP_NAME "AQMAP" // Prefix for wi-fi point with settings
+#define AP_NAME "AQM_AP" // Prefix for wi-fi point with settings
 #define AP_PASS "adminadmin"
 #define RESET_DB true
+#define USE_DARK_THEME true
 
 #define MQTT_SERVER "m8.wqtt.ru"
 #define MQTT_PORT 20336
@@ -19,4 +20,5 @@
 #define MS_100 100
 #define SEC_1 1000
 #define SEC_5 5000
+#define SEC_10 10000
 #define SEC_30 30000

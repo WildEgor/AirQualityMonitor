@@ -15,7 +15,11 @@ public:
 
     void setup() override;
     void exec() override;
+    float getCO2Min();
+    float getCO2Max();
     uint16_t getCO2();
+    float getTVOCMin();
+    float getTVOCMax();
     uint16_t getTVOC();
     const char* getType() const override;
     bool isInitialized() const override;

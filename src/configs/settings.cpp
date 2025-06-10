@@ -75,8 +75,6 @@ void Settings::build(sets::Builder& b) {
         }
         {
             sets::Menu m(b, "Датчик CO2");
-            b.Time(kk::co2_measure_prd, "Период измерений");
-            b.Time(kk::co2_pub_prd, "Период публикаций");
             b.Number(kk::co2_danger_lvl, "Значение тревоги", nullptr, 0, 8000);
             b.Select(kk::co2_scale_type, "Тип шкалы CO2", co2_scale_types);
             b.Button(SH("co2_save"), "Сохранить");
@@ -124,12 +122,6 @@ void Settings::build(sets::Builder& b) {
                 Serial.println("co2_save pressed");
 
                 if (_db && _db->update()) {
-                    uint32_t new_interval = (*_db)[kk::co2_measure_prd].toInt();
-                    if (new_interval > 0 && new_interval < SEC_30) {
-                        _sensors->updateInterval("co2", new_interval);
-                    } else {
-                        Serial.println("invalid CO2 measurement interval!");
-                    }
                     return;
                 }
 
