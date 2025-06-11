@@ -1,12 +1,13 @@
 #include "settings_db.h"
+#include "logger/logger.h"
 
 String co2_scale_types = "DEFAULT;EASY";
-static const char TAG[] = "SettingsDB";
 
 SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, "/settings.db") {}
 
 void SettingsDB::setup() {
-    Serial.println("init db...");
+    SET_LOG_COMPONENT("SettingsDB");
+    LOG_INFO("init...");
     bool fsInitialized = true;
 
 #ifdef ESP32
@@ -16,7 +17,7 @@ void SettingsDB::setup() {
 #endif
 
     if (!fsInitialized) {
-        Serial.println("init littlefs failed");
+        LOG_ERROR("init littlefs failed!");
         return;
     }
 
@@ -40,7 +41,7 @@ void SettingsDB::setup() {
 
     // ============================== CO2 ==============================
     _db.init(kk::co2_scale_type, "DEFAULT");
-    _db.init(kk::co2_danger_lvl, 1200);
+    _db.init(kk::co2_danger_lvl, RGB_DEFAUL_ALERT_TRHLD);
 
     // ============================== COMMON ==============================
     _db.init(kk::rgb_enabled, !USE_DARK_THEME);
@@ -48,7 +49,7 @@ void SettingsDB::setup() {
 
     _db.dump(Serial);
 
-    Serial.println("db ok!");
+    LOG_INFO("init ok!");
 }
 
 void SettingsDB::exec() {

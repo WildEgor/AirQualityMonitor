@@ -4,6 +4,7 @@
 #include "widgets/meter.h"
 #include "gc9a01_config.h"
 #include "sensors/co2.h"
+#include "logger/logger.h"
 
 class Display: public LoopTimerBase {
 public:
@@ -17,16 +18,17 @@ public:
         _show_intro(true) {}
 
     void setup() {
-        Serial.println("init tft");
+        SET_LOG_COMPONENT("Display");
+        LOG_INFO("init tft...");
         _dark_theme = (*_db)[kk::use_dark_theme].toBool();
 
         _tft.init();
         _tft.setRotation(0);
         _init_theme(true);
         
-        Serial.println("init tft ok");
+        LOG_INFO("init tft ok!");
 
-        Serial.println("init widgets");
+        LOG_INFO("init widgets...");
         _co2_meter = MeterWidget(&_tft);
         _co2_meter.setTheme(_dark_theme);
 
@@ -36,7 +38,7 @@ public:
         _co2_meter.setZones(rs,re,os,oe,ys,ye,gs,ge);
         // TODO: refactor
         _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "pm", "", "", "", "", ""); 
-        Serial.println("init widgets ok");
+        LOG_INFO("init widgets ok!");
     }
 
     void exec() {
@@ -72,6 +74,7 @@ private:
             _init_theme(false);
             _tft.setTextColor(TFT_RED);
             _tft.println("WIFI NOT CONNECTED!");
+            LOG_ERROR("wifi not connected;");
             delay(500);
             _show_intro = true;
             return;
@@ -83,7 +86,9 @@ private:
         
         _tft.setCursor(20, 130);
         _init_theme(false);
-        _tft.println("Admin panel: http://" + _wifi->ip());
+        String adminURL = "Admin panel: http://" + _wifi->ip();
+        _tft.println(adminURL);
+        LOG_INFO(adminURL);
         delay(3000);
 
         _show_intro = false;
@@ -91,7 +96,7 @@ private:
 
     void _print_gauge() {
         if (!_co2_sensor.isInitialized()) {
-            Serial.println("display: co2 sensor not initialized");
+            LOG_WARNING("co2 sensor not initialized");
             delay(500);
             return;
         }

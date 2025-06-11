@@ -2,6 +2,7 @@
 #include <Looper.h>
 
 #include "db/settings_db.h"
+#include "configs/config.h"
 #include "configs/settings.h"
 #include "connections/mqtt_conn.h"
 #include "sensors/co2.h"
@@ -10,12 +11,15 @@
 #include "controllers/rgb.h"
 #include "model/co2_data.h"
 #include "connections/wifi_conn.h"
+#include "logger/logger.h"
 
 void setup() {
   Serial.begin(115200);
   delay(SEC_1);
 
-  Serial.println("setup...");
+  SET_LOG_LEVEL(APP_LOG_LEVEL); // TODO: move to settings
+  SET_LOG_COMPONENT(APP_NAME);
+  LOG_INFO("init...");
 
   SettingsDB* sdb = new SettingsDB();
   sdb->setup();
@@ -54,6 +58,8 @@ void setup() {
   Settings* sett = new Settings(*sdb, *wifi, *mqtt, *sensors, *co2p, *rgb, *display);
   sett->setup();
   sett->addLoop();
+
+  LOG_INFO("init ok!");
 }
 
 void loop() {

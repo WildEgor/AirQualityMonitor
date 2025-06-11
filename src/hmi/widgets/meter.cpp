@@ -186,8 +186,14 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
 void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
 {
   int value = (val - scaleStart) * factor;
-  char buf[8]; 
-  dtostrf(val, 5, 1, buf);
+  char buf[8];
+  if (val >= 1000 || val <= -1000)
+    dtostrf(val, 7, 1, buf);
+  else {
+    char temp_buf[8];
+    dtostrf(val, 6, 1, temp_buf);
+    snprintf(buf, sizeof(buf), "%s", temp_buf + 1);
+  }
 
   if (!dark_theme) {
     ntft->setTextColor(TFT_BLACK, TFT_WHITE);
@@ -195,7 +201,6 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
     ntft->setTextColor(TFT_WHITE, TFT_BLACK);
   }
 
-  // TODO: need fix cause if show 999 after 1000 then 1 still show
   ntft->drawRightString(buf, mx + 50, my + 119 - 20, 2);
 
   if (value < -10) value = -10; // Limit value to emulate needle end stops

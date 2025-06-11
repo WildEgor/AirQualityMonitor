@@ -1,14 +1,15 @@
 #include "ntp_conn.h"
+#include "logger/logger.h"
 
 NTPConn::NTPConn() : LoopTickerBase(), _ms(0), _is_initialized(false) {}
 
 void NTPConn::setup() {
+    SET_LOG_COMPONENT("NTPConn");
     NTP.begin(3);  // TODO: use settings_db to get timezone
 
     NTP.onError([]() {
-        Serial.println(NTP.readError());
-        Serial.print("online: ");
-        Serial.println(NTP.online());
+        LOG_ERROR("error: " + String(NTP.readError()));
+        LOG_INFO("online: " + String(NTP.online()));
     });
 
     NTP.onSecond([]() {

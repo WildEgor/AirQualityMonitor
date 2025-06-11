@@ -3,6 +3,7 @@
 #include <Looper.h>
 #include <map>
 #include <string>
+#include "logger/logger.h"
 
 class SensorBase : public LoopTimerBase {
 public:
@@ -46,7 +47,8 @@ public:
         it->second->setInterval(new_interval);
         it->second->addLoop();
 
-        Serial.printf("sensor %s update interval -> %d\n", name, new_interval);
+        SET_LOG_COMPONENT("SensorContainer");
+        LOG_DEBUG("sensor " + String(name.c_str()) + " update interval -> " + String(new_interval));
         
         return true;
     }

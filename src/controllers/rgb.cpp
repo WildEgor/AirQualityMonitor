@@ -17,6 +17,9 @@ RGBController::~RGBController() {
 }
 
 void RGBController::setup() {
+    SET_LOG_COMPONENT("RGBController");
+    LOG_INFO("init...");
+
     if (_leds != nullptr) {
         delete _leds;
     }
@@ -31,6 +34,8 @@ void RGBController::setup() {
     _enabled = (*_db)[kk::rgb_enabled].toBool();
 
     _is_initialized = true;
+
+    LOG_INFO("init ok!");
 }
 
 void RGBController::setUpdaterCb(UpdaterCallback cb) {
@@ -41,7 +46,7 @@ void RGBController::exec() {
     _curr_period = this->getPeriod();
 
     if (!_is_initialized) {
-        setup();
+        LOG_ERROR("call setup() first!");
         return;
     }
 
@@ -71,8 +76,14 @@ void RGBController::exec() {
 
 void RGBController::toggle(bool value) {
     _enabled = value;
-
     clear();
+
+    if (value) {
+        LOG_DEBUG("enabled");
+        return;
+    }
+
+    LOG_DEBUG("disabled");
 }
 
 void RGBController::renderLevel(float value, float min, float max) {
@@ -90,6 +101,7 @@ void RGBController::renderLevel(float value, float min, float max) {
 
 void RGBController::clear() {
     if (_leds != nullptr) {
+        LOG_DEBUG("cleared");
         _leds->clear();
         _leds->show();
     }

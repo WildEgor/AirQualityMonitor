@@ -1,6 +1,5 @@
 #include "settings.h"
-
-static const char TAG[] = "Settings";
+#include "logger/logger.h"
 
 Settings::Settings(
     SettingsDB& settingsDb, 
@@ -22,7 +21,8 @@ Settings::Settings(
     _is_initialized(false) {}
 
 void Settings::setup() {
-    Serial.println("init settings...");
+    SET_LOG_COMPONENT("Settings");
+    LOG_INFO("init...");
 
     _sett = SettingsGyver("AirQualityMonitor v" F_VERSION, _db);
     _sett.begin();
@@ -35,14 +35,14 @@ void Settings::setup() {
         this->build(b);
     });
 
-    Serial.println("settings ok!");
+    LOG_INFO("init ok!");
 
     _is_initialized = true;
 }
 
 void Settings::exec() {
     if (!_is_initialized) {
-        setup();
+        LOG_ERROR("call setup first!");
         return;
     }
 
@@ -90,18 +90,18 @@ void Settings::build(sets::Builder& b) {
     if (b.build.isAction()) {
         switch (b.build.id) {
             case SH("wifi_save"):
-                Serial.println("wifi_save pressed");
+                LOG_DEBUG("wifi_save pressed");
 
                 if (_db && _db->update()) {
                     _wifi_conn->connect();
                     return;
                 }
 
-                Serial.println("db update failed for wifi settings!");
+                LOG_ERROR("db update failed for wifi settings!");
                 break;
                 
             case SH("mqtt_save"):
-                Serial.println("mqtt_save pressed");
+                LOG_DEBUG("mqtt_save pressed");
                 
                 if (_db && _db->update()) {
                     _mqtt_conn->connect();
@@ -115,28 +115,29 @@ void Settings::build(sets::Builder& b) {
                     return;
                 }
 
-                Serial.println("db update failed for MQTT settings!");
+                LOG_ERROR("db update failed for mqtt settings!");
                 break;
             
             case SH("co2_save"):
-                Serial.println("co2_save pressed");
+                LOG_DEBUG("co2_save pressed");
 
                 if (_db && _db->update()) {
                     return;
                 }
 
-                Serial.println("db update failed for CO2 settings!");
+                LOG_ERROR("db update failed for co2 settings!");
                 break;
                 
             case SH("common_save"):
-                Serial.println("common_save pressed");
+                LOG_DEBUG("common_save pressed");
+                
                 if (_db && _db->update()) {
                     _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
                     _display->setTheme((*_db)[kk::use_dark_theme].toBool());
                     return;
                 }
 
-                Serial.println("db update failed for common settings!");
+                LOG_ERROR("db update failed for common settings!");
                 break;
         }
     }

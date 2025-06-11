@@ -1,9 +1,11 @@
 #include "co2.h"
+#include "logger/logger.h"
 
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _mock(false) {}
 
 void CO2Sensor::setup() {
-    Serial.println("initializing CO2 sensor...");
+    SET_LOG_COMPONENT("CO2Sensor");
+    LOG_INFO("setup...");
     _is_initialized = false;
 
     if (!_mock) {
@@ -16,7 +18,7 @@ void CO2Sensor::setup() {
     }
 
     _is_initialized = true;
-    Serial.println("CO2 sensor initialized successfully!");
+    LOG_INFO("init ok!");
 }
 
 void CO2Sensor::exec() {
@@ -71,7 +73,7 @@ void CO2Sensor::copyState(const SensorBase& other) {
 
 bool CO2Sensor::_init() {
     if (!_sensor.begin()) {
-        Serial.println("failed to start CO2 sensor! please check your wiring.");
+        LOG_ERROR("failed to begin() sensor! please check your wiring.");
         return false;
     }
     return true;
@@ -107,16 +109,12 @@ void CO2Sensor::_check_test_data() {
 }
 
 void CO2Sensor::_pub_event() {
-    Serial.println("publish co2_data");
+    LOG_DEBUG("publish to co2_data");
     Looper.sendEvent("co2_data", &_co2_data);
 }
 
 void CO2Sensor::_print_data() {
-    Serial.print("CO2: ");
-    Serial.print(_co2_data.co2);
-    Serial.print(" ppm, TVOC: ");
-    Serial.print(_co2_data.tvoc);
-    Serial.println(" ppb");
+    LOG_DEBUG("CO2: " + String(_co2_data.co2) + " ppm, TVOC: " + String(_co2_data.tvoc) + " ppb");
 }
 
 // --- CO2Publisher ---
