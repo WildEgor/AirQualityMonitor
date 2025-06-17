@@ -50,7 +50,6 @@ void Settings::exec() {
 }
 
 void Settings::update(sets::Updater& u) {
-    
     // ...
 }
 
