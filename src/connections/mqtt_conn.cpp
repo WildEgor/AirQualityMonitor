@@ -1,4 +1,5 @@
 #include "mqtt_conn.h"
+#define LOG_COMPONENT "MQTTConn"
 #include "logger/logger.h"
 
 WiFiClient _espClient;
@@ -9,7 +10,6 @@ MQTTConn::MQTTConn(SettingsDB& settingsDb, WiFiConn& wifiConn) : LoopTickerBase(
 void MQTTConn::setup() {
     if (!isEnabled()) return;
 
-    SET_LOG_COMPONENT("MQTTConn");
     LOG_INFO("init...");
 
     _connectToMQTT(

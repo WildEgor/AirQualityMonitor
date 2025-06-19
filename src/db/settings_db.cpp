@@ -1,4 +1,5 @@
 #include "settings_db.h"
+#define LOG_COMPONENT "SettingsDB"
 #include "logger/logger.h"
 
 String co2_scale_types = "DEFAULT;EASY";
@@ -6,7 +7,6 @@ String co2_scale_types = "DEFAULT;EASY";
 SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, "/settings.db") {}
 
 void SettingsDB::setup() {
-    SET_LOG_COMPONENT("SettingsDB");
     LOG_INFO("init...");
     bool fsInitialized = true;
 
@@ -41,11 +41,11 @@ void SettingsDB::setup() {
 
     // ============================== CO2 ==============================
     _db.init(kk::co2_scale_type, "DEFAULT");
-    _db.init(kk::co2_danger_lvl, RGB_DEFAUL_ALERT_TRHLD);
+    _db.init(kk::co2_danger_lvl, RGB_DEFAULT_ALERT_TRHLD);
 
     // ============================== COMMON ==============================
-    _db.init(kk::rgb_enabled, !USE_DARK_THEME);
-    _db.init(kk::use_dark_theme, USE_DARK_THEME);
+    _db.init(kk::rgb_enabled, !APP_DARK_THEME);
+    _db.init(kk::use_dark_theme, APP_DARK_THEME);
 
     _db.dump(Serial);
 

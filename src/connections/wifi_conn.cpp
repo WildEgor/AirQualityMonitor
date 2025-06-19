@@ -1,10 +1,10 @@
 #include "wifi_conn.h"
+#define LOG_COMPONENT "WiFiConn"
 #include "logger/logger.h"
 
 WiFiConn::WiFiConn(SettingsDB& settingsDb) : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi_ok(false), _is_initialized(false) {}
 
 void WiFiConn::setup() {
-    SET_LOG_COMPONENT("WiFiConn");
     LOG_INFO("init...");
 
     _wifiConnector = new WiFiConnectorClass(WIFI_AP_NAME, WIFI_AP_PASS, 60, true);

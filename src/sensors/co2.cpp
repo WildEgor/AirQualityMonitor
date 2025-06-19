@@ -1,10 +1,10 @@
 #include "co2.h"
+#define LOG_COMPONENT "CO2Sensor"
 #include "logger/logger.h"
 
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _mock(false) {}
 
 void CO2Sensor::setup() {
-    SET_LOG_COMPONENT("CO2Sensor");
     LOG_INFO("setup...");
     _is_initialized = false;
 

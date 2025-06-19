@@ -1,10 +1,10 @@
 #include "ntp_conn.h"
+#define LOG_COMPONENT "NTPConn"
 #include "logger/logger.h"
 
 NTPConn::NTPConn() : LoopTickerBase(), _ms(0), _is_initialized(false) {}
 
 void NTPConn::setup() {
-    SET_LOG_COMPONENT("NTPConn");
     NTP.begin(3);  // TODO: use settings_db to get timezone
 
     NTP.onError([]() {

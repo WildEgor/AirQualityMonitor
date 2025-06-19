@@ -1,9 +1,12 @@
 #pragma once
 #include <Looper.h>
 #include <TFT_eSPI.h>
+
 #include "widgets/meter.h"
-#include "gc9a01_config.h"
+#include "configs/config.h"
 #include "sensors/co2.h"
+
+#define LOG_COMPONENT "Display"
 #include "logger/logger.h"
 
 class Display: public LoopTimerBase {
@@ -18,7 +21,6 @@ public:
         _show_intro(true) {}
 
     void setup() {
-        SET_LOG_COMPONENT("Display");
         LOG_INFO("init tft...");
         _dark_theme = (*_db)[kk::use_dark_theme].toBool();
 

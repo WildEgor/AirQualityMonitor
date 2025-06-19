@@ -18,7 +18,6 @@ void setup() {
   delay(SEC_1);
 
   SET_LOG_LEVEL(APP_LOG_LEVEL); // TODO: move to settings
-  SET_LOG_COMPONENT(APP_NAME);
   LOG_INFO("init...");
 
   SettingsDB* sdb = new SettingsDB();
@@ -43,7 +42,6 @@ void setup() {
   SensorContainer* sensors = new SensorContainer();
   sensors->addSensor(co2->getType(), co2);
 
-  // TODO: add show ip to connect
   Display* display = new Display(MS_100, *sdb, *co2, *wifi);
   display->setup();
   display->addLoop();

@@ -1,11 +1,12 @@
- #include "Arduino.h"
- #include "meter.h"
+#include "Arduino.h"
+
+#include "meter.h"
 
 // #########################################################################
 // Meter constructor
 // #########################################################################
- MeterWidget::MeterWidget(TFT_eSPI* tft)
- {
+MeterWidget::MeterWidget(TFT_eSPI* tft)
+{
   ltx = 0;              // Saved x coord of bottom of needle
   osx = 120, osy = 120; // Saved x & y coords
   old_analog =  -999;   // Value last displayed
@@ -36,7 +37,7 @@
   greenEnd = 0;
 
   ntft = tft;
- }
+}
 
 // #########################################################################
 // Draw meter meter at x, y and define full scale range & the scale labels

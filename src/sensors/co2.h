@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SparkFunCCS811.h>
+
 #include "sensor_base.h"
 #include "connections/mqtt_conn.h"
 #include "model/co2_data.h"

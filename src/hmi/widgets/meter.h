@@ -4,9 +4,6 @@
 #include "Arduino.h"
 #include "TFT_eSPI.h"
 
-// Meter boarder colour
-#define TFT_GREY 0x5AEB
-
 // Meter class
 class MeterWidget
 {

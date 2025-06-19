@@ -1,3 +1,4 @@
+#define LOG_COMPONENT "RGBController"
 #include "rgb.h"
 
 RGBController::RGBController(uint32_t ms, SettingsDB& settingsDb)
@@ -17,7 +18,6 @@ RGBController::~RGBController() {
 }
 
 void RGBController::setup() {
-    SET_LOG_COMPONENT("RGBController");
     LOG_INFO("init...");
 
     if (_leds != nullptr) {
@@ -102,6 +102,7 @@ void RGBController::renderLevel(float value, float min, float max) {
 void RGBController::clear() {
     if (_leds != nullptr) {
         LOG_DEBUG("cleared");
+        
         _leds->clear();
         _leds->show();
     }

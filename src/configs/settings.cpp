@@ -1,4 +1,5 @@
 #include "settings.h"
+#define LOG_COMPONENT "Settings"
 #include "logger/logger.h"
 
 Settings::Settings(
@@ -21,10 +22,9 @@ Settings::Settings(
     _is_initialized(false) {}
 
 void Settings::setup() {
-    SET_LOG_COMPONENT("Settings");
     LOG_INFO("init...");
 
-    _sett = SettingsGyver("AirQualityMonitor v" F_VERSION, _db);
+    _sett = SettingsGyver("AirQualityMonitor v" APP_VERSION, _db);
     _sett.begin();
 
     _sett.onUpdate([this](sets::Updater& u) {
@@ -92,7 +92,7 @@ void Settings::build(sets::Builder& b) {
             case SH("wifi_save"):
                 LOG_DEBUG("wifi_save pressed");
 
-                if (_db && _db->update()) {
+                if (_db && _db->update() && _wifi_conn) {
                     _wifi_conn->connect();
                     return;
                 }
@@ -103,7 +103,7 @@ void Settings::build(sets::Builder& b) {
             case SH("mqtt_save"):
                 LOG_DEBUG("mqtt_save pressed");
                 
-                if (_db && _db->update()) {
+                if (_db && _db->update() && _mqtt_conn && _co2_pub) {
                     _mqtt_conn->connect();
 
                     String new_co2_topic = (*_db)[kk::mqtt_co2_topic].toString();
@@ -131,7 +131,7 @@ void Settings::build(sets::Builder& b) {
             case SH("common_save"):
                 LOG_DEBUG("common_save pressed");
                 
-                if (_db && _db->update()) {
+                if (_db && _db->update() && _rgb_controller && _display) {
                     _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
                     _display->setTheme((*_db)[kk::use_dark_theme].toBool());
                     return;
