@@ -7,6 +7,7 @@
 #include "connections/mqtt_conn.h"
 #include "sensors/sensor_base.h"
 #include "sensors/co2.h"
+#include "sensors/tp.h"
 #include "hmi/display.h"
 #include "controllers/rgb.h"
 #include "model/co2_data.h"
@@ -39,10 +40,15 @@ void setup() {
   CO2Publisher* co2p = new CO2Publisher(SEC_30, *co2, *mqtt);
   co2p->addLoop();
 
+  TPSensor* tp = new TPSensor(SEC_10);
+  tp->setup();
+  tp->addLoop();
+
   SensorContainer* sensors = new SensorContainer();
   sensors->addSensor(co2->getType(), co2);
+  sensors->addSensor(tp->getType(), tp);
 
-  Display* display = new Display(MS_100, *sdb, *co2, *wifi);
+  Display* display = new Display(MS_100, *sdb, *co2, *tp, *wifi);
   display->setup();
   display->addLoop();
 

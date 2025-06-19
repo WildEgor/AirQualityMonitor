@@ -5,16 +5,18 @@
 #include "widgets/meter.h"
 #include "configs/config.h"
 #include "sensors/co2.h"
+#include "sensors/tp.h"
 
 #define LOG_COMPONENT "Display"
 #include "logger/logger.h"
 
 class Display: public LoopTimerBase {
 public:
-    Display(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, WiFiConn& wifiConn)
+    Display(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, TPSensor& tp_sensor, WiFiConn& wifiConn)
         : LoopTimerBase(ms), 
         _db(&settingsDb.getDB()), 
-        _co2_sensor(co2_sensor), 
+        _co2_sensor(co2_sensor),
+        _tp_sensor(tp_sensor), 
         _co2_meter(nullptr), 
         _co2_scale(&CO2Scale::getInstance()), 
         _wifi(&wifiConn), 
@@ -59,6 +61,7 @@ private:
     MeterWidget _co2_meter;
     CO2Sensor& _co2_sensor;
     CO2Scale* _co2_scale;
+    TPSensor& _tp_sensor;
     WiFiConn* _wifi;
 
     bool _show_intro;

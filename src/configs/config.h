@@ -22,6 +22,8 @@
 #define MQTT_PORT 20336
 #define MQTT_DEFAULT_CO2_TOPIC "common/aqm/co2"
 #define MQTT_DEFAULT_TVOC_TOPIC "common/aqm/tvoc"
+#define MQTT_DEFAULT_TEMP_TOPIC "common/aqm/temp"
+#define MQTT_DEFAULT_PRESSURE_TOPIC "common/aqm/pressure"
 
 // wifi settings (see secrets.example.h too)
 #define WIFI_AP_NAME "AQM_AP" // Prefix for wi-fi point with settings
