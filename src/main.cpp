@@ -44,6 +44,9 @@ void setup() {
   tp->setup();
   tp->addLoop();
 
+  TPPublisher* tpp = new TPPublisher(SEC_30, *tp, *mqtt);
+  tpp->addLoop();
+
   SensorContainer* sensors = new SensorContainer();
   sensors->addSensor(co2->getType(), co2);
   sensors->addSensor(tp->getType(), tp);
