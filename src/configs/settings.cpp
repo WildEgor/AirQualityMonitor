@@ -1,24 +1,21 @@
-#include "settings.h"
 #define LOG_COMPONENT "Settings"
-#include "logger/logger.h"
+#include "services/logger.h"
+#include "settings.h"
+#include "services/publisher.h"
 
 Settings::Settings(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn, 
     MQTTConn& mqttConn, 
-    SensorContainer& sensors,
-    CO2Publisher& co2Pub,
     RGBController& rgbController,
-    Display& display
+    HMI& hmi
 ) 
     : LoopTickerBase(), 
     _db(&settingsDb.getDB()), 
     _wifi_conn(&wifiConn), 
-    _mqtt_conn(&mqttConn),
-    _sensors(&sensors), 
-    _co2_pub(&co2Pub),
+    _mqtt_conn(&mqttConn), 
     _rgb_controller(&rgbController), 
-    _display(&display),
+    _hmi(&hmi),
     _is_initialized(false) {}
 
 void Settings::setup() {
@@ -69,8 +66,6 @@ void Settings::build(sets::Builder& b) {
             b.Number(kk::mqtt_port);
             b.Input(kk::mqtt_username, "user");
             b.Pass(kk::mqtt_pass, "pass");
-            b.Input(kk::mqtt_co2_topic, "Топик co2");
-            b.Input(kk::mqtt_tvoc_topic, "Топик tvoc");
             b.Button(SH("mqtt_save"), "Подключить");
         }
         {
@@ -103,15 +98,8 @@ void Settings::build(sets::Builder& b) {
             case SH("mqtt_save"):
                 LOG_DEBUG("mqtt_save pressed");
                 
-                if (_db && _db->update() && _mqtt_conn && _co2_pub) {
+                if (_db && _db->update() && _mqtt_conn) {
                     _mqtt_conn->connect();
-
-                    String new_co2_topic = (*_db)[kk::mqtt_co2_topic].toString();
-                    String new_tvoc_topic = (*_db)[kk::mqtt_tvoc_topic].toString();
-                    if (!new_co2_topic.isEmpty() && !new_tvoc_topic.isEmpty()) {
-                        _co2_pub->setTopics(new_co2_topic, new_tvoc_topic);
-                    }
-
                     return;
                 }
 
@@ -131,9 +119,9 @@ void Settings::build(sets::Builder& b) {
             case SH("common_save"):
                 LOG_DEBUG("common_save pressed");
                 
-                if (_db && _db->update() && _rgb_controller && _display) {
+                if (_db && _db->update() && _rgb_controller && _hmi) {
                     _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
-                    _display->setTheme((*_db)[kk::use_dark_theme].toBool());
+                    _hmi->setTheme((*_db)[kk::use_dark_theme].toBool());
                     return;
                 }
 

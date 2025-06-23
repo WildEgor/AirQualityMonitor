@@ -7,12 +7,12 @@
 #include "sensors/co2.h"
 #include "sensors/tp.h"
 
-#define LOG_COMPONENT "Display"
-#include "logger/logger.h"
+#define LOG_COMPONENT "HMI"
+#include "services/logger.h"
 
-class Display: public LoopTimerBase {
+class HMI: public LoopTimerBase {
 public:
-    Display(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, TPSensor& tp_sensor, WiFiConn& wifiConn)
+    HMI(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, TPSensor& tp_sensor, WiFiConn& wifiConn)
         : LoopTimerBase(ms), 
         _db(&settingsDb.getDB()), 
         _co2_sensor(co2_sensor),

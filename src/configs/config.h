@@ -5,6 +5,7 @@
 #define APP_VERSION "1.0"
 #define APP_PLATFORM esp_32_s2_mini // "d1_mini"
 #define APP_LOG_LEVEL "DEBUG"
+#define ENABLE_TEST
 #define APP_DARK_THEME true // Choose color theme
 
 // maint

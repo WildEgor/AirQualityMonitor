@@ -1,12 +1,24 @@
 #pragma once
 #include <Arduino.h>
-#include <WiFiConnector.h>
+
 #include "db/settings_db.h"
 #include "configs/config.h"
 
+class WiFiAdapter {
+public:
+    WiFiAdapter(const String& APname = "ESP_AP", const String& APpass = "") {}
+    virtual ~WiFiAdapter() {}
+
+    virtual void connect(const String& ssid, const String& pass = "") = 0;
+    virtual bool connecting() = 0;
+    virtual bool connected() = 0;
+    virtual bool tick() = 0;
+    virtual String ip() = 0;
+}; 
+
 class WiFiConn : public LoopTickerBase {
 public:
-    WiFiConn(SettingsDB& settingsDb);
+    WiFiConn(SettingsDB& settingsDb, WiFiAdapter& wifiAdapter);
 
     void setup();
     void exec() override;
@@ -18,7 +30,6 @@ private:
     void _connectToWiFi(const String& ssid, const String& pass);
 
     GyverDBFile* _db;
-    WiFiConnectorClass* _wifiConnector;
-    bool _wifi_ok;
+    WiFiAdapter* _wifi_adapter;
     bool _is_initialized;
 };

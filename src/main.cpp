@@ -8,24 +8,30 @@
 #include "sensors/sensor_base.h"
 #include "sensors/co2.h"
 #include "sensors/tp.h"
-#include "hmi/display.h"
+#include "hmi/hmi.h"
 #include "controllers/rgb.h"
 #include "model/co2_data.h"
 #include "connections/wifi_conn.h"
-#include "logger/logger.h"
+#include "services/logger.h"
+#include "services/publisher.h"
+
+// #include "connections/wifi_std_adapter.cpp"
+#include "connections/wifi_connector_adapter.cpp"
 
 void setup() {
   Serial.begin(115200);
-  delay(SEC_1);
-
-  SET_LOG_LEVEL(APP_LOG_LEVEL); // TODO: move to settings
+  
+  SET_LOG_LEVEL(APP_LOG_LEVEL);
   LOG_INFO("init...");
 
   SettingsDB* sdb = new SettingsDB();
   sdb->setup();
   sdb->addLoop();
 
-  WiFiConn* wifi = new WiFiConn(*sdb);
+  // WiFiAdapter* wifia = new WiFiStdAdapter(WIFI_AP_NAME, WIFI_AP_PASS);
+  WiFiAdapter* wifia = new WiFiConnectorAdapter(WIFI_AP_NAME, WIFI_AP_PASS);
+
+  WiFiConn* wifi = new WiFiConn(*sdb, *wifia);
   wifi->setup();
   wifi->addLoop();
 
@@ -34,35 +40,55 @@ void setup() {
   mqtt->addLoop();
 
   CO2Sensor* co2 = new CO2Sensor(SEC_10);
+#ifdef ENABLE_TEST
+  co2->enableTest();
+#endif
   co2->setup();
   co2->addLoop();
 
-  CO2Publisher* co2p = new CO2Publisher(SEC_30, *co2, *mqtt);
+  MQTTPublisher* co2p = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_CO2_TOPIC);
+  co2p->setValueCb([co2]() -> float {
+    return co2->getCO2();
+  });
   co2p->addLoop();
 
+  MQTTPublisher* tvocp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TVOC_TOPIC);
+  tvocp->setValueCb([co2]() -> float {
+    return co2->getTVOC();
+  });
+  tvocp->addLoop();
+
   TPSensor* tp = new TPSensor(SEC_10);
+#ifdef ENABLE_TEST
+  tp->enableTest();
+#endif
   tp->setup();
   tp->addLoop();
 
-  TPPublisher* tpp = new TPPublisher(SEC_30, *tp, *mqtt);
-  tpp->addLoop();
+  MQTTPublisher* tempp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TEMP_TOPIC);
+  tempp->setValueCb([tp]() -> float {
+    return tp->getTemperature();
+  });
+  tempp->addLoop();
 
-  SensorContainer* sensors = new SensorContainer();
-  sensors->addSensor(co2->getType(), co2);
-  sensors->addSensor(tp->getType(), tp);
+  MQTTPublisher* pp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_PRESSURE_TOPIC);
+  pp->setValueCb([tp]() -> float {
+    return tp->getPressure();
+  });
+  pp->addLoop();
 
-  Display* display = new Display(MS_100, *sdb, *co2, *tp, *wifi);
-  display->setup();
-  display->addLoop();
+  HMI* hmi = new HMI(MS_100, *sdb, *co2, *tp, *wifi);
+  hmi->setup();
+  hmi->addLoop();
 
   RGBController* rgb = new RGBController(SEC_1, *sdb);
   rgb->setup();
-  rgb->setUpdaterCb([co2]() -> uint16_t {
+  rgb->setUpdaterCb([co2]() -> float {
     return co2->getCO2();
   });
   rgb->addLoop();
 
-  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *sensors, *co2p, *rgb, *display);
+  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *rgb, *hmi);
   sett->setup();
   sett->addLoop();
 

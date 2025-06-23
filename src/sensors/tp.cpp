@@ -1,6 +1,6 @@
 #include "tp.h"
 #define LOG_COMPONENT "TPSensor"
-#include "logger/logger.h"
+#include "services/logger.h"
 
 TPSensor::TPSensor(uint32_t ms) 
     : SensorBase(ms), _mock(false), _is_initialized(false) {}
@@ -9,23 +9,29 @@ void TPSensor::setup() {
     LOG_INFO("init...");
     _is_initialized = false;
     
-    if (!_mock && !_init()) {
-        LOG_ERROR("initialization failed!");
-        return;
+    if (!_mock) {
+        if (!_init()) {
+            LOG_ERROR("failed to init sensor! please check your wiring.");
+            return;
+        }
     }
 
     _is_initialized = true;
-    LOG_INFO("Initialization successful");
+    LOG_INFO("init ok!");
 }
 
 void TPSensor::exec() {
-    if (!_mock) {
-        if (!_is_initialized) return;
-        _check_data();
+    if (_mock) {
+        _check_test_data();
         return;
     }
-     
-    _check_test_data();
+
+    if (!_is_initialized) {
+        init();
+        return;
+    }
+    
+    _check_data();
 }
 
 float TPSensor::getTemperature() { 
@@ -73,7 +79,7 @@ void TPSensor::copyState(const SensorBase& other) {
 
 bool TPSensor::_init() {
     if (!_sensor.begin(BMP280_ADDR)) {
-        LOG_ERROR("check wiring! tp sensor not found");
+        LOG_ERROR("failed to begin() sensor! please check your wiring.");
         return false;
     }
     _sensor.setMode(FORCED_MODE);
@@ -106,25 +112,3 @@ void TPSensor::_print_data() {
     LOG_DEBUG(String("temp: ") + _data.temp + " °C, " +
              "pressure: " + (_data.pressure / 100.0f) + " hPa");
 }
-
-// ---- TPPublisher Implementation ----
-TPPublisher::TPPublisher(
-    uint32_t ms, TPSensor& sensor, MQTTConn& mqtt
-) : LoopTimerBase(ms), _sensor(sensor), _mqtt(mqtt), _enabled(true),
-    _temp_topic(MQTT_DEFAULT_TEMP_TOPIC), 
-    _pressure_topic(MQTT_DEFAULT_PRESSURE_TOPIC) {}
-
-void TPPublisher::exec() {
-    if (!_enabled || !_sensor.isInitialized() || !_mqtt.isConnected()) return;
-    
-    _mqtt.publish(_temp_topic, String(_sensor.getTemperature()));
-    _mqtt.publish(_pressure_topic, String(_sensor.getPressure() / 100.0f)); // Convert to hPa
-}
-
-void TPPublisher::setTopics(const String& temp, const String& pressure) {
-    if (!temp.isEmpty()) _temp_topic = temp;
-    if (!pressure.isEmpty()) _pressure_topic = pressure;
-}
-
-void TPPublisher::enable() { _enabled = true; }
-void TPPublisher::disable() { _enabled = false; }

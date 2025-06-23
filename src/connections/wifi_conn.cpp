@@ -1,32 +1,17 @@
-#include "wifi_conn.h"
 #define LOG_COMPONENT "WiFiConn"
-#include "logger/logger.h"
+#include "services/logger.h"
+#include "wifi_conn.h"
+#include "wifi_std_adapter.cpp"
 
-WiFiConn::WiFiConn(SettingsDB& settingsDb) : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi_ok(false), _is_initialized(false) {}
+WiFiConn::WiFiConn(SettingsDB& settingsDb, WiFiAdapter& wifiAdapter) : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi_adapter(&wifiAdapter), _is_initialized(false) {}
 
 void WiFiConn::setup() {
     LOG_INFO("init...");
-
-    _wifiConnector = new WiFiConnectorClass(WIFI_AP_NAME, WIFI_AP_PASS, 60, true);
-
-    _wifiConnector->onConnect([this]() {
-        LOG_INFO("AP IP address: " + WiFi.localIP().toString());
-        _wifi_ok = true;
-    });
-
-    _wifiConnector->onError([this]() {
-        LOG_ERROR("connection error");
-        _wifi_ok = false;
-    });
     
-    if (!_wifiConnector->connecting()) {
-        if ((*_db)[kk::wifi_ssid].length()) {
-            _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
+    if (!isConnected()) {
+        _connectToWiFi((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
             
-            LOG_INFO("init ok!");
-        } else {
-            LOG_WARNING("wifi ssid is empty!");
-        }
+        LOG_INFO("init ok!");
 
         _is_initialized = true;
     }
@@ -38,13 +23,11 @@ void WiFiConn::exec() {
         return;
     }
 
-    _wifiConnector->tick();
-
-    if (_wifiConnector->connected()) {
-        return;
-    }
-
     connect();
+
+    if (_wifi_adapter->connected()) {
+        _wifi_adapter->tick();
+    }
 }
 
 void WiFiConn::connect() {
@@ -54,11 +37,11 @@ void WiFiConn::connect() {
 }
 
 bool WiFiConn::isConnected() {
-    return _wifiConnector->connected();
+    return _wifi_adapter->connected() && !_wifi_adapter->connecting();
 }
 
 String WiFiConn::ip() {
-    return WiFi.localIP().toString();
+    return _wifi_adapter->ip();
 }
 
 void WiFiConn::_connectToWiFi(const String& ssid, const String& pass) {
@@ -66,10 +49,10 @@ void WiFiConn::_connectToWiFi(const String& ssid, const String& pass) {
 
     LOG_INFO("connecting to " + ssid);
 
-    _wifiConnector->connect(ssid, pass);
+    _wifi_adapter->connect(ssid, pass);
 
     int retries = 0;
-    while (!_wifiConnector->connected() && retries < WIFI_CONN_RETRY_COUNT) {
+    while (!_wifi_adapter->connected() && retries < WIFI_CONN_RETRY_COUNT) {
         if (WIFI_CONN_RETRY_TIMEOUT >= 500) {
             delay(WIFI_CONN_RETRY_TIMEOUT);
         } else {

@@ -1,6 +1,6 @@
-#include "settings_db.h"
 #define LOG_COMPONENT "SettingsDB"
-#include "logger/logger.h"
+#include "services/logger.h"
+#include "settings_db.h"
 
 String co2_scale_types = "DEFAULT;EASY";
 

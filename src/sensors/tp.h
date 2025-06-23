@@ -38,19 +38,3 @@ private:
     void _pub_event();
     void _print_data();
 };
-
-class TPPublisher : public LoopTimerBase {
-public:
-    TPPublisher(uint32_t ms, TPSensor& sensor, MQTTConn& mqtt);
-    void exec() override;
-    void setTopics(const String& temperature, const String& pressure);
-    void enable();
-    void disable();
-
-private:
-    TPSensor& _sensor;
-    MQTTConn& _mqtt;
-    bool _enabled;
-    String _temp_topic;
-    String _pressure_topic;
-};

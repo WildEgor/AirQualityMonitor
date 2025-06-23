@@ -5,7 +5,6 @@
 
 #include "db/settings_db.h"
 #include "configs/config.h"
-#include "connections/ntp_conn.h"
 #include "connections/wifi_conn.h"
 
 extern WiFiClient _espClient;
