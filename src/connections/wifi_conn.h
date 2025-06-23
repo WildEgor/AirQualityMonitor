@@ -6,7 +6,7 @@
 
 class WiFiAdapter {
 public:
-    WiFiAdapter(const String& APname = "ESP_AP", const String& APpass = "") {}
+    WiFiAdapter(const String& APname = "ESP_AP", const String& APpass = "", uint16_t timeout = 60, bool closeAP = false) {}
     virtual ~WiFiAdapter() {}
 
     virtual void connect(const String& ssid, const String& pass = "") = 0;

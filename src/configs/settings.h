@@ -18,6 +18,7 @@ public:
         RGBController& rgbCtrl,
         HMI& hmi
     );
+    Settings(SettingsDB& settingsDb, WiFiConn& wifiConn);
 
     void setup();
     void exec() override;

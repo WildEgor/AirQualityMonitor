@@ -18,6 +18,18 @@ Settings::Settings(
     _hmi(&hmi),
     _is_initialized(false) {}
 
+Settings::Settings(
+    SettingsDB& settingsDb, 
+    WiFiConn& wifiConn
+) 
+    : LoopTickerBase(), 
+    _db(&settingsDb.getDB()), 
+    _wifi_conn(&wifiConn), 
+    _mqtt_conn(nullptr), 
+    _rgb_controller(nullptr), 
+    _hmi(nullptr),
+    _is_initialized(false) {}
+
 void Settings::setup() {
     LOG_INFO("init...");
 

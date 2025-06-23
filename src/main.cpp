@@ -12,11 +12,9 @@
 #include "controllers/rgb.h"
 #include "model/co2_data.h"
 #include "connections/wifi_conn.h"
+#include "connections/wifi_connector_adapter.cpp"
 #include "services/logger.h"
 #include "services/publisher.h"
-
-// #include "connections/wifi_std_adapter.cpp"
-#include "connections/wifi_connector_adapter.cpp"
 
 void setup() {
   Serial.begin(115200);
@@ -28,9 +26,7 @@ void setup() {
   sdb->setup();
   sdb->addLoop();
 
-  // WiFiAdapter* wifia = new WiFiStdAdapter(WIFI_AP_NAME, WIFI_AP_PASS);
-  WiFiAdapter* wifia = new WiFiConnectorAdapter(WIFI_AP_NAME, WIFI_AP_PASS);
-
+  WiFiAdapter* wifia = new WiFiConnectorAdapter(WIFI_AP_NAME, WIFI_AP_PASS, WIFI_CONN_RETRY_TIMEOUT, false);
   WiFiConn* wifi = new WiFiConn(*sdb, *wifia);
   wifi->setup();
   wifi->addLoop();
@@ -46,6 +42,14 @@ void setup() {
   co2->setup();
   co2->addLoop();
 
+  TPSensor* tp = new TPSensor(SEC_10);
+#ifdef ENABLE_TEST
+  tp->enableTest();
+#endif
+  tp->setup();
+  tp->addLoop();
+
+#ifndef ENABLE_TEST
   MQTTPublisher* co2p = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_CO2_TOPIC);
   co2p->setValueCb([co2]() -> float {
     return co2->getCO2();
@@ -58,13 +62,6 @@ void setup() {
   });
   tvocp->addLoop();
 
-  TPSensor* tp = new TPSensor(SEC_10);
-#ifdef ENABLE_TEST
-  tp->enableTest();
-#endif
-  tp->setup();
-  tp->addLoop();
-
   MQTTPublisher* tempp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TEMP_TOPIC);
   tempp->setValueCb([tp]() -> float {
     return tp->getTemperature();
@@ -76,6 +73,7 @@ void setup() {
     return tp->getPressure();
   });
   pp->addLoop();
+#endif
 
   HMI* hmi = new HMI(MS_100, *sdb, *co2, *tp, *wifi);
   hmi->setup();

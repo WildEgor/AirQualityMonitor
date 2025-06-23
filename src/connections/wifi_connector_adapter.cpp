@@ -1,11 +1,25 @@
+#define LOG_COMPONENT "WiFiConn"
+#include "services/logger.h"
 #include <WiFiConnector.h>
 #include "wifi_conn.h"
 #include "configs/config.h"
 
 class WiFiConnectorAdapter : public WiFiAdapter {
 public:
-    WiFiConnectorAdapter(const String& APname = "ESP_AP", const String& APpass = "") {
-        _wifiConnector = new WiFiConnectorClass(APname, APpass, 30, false); // TODO: move to config
+    WiFiConnectorAdapter(
+        const String& APname = "ESP_AP", 
+        const String& APpass = "",
+        uint16_t timeout = 60,
+        bool closeAP = false) {
+        _wifiConnector = new WiFiConnectorClass(APname, APpass, timeout, closeAP);
+
+        _wifiConnector->onConnect([this]() {
+            LOG_INFO("connected!");
+        });
+
+        _wifiConnector->onError([this]() {
+            LOG_ERROR("connection error");
+        });
     }
 
     void connect(const String& ssid, const String& pass = "") override {
@@ -21,9 +35,6 @@ public:
     }
 
     String ip() override {
-        if (_wifiConnector->connecting()) {
-            return "0.0.0.0";
-        }
         if (!_wifiConnector->connected()) {
             return WiFi.softAPIP().toString();
         }
@@ -33,7 +44,6 @@ public:
     bool tick() override {
         return _wifiConnector->tick();
     }
-
 private:
     WiFiConnectorClass* _wifiConnector;
 };

@@ -3,9 +3,9 @@
 // app 
 #define APP_NAME "AirQualityMonitor"
 #define APP_VERSION "1.0"
-#define APP_PLATFORM esp_32_s2_mini // "d1_mini"
+#define APP_PLATFORM esp_32_d1_mini // "d1_mini" "esp_32_s2_mini"
 #define APP_LOG_LEVEL "DEBUG"
-#define ENABLE_TEST
+// #define ENABLE_TEST
 #define APP_DARK_THEME true // Choose color theme
 
 // maint
@@ -29,8 +29,7 @@
 // wifi settings (see secrets.example.h too)
 #define WIFI_AP_NAME "AQM_AP" // Prefix for wi-fi point with settings
 #define WIFI_AP_PASS "adminadmin"
-#define WIFI_CONN_RETRY_COUNT 5
-#define WIFI_CONN_RETRY_TIMEOUT 500 // ms
+#define WIFI_CONN_RETRY_TIMEOUT 15 // sec
 
 // rgb settings
 #define RGB_PIN         19
