@@ -1,4 +1,5 @@
 #define LOG_COMPONENT "RGBController"
+#include "services/logger.h"
 #include "rgb.h"
 
 RGBController::RGBController(uint32_t ms, SettingsDB& settingsDb)

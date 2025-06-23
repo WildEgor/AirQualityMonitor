@@ -1,20 +1,18 @@
-#include "co2.h"
 #define LOG_COMPONENT "CO2Sensor"
-#include "logger/logger.h"
+#include "services/logger.h"
+#include "co2.h"
 
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _mock(false) {}
 
 void CO2Sensor::setup() {
-    LOG_INFO("setup...");
+    LOG_INFO("init...");
     _is_initialized = false;
 
     if (!_mock) {
-        _sensor = CCS811(CCS811_ADDR);
-        Wire.begin();
-
-        if (!_init()) return;
-
-        _sensor.setDriveMode(2); // 1 - every 1s, 2 - 10s, 3 - 60s measure
+        if (!_init()) {
+            LOG_ERROR("failed to init sensor! please check your wiring.");
+            return;
+        }
     }
 
     _is_initialized = true;
@@ -22,19 +20,21 @@ void CO2Sensor::setup() {
 }
 
 void CO2Sensor::exec() {
-    if (!_mock) {
-        if (!_is_initialized) {
-            init();
-            return;
-        }
-        _check_data();
-    } else {
+    if (_mock) {
         _check_test_data();
+        return;
     }
+
+    if (!_is_initialized) {
+        init();
+        return;
+    }
+
+    _check_data();
 }
 
-uint16_t CO2Sensor::getCO2() { return _co2_data.co2; }
-uint16_t CO2Sensor::getTVOC() { return _co2_data.tvoc; }
+float CO2Sensor::getCO2() { return _data.co2; }
+float CO2Sensor::getTVOC() { return _data.tvoc; }
 
 const char* CO2Sensor::getType() const {
     return "co2";
@@ -65,17 +65,19 @@ void CO2Sensor::enableTest() {
 }
 
 void CO2Sensor::copyState(const SensorBase& other) {
-    const CO2Sensor& co2_other = static_cast<const CO2Sensor&>(other);
-    _mock = co2_other._mock;
-    _co2_data = co2_other._co2_data;
-    _is_initialized = co2_other._is_initialized;
+    const CO2Sensor& _other = static_cast<const CO2Sensor&>(other);
+    _mock = _other._mock;
+    _data = _other._data;
+    _is_initialized = _other._is_initialized;
 }
 
 bool CO2Sensor::_init() {
+    _sensor = CCS811(CCS811_ADDR);
+    Wire.begin();
     if (!_sensor.begin()) {
-        LOG_ERROR("failed to begin() sensor! please check your wiring.");
         return false;
     }
+    _sensor.setDriveMode(2); // 1 - every 1s, 2 - 10s, 3 - 60s measure
     return true;
 }
 
@@ -83,60 +85,39 @@ void CO2Sensor::_check_data() {
     if (_sensor.dataAvailable()) {
         _sensor.readAlgorithmResults();
 
-        _co2_data.co2 = _sensor.getCO2();
-        if (_co2_data.co2 > getCO2Max()) {
-            _co2_data.co2 = getCO2Max();
+        _data.co2 = static_cast<float>(_sensor.getCO2());
+        if (_data.co2 > getCO2Max()) {
+            _data.co2 = getCO2Max();
         }
-        if (_co2_data.co2 < getCO2Min()) {
-            _co2_data.co2 = getCO2Min();
+        if (_data.co2 < getCO2Min()) {
+            _data.co2 = getCO2Min();
         }
 
-        _co2_data.tvoc = _sensor.getTVOC();
-        if (_co2_data.tvoc > getTVOCMax()) {
-            _co2_data.tvoc = getTVOCMax();
+        _data.tvoc = static_cast<float>(_sensor.getTVOC());
+        if (_data.tvoc > getTVOCMax()) {
+            _data.tvoc = getTVOCMax();
         }
-        if (_co2_data.tvoc < getTVOCMin()) {
-            _co2_data.tvoc = getTVOCMin();
+        if (_data.tvoc < getTVOCMin()) {
+            _data.tvoc = getTVOCMin();
         }
         _print_data();
     }
 }
 
 void CO2Sensor::_check_test_data() {
-    _co2_data.co2 = 800;
-    _co2_data.tvoc = 3000;
+    _data.co2 = 800.1;
+    _data.tvoc = 3000.1;
     _print_data();
 }
 
 void CO2Sensor::_pub_event() {
     LOG_DEBUG("publish to co2_data");
-    Looper.sendEvent("co2_data", &_co2_data);
+    Looper.sendEvent("co2_data", &_data);
 }
 
 void CO2Sensor::_print_data() {
-    LOG_DEBUG("CO2: " + String(_co2_data.co2) + " ppm, TVOC: " + String(_co2_data.tvoc) + " ppb");
+    LOG_DEBUG("CO2: " + String(_data.co2) + " ppm, TVOC: " + String(_data.tvoc) + " ppb");
 }
-
-// --- CO2Publisher ---
-
-CO2Publisher::CO2Publisher(uint32_t ms, CO2Sensor& sensor, MQTTConn& mqtt)
-    : LoopTimerBase(ms), _sensor(sensor), _mqtt(mqtt), _enabled(true),
-      _co2_topic(MQTT_DEFAULT_CO2_TOPIC), _tvoc_topic(MQTT_DEFAULT_TVOC_TOPIC) {}
-
-void CO2Publisher::exec() {
-    if (!_sensor.isInitialized() || !_mqtt.isConnected()) return;
-
-    _mqtt.publish(_co2_topic, String(_sensor.getCO2()));
-    _mqtt.publish(_tvoc_topic, String(_sensor.getTVOC()));
-}
-
-void CO2Publisher::setTopics(const String& co2, const String& tvoc) {
-    if (!co2.isEmpty()) _co2_topic = co2;
-    if (!tvoc.isEmpty()) _tvoc_topic = tvoc;
-}
-
-void CO2Publisher::enable() { _enabled = true; }
-void CO2Publisher::disable() { _enabled = false; }
 
 // --- CO2Scale ---
 

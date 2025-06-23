@@ -20,7 +20,6 @@ void Logger::setLevel(const String& level) {
     } else if (levelUpper == "ERROR") {
         _current_level = LogLevel::ERROR;
     } else {
-        // Use a default macro to log errors without component dependency
         Serial.println("[ERROR][Logger] Invalid log level: " + level);
     }
 }
@@ -29,12 +28,25 @@ void Logger::log(LogLevel level, const char* component, const String& message) {
     if (level < _current_level) return;
     
     String level_str;
+    String color_code;
     switch (level) {
-        case LogLevel::DEBUG:    level_str = "DEBUG"; break;
-        case LogLevel::INFO:     level_str = "INFO";  break;
-        case LogLevel::WARNING:  level_str = "WARN";  break;
-        case LogLevel::ERROR:    level_str = "ERROR"; break;
+        case LogLevel::DEBUG:
+            level_str = "DEBUG";
+            color_code = "\033[36m"; // Cyan
+            break;
+        case LogLevel::INFO:
+            level_str = "INFO";
+            color_code = "\033[32m"; // Green
+            break;
+        case LogLevel::WARNING:
+            level_str = "WARN";
+            color_code = "\033[33m"; // Yellow
+            break;
+        case LogLevel::ERROR:
+            level_str = "ERROR";
+            color_code = "\033[31m"; // Red
+            break;
     }
-    
-    Serial.println("[" + level_str + "][" + component + "] " + message);
+    String reset_code = "\033[0m";
+    Serial.println(color_code + "[" + level_str + "][" + component + "] " + message + reset_code);
 }

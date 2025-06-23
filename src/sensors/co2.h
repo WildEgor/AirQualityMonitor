@@ -10,6 +10,11 @@
 
 #define CCS811_ADDR 0x5A
 
+struct ColorThreshold {
+    uint16_t threshold;
+    uint8_t r, g, b;
+};
+
 class CO2Sensor : public SensorBase {
 public:
     CO2Sensor(uint32_t ms);
@@ -18,10 +23,10 @@ public:
     void exec() override;
     float getCO2Min();
     float getCO2Max();
-    uint16_t getCO2();
+    float getCO2();
     float getTVOCMin();
     float getTVOCMax();
-    uint16_t getTVOC();
+    float getTVOC();
     const char* getType() const override;
     bool isInitialized() const override;
     void enableTest();
@@ -31,35 +36,13 @@ private:
     CCS811 _sensor;
     bool _mock;
     bool _is_initialized;
-    CO2Data _co2_data;
+    CO2Data _data;
 
     bool _init();
     void _check_data();
     void _check_test_data();
     void _pub_event();
     void _print_data();
-};
-
-class CO2Publisher : public LoopTimerBase {
-public:
-    CO2Publisher(uint32_t ms, CO2Sensor& sensor, MQTTConn& mqtt);
-
-    void exec() override;
-    void setTopics(const String& co2, const String& tvoc);
-    void enable();
-    void disable();
-
-private:
-    CO2Sensor& _sensor;
-    MQTTConn& _mqtt;
-    bool _enabled;
-    String _co2_topic;
-    String _tvoc_topic;
-};
-
-struct ColorThreshold {
-    uint16_t threshold;
-    uint8_t r, g, b;
 };
 
 class CO2Scale {
