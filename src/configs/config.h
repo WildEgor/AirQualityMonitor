@@ -2,17 +2,19 @@
 
 // app 
 #define APP_NAME "AirQualityMonitor"
-#define APP_VERSION "1.0"
-#define APP_PLATFORM esp_32_d1_mini // "d1_mini" "esp_32_s2_mini"
+#define APP_VERSION "1.1"
+#define APP_PLATFORM esp_32_d1_mini // "esp_32_d1_mini" "esp_32_s2_mini"
 #define APP_LOG_LEVEL "DEBUG"
 // #define ENABLE_TEST
 #define APP_DARK_THEME true // Choose color theme
 
 // maint
-#define RESET_DB false // Factory reset db
+// #define DB_RESET // Factory reset db
+#define DB_NAME "/settings.db"
 
 // system (dont change)
 #define MS_100 100
+#define MS_500 500
 #define SEC_1 1000
 #define SEC_5 5000
 #define SEC_10 10000
@@ -21,10 +23,11 @@
 // mqtt service to interact with yandex (see wqtt.ru)
 #define MQTT_SERVER "m8.wqtt.ru"
 #define MQTT_PORT 20336
-#define MQTT_DEFAULT_CO2_TOPIC "common/aqm/co2"
-#define MQTT_DEFAULT_TVOC_TOPIC "common/aqm/tvoc"
-#define MQTT_DEFAULT_TEMP_TOPIC "common/aqm/temp"
-#define MQTT_DEFAULT_PRESSURE_TOPIC "common/aqm/pressure"
+#define MQTT_DEFAULT_DEVICE_ID "aqm"
+#define MQTT_DEFAULT_CO2_TOPIC "/co2"
+#define MQTT_DEFAULT_TVOC_TOPIC "/tvoc"
+#define MQTT_DEFAULT_TEMP_TOPIC "/temp"
+#define MQTT_DEFAULT_PRESSURE_TOPIC "/pressure"
 
 // wifi settings (see secrets.example.h too)
 #define WIFI_AP_NAME "AQM_AP" // Prefix for wi-fi point with settings

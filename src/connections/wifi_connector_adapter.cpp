@@ -1,16 +1,18 @@
 #define LOG_COMPONENT "WiFiConn"
 #include "services/logger.h"
-#include <WiFiConnector.h>
 #include "wifi_conn.h"
 #include "configs/config.h"
 
+// WiFiConnectorAdapter implement connection to wifi using gyverlibs/WiFiConnector
 class WiFiConnectorAdapter : public WiFiAdapter {
 public:
     WiFiConnectorAdapter(
         const String& APname = "ESP_AP", 
         const String& APpass = "",
         uint16_t timeout = 60,
-        bool closeAP = false) {
+        bool closeAP = false
+    ) {
+        LOG_INFO("init...");
         _wifiConnector = new WiFiConnectorClass(APname, APpass, timeout, closeAP);
 
         _wifiConnector->onConnect([this]() {
@@ -18,8 +20,11 @@ public:
         });
 
         _wifiConnector->onError([this]() {
-            LOG_ERROR("connection error");
+            LOG_WARN("connection error");
         });
+
+        _is_initialized = true;
+        LOG_INFO("init ok!");
     }
 
     void connect(const String& ssid, const String& pass = "") override {
@@ -41,9 +46,10 @@ public:
         return WiFi.localIP().toString();
     }
 
-    bool tick() override {
+    bool exec() override {
         return _wifiConnector->tick();
     }
 private:
-    WiFiConnectorClass* _wifiConnector;
+    WiFiConnectorClass* _wifiConnector = nullptr;
+    bool _is_initialized = false;
 };

@@ -11,15 +11,12 @@ public:
     RGBController(uint32_t ms, SettingsDB& settingsDb);
     ~RGBController();
 
-    void setup() override;
     void exec() override;
+    void toggle(bool value) override;
 
-    void toggle(bool value);
     void setUpdaterCb(UpdaterCallback cb);
     void renderLevel(float value, float min, float max);
     void clear();
-
-    void copyState(const ControllerBase& other) override;
     const char* getType() const override;
 
 private:
@@ -29,9 +26,7 @@ private:
     GyverDBFile* _db;
     UpdaterCallback _u_cb;
     CO2Scale* _co2_scale;
-    bool _is_initialized;
     bool _blink;
-    bool _enabled;
     uint16_t _default_period;
     uint16_t _curr_period;
 };

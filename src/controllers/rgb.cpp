@@ -9,34 +9,29 @@ RGBController::RGBController(uint32_t ms, SettingsDB& settingsDb)
       _leds(nullptr),
       _db(&settingsDb.getDB()),
       _co2_scale(&CO2Scale::getInstance()),
-      _is_initialized(false) {}
+      _blink(false)
+      {
+        LOG_INFO("init...");
+
+        _leds = new Adafruit_NeoPixel(_num_leds, _pin, NEO_GRB + NEO_KHZ800);
+        _leds->begin();
+        _leds->setBrightness(100);
+        clear();
+
+        _co2_scale->init(_db);
+        _default_period = this->getPeriod();
+        _enabled = (*_db)[kk::rgb_enabled].toBool();
+        
+        LOG_INFO("init ok!");
+        _is_initialized = true;
+        this->addLoop();
+    }
 
 RGBController::~RGBController() {
-    if (_leds != nullptr) {
+    if (_leds) {
         delete _leds;
         _leds = nullptr;
     }
-}
-
-void RGBController::setup() {
-    LOG_INFO("init...");
-
-    if (_leds != nullptr) {
-        delete _leds;
-    }
-
-    _leds = new Adafruit_NeoPixel(_num_leds, _pin, NEO_GRB + NEO_KHZ800);
-    _leds->begin();
-    _leds->setBrightness(100);
-    clear();
-
-    _co2_scale->init(_db);
-    _default_period = this->getPeriod();
-    _enabled = (*_db)[kk::rgb_enabled].toBool();
-
-    _is_initialized = true;
-
-    LOG_INFO("init ok!");
 }
 
 void RGBController::setUpdaterCb(UpdaterCallback cb) {
@@ -47,7 +42,6 @@ void RGBController::exec() {
     _curr_period = this->getPeriod();
 
     if (!_is_initialized) {
-        LOG_ERROR("call setup() first!");
         return;
     }
 
@@ -107,14 +101,6 @@ void RGBController::clear() {
         _leds->clear();
         _leds->show();
     }
-}
-
-void RGBController::copyState(const ControllerBase& other) {
-    const RGBController& rgb_other = static_cast<const RGBController&>(other);
-    _pin = rgb_other._pin;
-    _num_leds = rgb_other._num_leds;
-    _is_initialized = rgb_other._is_initialized;
-    _enabled = rgb_other._enabled;
 }
 
 const char* RGBController::getType() const {

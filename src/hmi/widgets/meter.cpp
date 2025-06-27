@@ -18,7 +18,7 @@ MeterWidget::MeterWidget(TFT_eSPI* tft)
   factor = 1.0;
   scaleStart = 0.0;
 
-  mlabel[8] = '\0';
+  memset(mlabel, 0, sizeof(mlabel));
 
   // Defaults
   strncpy(ms0,   "0", 4);
@@ -55,7 +55,8 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
   factor = 100.0/(endScale - startScale);
   scaleStart = startScale;
 
-  strncpy(mlabel, units, 8);
+  strncpy(mlabel, units, sizeof(mlabel) - 1);
+  mlabel[sizeof(mlabel) - 1] = '\0';
 
   strncpy(ms0, s0, 4);
   strncpy(ms1, s1, 4);

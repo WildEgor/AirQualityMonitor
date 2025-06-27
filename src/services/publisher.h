@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include "Looper.h"
+
 #include "connections/mqtt_conn.h"
 
 class MQTTPublisher : public LoopTimerBase {
@@ -8,10 +9,12 @@ public:
     using ValueCallback = std::function<float()>;
 
     MQTTPublisher(uint32_t ms, MQTTConn& mqtt, const String& topic = "")
-        : LoopTimerBase(ms), _mqtt(mqtt), _enabled(true), _topic(topic) {}
+        : LoopTimerBase(ms), _mqtt(mqtt), _enabled(true), _topic(topic) {
+            this->addLoop();
+        }
 
     void exec() override {
-        if (!_enabled || !_mqtt.isConnected() || !_cb) return;
+        if (!_enabled || !_mqtt.connected() || !_cb) return;
         publish();
     }
 

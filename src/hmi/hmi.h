@@ -20,9 +20,8 @@ public:
         _co2_meter(nullptr), 
         _co2_scale(&CO2Scale::getInstance()), 
         _wifi(&wifiConn), 
-        _show_intro(true) {}
-
-    void setup() {
+        _show_intro(true),
+        _dark_theme(false) {
         LOG_INFO("init tft...");
         _dark_theme = (*_db)[kk::use_dark_theme].toBool();
 
@@ -43,6 +42,7 @@ public:
         // TODO: refactor
         _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "pm", "", "", "", "", ""); 
         LOG_INFO("init widgets ok!");
+        this->addLoop();
     }
 
     void exec() {
@@ -64,8 +64,8 @@ private:
     TPSensor& _tp_sensor;
     WiFiConn* _wifi;
 
-    bool _show_intro;
-    bool _dark_theme;
+    bool _show_intro = true;
+    bool _dark_theme = false;
 
     void _render() {
         _show_intro = true;
@@ -74,7 +74,7 @@ private:
     }
 
     void _print_ip() {
-        if (!_wifi->isConnected()) {
+        if (!_wifi->connected()) {
             _tft.setCursor(35, 135);
             _init_theme(false);
             _tft.setTextColor(TFT_RED);
@@ -93,7 +93,7 @@ private:
         _init_theme(false);
         String adminURL = "Admin panel: http://" + _wifi->ip();
         _tft.println(adminURL);
-        LOG_INFO(adminURL);
+        LOG_ERROR(adminURL);
         delay(3000);
 
         _show_intro = false;
@@ -101,7 +101,7 @@ private:
 
     void _print_gauge() {
         if (!_co2_sensor.isInitialized()) {
-            LOG_WARNING("co2 sensor not initialized");
+            LOG_WARN("co2 sensor not initialized");
             delay(500);
             return;
         }

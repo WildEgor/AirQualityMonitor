@@ -13,6 +13,7 @@
 class TPSensor : public SensorBase {
 public:
     TPSensor(uint32_t ms);
+    
     void setup() override;
     void exec() override;
     float getTemperatureMin();
@@ -22,19 +23,12 @@ public:
     float getPressureMax();
     float getPressure();
     const char* getType() const override;
-    bool isInitialized() const override;
-    void enableTest();
-    void copyState(const SensorBase& other) override;
 
 private:
     GyverBME280 _sensor;
-    bool _mock;
-    bool _is_initialized;
     TPData _data;
     
     bool _init();
     void _check_data();
-    void _check_test_data();
-    void _pub_event();
     void _print_data();
 };

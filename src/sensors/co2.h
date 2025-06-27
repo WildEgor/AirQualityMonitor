@@ -28,20 +28,13 @@ public:
     float getTVOCMax();
     float getTVOC();
     const char* getType() const override;
-    bool isInitialized() const override;
-    void enableTest();
-    void copyState(const SensorBase& other) override;
 
 private:
     CCS811 _sensor;
-    bool _mock;
-    bool _is_initialized;
     CO2Data _data;
 
     bool _init();
     void _check_data();
-    void _check_test_data();
-    void _pub_event();
     void _print_data();
 };
 

@@ -5,6 +5,33 @@
 
 Settings::Settings(
     SettingsDB& settingsDb, 
+    WiFiConn& wifiConn
+) 
+    : LoopTickerBase(), 
+    _db(&settingsDb.getDB()), 
+    _wifi_conn(&wifiConn), 
+    _is_initialized(false) {
+        LOG_INFO("init...");
+
+        _sett = SettingsGyver("AirQualityMonitor v" APP_VERSION, _db);
+        _sett.begin();
+
+        _sett.onUpdate([this](sets::Updater& u) {
+            this->_update(u);
+        });
+
+        _sett.onBuild([this](sets::Builder& b) {
+            this->_build(b);
+        });
+
+        LOG_INFO("init ok!");
+
+        this->addLoop();
+        _is_initialized = true;
+    }
+
+Settings::Settings(
+    SettingsDB& settingsDb, 
     WiFiConn& wifiConn, 
     MQTTConn& mqttConn, 
     RGBController& rgbController,
@@ -16,38 +43,25 @@ Settings::Settings(
     _mqtt_conn(&mqttConn), 
     _rgb_controller(&rgbController), 
     _hmi(&hmi),
-    _is_initialized(false) {}
+    _is_initialized(false) {
+        LOG_INFO("init...");
 
-Settings::Settings(
-    SettingsDB& settingsDb, 
-    WiFiConn& wifiConn
-) 
-    : LoopTickerBase(), 
-    _db(&settingsDb.getDB()), 
-    _wifi_conn(&wifiConn), 
-    _mqtt_conn(nullptr), 
-    _rgb_controller(nullptr), 
-    _hmi(nullptr),
-    _is_initialized(false) {}
+        _sett = SettingsGyver("AirQualityMonitor v" APP_VERSION, _db);
+        _sett.begin();
 
-void Settings::setup() {
-    LOG_INFO("init...");
+        _sett.onUpdate([this](sets::Updater& u) {
+            this->_update(u);
+        });
 
-    _sett = SettingsGyver("AirQualityMonitor v" APP_VERSION, _db);
-    _sett.begin();
+        _sett.onBuild([this](sets::Builder& b) {
+            this->_build(b);
+        });
 
-    _sett.onUpdate([this](sets::Updater& u) {
-        this->update(u);
-    });
+        LOG_INFO("init ok!");
 
-    _sett.onBuild([this](sets::Builder& b) {
-        this->build(b);
-    });
-
-    LOG_INFO("init ok!");
-
-    _is_initialized = true;
-}
+        this->addLoop();
+        _is_initialized = true;
+    }
 
 void Settings::exec() {
     if (!_is_initialized) {
@@ -58,11 +72,11 @@ void Settings::exec() {
     _sett.tick();
 }
 
-void Settings::update(sets::Updater& u) {
+void Settings::_update(sets::Updater& u) {
     // ...
 }
 
-void Settings::build(sets::Builder& b) {
+void Settings::_build(sets::Builder& b) {
     {
         sets::Group g(b, "Настройки");
         {
@@ -78,6 +92,7 @@ void Settings::build(sets::Builder& b) {
             b.Number(kk::mqtt_port);
             b.Input(kk::mqtt_username, "user");
             b.Pass(kk::mqtt_pass, "pass");
+            b.Input(kk::mqtt_device_id, MQTT_DEFAULT_DEVICE_ID);
             b.Button(SH("mqtt_save"), "Подключить");
         }
         {
@@ -90,6 +105,7 @@ void Settings::build(sets::Builder& b) {
             sets::Menu m(b, "Common");
             b.Switch(kk::rgb_enabled, "rgb");
             b.Switch(kk::use_dark_theme, "dark theme");
+            b.Select(kk::log_level, "Уровень логирования", log_levels);
             b.Button(SH("common_save"), "Сохранить");
         }
     }
@@ -111,6 +127,7 @@ void Settings::build(sets::Builder& b) {
                 LOG_DEBUG("mqtt_save pressed");
                 
                 if (_db && _db->update() && _mqtt_conn) {
+                    _mqtt_conn->setDeviceID((*_db)[kk::mqtt_device_id].toString());
                     _mqtt_conn->connect();
                     return;
                 }
@@ -131,9 +148,14 @@ void Settings::build(sets::Builder& b) {
             case SH("common_save"):
                 LOG_DEBUG("common_save pressed");
                 
-                if (_db && _db->update() && _rgb_controller && _hmi) {
-                    _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
-                    _hmi->setTheme((*_db)[kk::use_dark_theme].toBool());
+                if (_db && _db->update()) {
+                    SET_LOG_LEVEL((*_db)[kk::log_level].toString());
+
+                    if (_rgb_controller && _hmi) {
+                        _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
+                        _hmi->setTheme((*_db)[kk::use_dark_theme].toBool());
+                    }
+                
                     return;
                 }
 

@@ -5,7 +5,7 @@
 enum class LogLevel {
     DEBUG,
     INFO,
-    WARNING,
+    WARN,
     ERROR
 };
 
@@ -30,6 +30,6 @@ private:
 #define LOGGER Logger::getInstance()
 #define LOG_DEBUG(msg) LOGGER.log(LogLevel::DEBUG, LOG_COMPONENT, msg)
 #define LOG_INFO(msg) LOGGER.log(LogLevel::INFO, LOG_COMPONENT, msg)
-#define LOG_WARNING(msg) LOGGER.log(LogLevel::WARNING, LOG_COMPONENT, msg)
+#define LOG_WARN(msg) LOGGER.log(LogLevel::WARN, LOG_COMPONENT, msg)
 #define LOG_ERROR(msg) LOGGER.log(LogLevel::ERROR, LOG_COMPONENT, msg)
 #define SET_LOG_LEVEL(level) LOGGER.setLevel(level)

@@ -18,14 +18,15 @@ public:
         RGBController& rgbCtrl,
         HMI& hmi
     );
-    Settings(SettingsDB& settingsDb, WiFiConn& wifiConn);
+    Settings(SettingsDB& settingsDb, 
+        WiFiConn& wifiConn
+    );
 
-    void setup();
     void exec() override;
 
 private:
-    void update(sets::Updater& u);
-    void build(sets::Builder& b);
+    void _update(sets::Updater& u);
+    void _build(sets::Builder& b);
 
     SettingsGyver _sett;
     GyverDBFile* _db;

@@ -16,7 +16,7 @@ void Logger::setLevel(const String& level) {
     } else if (levelUpper == "INFO") {
         _current_level = LogLevel::INFO;
     } else if (levelUpper == "WARNING" || levelUpper == "WARN") {
-        _current_level = LogLevel::WARNING;
+        _current_level = LogLevel::WARN;
     } else if (levelUpper == "ERROR") {
         _current_level = LogLevel::ERROR;
     } else {
@@ -38,7 +38,7 @@ void Logger::log(LogLevel level, const char* component, const String& message) {
             level_str = "INFO";
             color_code = "\033[32m"; // Green
             break;
-        case LogLevel::WARNING:
+        case LogLevel::WARN:
             level_str = "WARN";
             color_code = "\033[33m"; // Yellow
             break;

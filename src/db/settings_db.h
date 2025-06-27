@@ -13,17 +13,18 @@ enum kk : size_t {
     mqtt_port,
     mqtt_username,
     mqtt_pass,
-    mqtt_co2_topic,
-    mqtt_tvoc_topic,
+    mqtt_device_id,
     co2_measure_prd,
     co2_pub_prd,
     co2_scale_type,
     co2_danger_lvl,
     rgb_enabled,
     use_dark_theme,
+    log_level,
 };
 
 extern String co2_scale_types;
+extern String log_levels;
 
 class SettingsDB : public LoopTickerBase {
 public:

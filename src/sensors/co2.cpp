@@ -2,31 +2,24 @@
 #include "services/logger.h"
 #include "co2.h"
 
-CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _mock(false) {}
-
-void CO2Sensor::setup() {
+CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms) {
     LOG_INFO("init...");
-    _is_initialized = false;
-
-    if (!_mock) {
-        if (!_init()) {
-            LOG_ERROR("failed to init sensor! please check your wiring.");
-            return;
-        }
+    this->addLoop();
+    
+    if (!_enable_test && !_init()) {
+        LOG_ERROR("init failed! please check your wiring.");
+        return;
     }
 
     _is_initialized = true;
     LOG_INFO("init ok!");
 }
 
-void CO2Sensor::exec() {
-    if (_mock) {
-        _check_test_data();
-        return;
-    }
+void CO2Sensor::setup() {}
 
+void CO2Sensor::exec() {
     if (!_is_initialized) {
-        init();
+        _init();
         return;
     }
 
@@ -56,32 +49,29 @@ float CO2Sensor::getTVOCMax() {
     return 1187.0f;
 }
 
-bool CO2Sensor::isInitialized() const {
-    return _is_initialized;
-}
-
-void CO2Sensor::enableTest() {
-    _mock = true;
-}
-
-void CO2Sensor::copyState(const SensorBase& other) {
-    const CO2Sensor& _other = static_cast<const CO2Sensor&>(other);
-    _mock = _other._mock;
-    _data = _other._data;
-    _is_initialized = _other._is_initialized;
-}
-
 bool CO2Sensor::_init() {
-    _sensor = CCS811(CCS811_ADDR);
-    Wire.begin();
-    if (!_sensor.begin()) {
-        return false;
+    if (!_enable_test) {
+        _sensor = CCS811(CCS811_ADDR);
+        
+        Wire.begin();
+        if (!_sensor.begin()) {
+            return false;
+        }
+
+        _sensor.setDriveMode(2); // 1 - every 1s, 2 - 10s, 3 - 60s measure
     }
-    _sensor.setDriveMode(2); // 1 - every 1s, 2 - 10s, 3 - 60s measure
+    
     return true;
 }
 
 void CO2Sensor::_check_data() {
+    if (_enable_test) {
+        _data.co2 = 800.1;
+        _data.tvoc = 3000.1;
+        _print_data();
+        return;
+    }
+
     if (_sensor.dataAvailable()) {
         _sensor.readAlgorithmResults();
 
@@ -104,23 +94,11 @@ void CO2Sensor::_check_data() {
     }
 }
 
-void CO2Sensor::_check_test_data() {
-    _data.co2 = 800.1;
-    _data.tvoc = 3000.1;
-    _print_data();
-}
-
-void CO2Sensor::_pub_event() {
-    LOG_DEBUG("publish to co2_data");
-    Looper.sendEvent("co2_data", &_data);
-}
-
 void CO2Sensor::_print_data() {
     LOG_DEBUG("CO2: " + String(_data.co2) + " ppm, TVOC: " + String(_data.tvoc) + " ppb");
 }
 
 // --- CO2Scale ---
-
 CO2Scale& CO2Scale::getInstance() {
     static CO2Scale instance;
     return instance;
