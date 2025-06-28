@@ -24,10 +24,10 @@
 #define MQTT_SERVER "m8.wqtt.ru"
 #define MQTT_PORT 20336
 #define MQTT_DEFAULT_DEVICE_ID "aqm"
-#define MQTT_DEFAULT_CO2_TOPIC "/co2"
-#define MQTT_DEFAULT_TVOC_TOPIC "/tvoc"
-#define MQTT_DEFAULT_TEMP_TOPIC "/temp"
-#define MQTT_DEFAULT_PRESSURE_TOPIC "/pressure"
+#define MQTT_DEFAULT_CO2_TOPIC "co2"
+#define MQTT_DEFAULT_TVOC_TOPIC "tvoc"
+#define MQTT_DEFAULT_TEMP_TOPIC "temp"
+#define MQTT_DEFAULT_PRESSURE_TOPIC "pressure"
 
 // wifi settings (see secrets.example.h too)
 #define WIFI_AP_NAME "AQM_AP" // Prefix for wi-fi point with settings

@@ -28,7 +28,7 @@ class MeterWidget
     float ltx;         // x delta of needle start
     uint16_t osx, osy; // Saved x & y coords of needle end
     int old_analog;    // Value last displayed
-    int old_digital;   // Value last displayed
+    int old_value;   // Value last displayed
 
     bool dark_theme;
 

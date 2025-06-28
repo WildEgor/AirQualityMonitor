@@ -10,6 +10,8 @@ MQTTConn::MQTTConn(SettingsDB& settingsDb, WiFiConn& wifiConn) : LoopTickerBase(
 
     LOG_INFO("init...");
 
+    _device_id = (*_db)[kk::mqtt_device_id].toString();
+
     _connectToMQTT(
         (*_db)[kk::mqtt_server],
         (*_db)[kk::mqtt_port].toInt16(),

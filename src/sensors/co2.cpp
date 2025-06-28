@@ -50,16 +50,18 @@ float CO2Sensor::getTVOCMax() {
 }
 
 bool CO2Sensor::_init() {
-    if (!_enable_test) {
-        _sensor = CCS811(CCS811_ADDR);
-        
-        Wire.begin();
-        if (!_sensor.begin()) {
-            return false;
-        }
-
-        _sensor.setDriveMode(2); // 1 - every 1s, 2 - 10s, 3 - 60s measure
+    if (_enable_test) {
+        return true;
     }
+    
+    _sensor = CCS811(CCS811_ADDR);
+        
+    Wire.begin();
+    if (!_sensor.begin()) {
+        return false;
+    }
+
+    _sensor.setDriveMode(2); // 1 - every 1s, 2 - 10s, 3 - 60s measure
     
     return true;
 }
@@ -68,18 +70,6 @@ void CO2Sensor::_check_data() {
     if (_enable_test) {
         _data.co2 = 800.1;
         _data.tvoc = 3000.1;
-
-        _data.changed = false;
-
-        if (_data.co2_old != _data.co2) {
-            _data.changed = true;
-            _data.co2_old = _data.co2;
-        }
-
-        if (_data.tvoc_old != _data.tvoc) {
-            _data.changed = true;
-            _data.tvoc_old = _data.tvoc;
-        }
 
         _print_data();
         return;
@@ -102,18 +92,6 @@ void CO2Sensor::_check_data() {
         }
         if (_data.tvoc < getTVOCMin()) {
             _data.tvoc = getTVOCMin();
-        }
-
-        _data.changed = false;
-
-        if (_data.co2_old != _data.co2) {
-            _data.changed = true;
-            _data.co2_old = _data.co2;
-        }
-
-        if (_data.tvoc_old != _data.tvoc) {
-            _data.changed = true;
-            _data.tvoc_old = _data.tvoc;
         }
 
         _print_data();

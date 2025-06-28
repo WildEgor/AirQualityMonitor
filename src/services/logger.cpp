@@ -11,16 +11,16 @@ void Logger::setLevel(const String& level) {
     String levelUpper = level;
     levelUpper.toUpperCase();
     
-    if (levelUpper == "DEBUG") {
+    if (levelUpper == "DEBUG" || levelUpper == "0") {
         _current_level = LogLevel::DEBUG;
-    } else if (levelUpper == "INFO") {
+    } else if (levelUpper == "INFO" || levelUpper == "1") {
         _current_level = LogLevel::INFO;
-    } else if (levelUpper == "WARNING" || levelUpper == "WARN") {
+    } else if (levelUpper == "WARN" || levelUpper == "2") {
         _current_level = LogLevel::WARN;
-    } else if (levelUpper == "ERROR") {
+    } else if (levelUpper == "ERROR" || levelUpper == "3") {
         _current_level = LogLevel::ERROR;
     } else {
-        Serial.println("[ERROR][Logger] Invalid log level: " + level);
+        log(LogLevel::ERROR, "Logger", "invalid log level: " + level);
     }
 }
 

@@ -27,9 +27,6 @@ public:
     float getTVOCMin();
     float getTVOCMax();
     float getTVOC();
-    bool hasChanges() {
-        return _data.changed;
-    };
     const char* getType() const override;
 
 private:

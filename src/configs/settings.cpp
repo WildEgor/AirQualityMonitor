@@ -17,7 +17,11 @@ Settings::Settings(
     _is_initialized(false) {
         LOG_INFO("init...");
 
-        _sett = SettingsGyver("AirQualityMonitor v" APP_VERSION, _db);
+        _sett = SettingsGyver(String(APP_NAME) + " v" + String(APP_VERSION), _db);
+        _sett.config.requestTout = SEC_10;
+        _sett.config.pingTout = SEC_30;
+        _sett.config.updateTout = 0;
+        _sett.config.theme = sets::Colors::Green;
         _sett.begin();
 
         _sett.onUpdate([this](sets::Updater& u) {
@@ -26,6 +30,10 @@ Settings::Settings(
 
         _sett.onBuild([this](sets::Builder& b) {
             this->_build(b);
+        });
+
+        _sett.onFocusChange([this]() {
+            LOG_INFO("browser connected!");
         });
 
         LOG_INFO("init ok!");
@@ -50,7 +58,11 @@ Settings::Settings(
     _is_initialized(false) {
         LOG_INFO("init...");
 
-        _sett = SettingsGyver("AirQualityMonitor v" APP_VERSION, _db);
+        _sett = SettingsGyver(String(APP_NAME) + " v" + String(APP_VERSION), _db);
+        _sett.config.requestTout = SEC_10;
+        _sett.config.pingTout = SEC_30;
+        _sett.config.updateTout = 0;
+        _sett.config.theme = sets::Colors::Green;
         _sett.begin(false);
 
         _sett.onUpdate([this](sets::Updater& u) {
@@ -64,9 +76,6 @@ Settings::Settings(
         _sett.onFocusChange([this]() {
             LOG_INFO("browser connected!");
         });
-
-        _sett.config.requestTout = SEC_10;
-        _sett.config.pingTout = SEC_10;
 
         LOG_INFO("init ok!");
 

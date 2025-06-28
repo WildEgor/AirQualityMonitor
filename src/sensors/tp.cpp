@@ -5,7 +5,7 @@
 TPSensor::TPSensor(uint32_t ms) 
     : SensorBase(ms) {
     LOG_INFO("init...");
-    this->addLoop();
+    // this->addLoop(); // HINT: uncomment if bme180 support
     
     if (!_enable_test && !_init()) {
         LOG_ERROR("init failed! please check your wiring.");
