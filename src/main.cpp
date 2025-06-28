@@ -2,17 +2,17 @@
 #include <Looper.h>
 
 #include "db/settings_db.h"
+#include "model/co2_data.h"
 #include "configs/config.h"
 #include "configs/settings.h"
 #include "connections/mqtt_conn.h"
+#include "connections/wifi_conn.h"
+#include "connections/wifi_connector_adapter.cpp"
 #include "sensors/sensor_base.h"
 #include "sensors/co2.h"
 #include "sensors/tp.h"
 #include "hmi/hmi.h"
 #include "controllers/rgb.h"
-#include "model/co2_data.h"
-#include "connections/wifi_conn.h"
-#include "connections/wifi_connector_adapter.cpp"
 #include "services/logger.h"
 #include "services/publisher.h"
 

@@ -14,17 +14,16 @@ class HMI: public LoopTimerBase {
 public:
     HMI(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, TPSensor& tp_sensor, WiFiConn& wifiConn)
         : LoopTimerBase(ms), 
-        _db(&settingsDb.getDB()), 
+        _db(&settingsDb.db()), 
         _co2_sensor(co2_sensor),
         _tp_sensor(tp_sensor), 
         _co2_meter(nullptr), 
         _co2_scale(&CO2Scale::getInstance()), 
         _wifi(&wifiConn), 
-        _show_intro(true),
         _dark_theme(false),
         _last_co2_value(-1),
         _last_wifi_state(false),
-        _intro_shown(true),
+        _intro_shown(false),
         _force_redraw(true),
         _last_render_time(0) {
 
@@ -41,7 +40,7 @@ public:
         _co2_scale->getScale(rs,re,os,oe,ys,ye,gs,ge);
         _co2_meter.setTheme(_dark_theme);
         _co2_meter.setZones(rs,re,os,oe,ys,ye,gs,ge);
-        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "pm", "", "", "", "", ""); 
+        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", ""); 
         LOG_INFO("init widgets ok!");
 
         _render();
@@ -57,7 +56,7 @@ public:
             _dark_theme = dark;
             _init_theme(true);
             _co2_meter.setTheme(_dark_theme);
-            _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "pm", "", "", "", "", "");
+            _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", "");
             _force_redraw = true; 
             _render();
         }
@@ -72,7 +71,6 @@ private:
     TPSensor& _tp_sensor;
     WiFiConn* _wifi;
 
-    bool _show_intro = true;
     bool _dark_theme = false;
     float _last_co2_value = -1;
     bool _last_wifi_state = false;
@@ -103,6 +101,13 @@ private:
             return true;
         }
 
+        // Check if WiFi state changed
+        bool current_wifi_state = _wifi->connected();
+        if (current_wifi_state != _last_wifi_state) {
+            _last_wifi_state = current_wifi_state;
+            return true;
+        }
+
         // Check if CO2 value changed
         float current_co2 = _co2_sensor.getCO2();
 
@@ -114,15 +119,9 @@ private:
             return true;
         }
 
-        // Check if WiFi state changed
-        bool current_wifi_state = _wifi->connected();
-        if (current_wifi_state != _last_wifi_state) {
-            _last_wifi_state = current_wifi_state;
-            return true;
-        }
-
-        // Show intro message periodically (every 30 seconds) if not shown
-        if (!_intro_shown && (millis() - _last_render_time) > SEC_10) {
+        // Show intro message periodically (every 5 seconds) if not shown
+        if ((millis() - _last_render_time) > SEC_5) {
+            _intro_shown = true;
             return true;
         }
 
@@ -133,27 +132,37 @@ private:
         if (_intro_shown || _force_redraw) {
             _intro_shown = false;
 
-            _tft.setCursor(50, 135);
-    
-            if (!_wifi->connected()) {
+            if (_dark_theme) {
+                _tft.fillRect(100, 145, 60, 10, TFT_BLACK);
+            } else {
+                _tft.fillRect(100, 145, 60, 10, TFT_WHITE);
+            }
+
+            _tft.setCursor(100, 145);
+        
+            if (!_last_wifi_state) {
                 _tft.setTextColor(TFT_RED);
                 _tft.println("WIFI X");
                 LOG_ERROR("wifi not connected");
-                return;
             } else {
-                _tft.setTextColor(TFT_GREEN);
+                _tft.setTextColor(TFT_DARKGREEN);
                 _tft.println("WIFI OK");
             }
         }
 
-        // Show admin URL only once or when forced
         if (!_intro_shown || _force_redraw) {
-            _init_theme(false);
-            _tft.setTextColor(TFT_GREEN);
+            if (_dark_theme) {
+                _tft.fillRect(20, 130, 200, 10, TFT_BLACK);
+                _tft.setTextColor(TFT_LIGHTGREY);
+            } else {
+                _tft.fillRect(20, 130, 200, 10, TFT_WHITE);
+                _tft.setTextColor(TFT_BLACK);
+            }
+
             _tft.setCursor(20, 130);
             String adminURL = "Admin panel: http://" + _wifi->ip();
             _tft.println(adminURL);
-            LOG_ERROR(adminURL);
+            LOG_INFO(adminURL);
         }
     }
 

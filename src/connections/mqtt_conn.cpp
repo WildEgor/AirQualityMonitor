@@ -5,7 +5,7 @@
 WiFiClient _espClient;
 PubSubClient _pub_client(_espClient);
 
-MQTTConn::MQTTConn(SettingsDB& settingsDb, WiFiConn& wifiConn) : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi(&wifiConn) {
+MQTTConn::MQTTConn(SettingsDB& settingsDb, WiFiConn& wifiConn) : LoopTickerBase(), _db(&settingsDb.db()), _wifi(&wifiConn) {
     if (!isEnabled()) return;
 
     LOG_INFO("init...");
@@ -61,7 +61,10 @@ void MQTTConn::publish(const String& topic, const String& payload) {
 
     String t = _device_id + "/" + topic;
 
-    _pub_client.publish(t.c_str(), payload.c_str(), false);
+    bool ok = _pub_client.publish(t.c_str(), payload.c_str(), false);
+    if (!ok) {
+        LOG_ERROR("publish failed");
+    }
 }
 
 void MQTTConn::setDeviceID(const String& id) {

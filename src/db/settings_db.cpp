@@ -29,14 +29,14 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
     // ============================== APP ==============================
     _db.init(kk::rgb_enabled, !APP_DARK_THEME);
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
-    _db.init(kk::log_level, APP_LOG_LEVEL);
+    _db.init(kk::log_lvl, APP_LOG_LEVEL);
 
     // ============================== WIFI ==============================
     _db.init(kk::wifi_ssid, WIFI_SSID);
     _db.init(kk::wifi_pass, WIFI_PASS);
 
     // ============================== MQTT ==============================
-    _db.init(kk::mqtt_enabled, true);
+    _db.init(kk::mqtt_enabled, MQTT_ENABLED);
     _db.init(kk::mqtt_server, MQTT_SERVER);
     _db.init(kk::mqtt_port, MQTT_PORT);
     _db.init(kk::mqtt_username, MQTT_USERNAME);
@@ -45,7 +45,7 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
 
     // ============================== CO2 ==============================
     _db.init(kk::co2_scale_type, "DEFAULT");
-    _db.init(kk::co2_danger_lvl, RGB_DEFAULT_ALERT_TRHLD);
+    _db.init(kk::co2_alarm_lvl, RGB_DEFAULT_ALERT_TRHLD);
 
 #ifdef ENABLE_TEST
     _db.dump(Serial);
@@ -60,6 +60,6 @@ void SettingsDB::exec() {
     _db.tick();
 }
 
-GyverDBFile& SettingsDB::getDB() {
+GyverDBFile& SettingsDB::db() {
     return _db;
 }

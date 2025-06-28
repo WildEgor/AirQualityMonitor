@@ -25,6 +25,7 @@ public:
     void exec() override;
 
 private:
+    void _init();
     void _update(sets::Updater& u);
     void _build(sets::Builder& b);
 

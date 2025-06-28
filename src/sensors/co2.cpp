@@ -170,12 +170,12 @@ float CO2Scale::getMax() { return _max; }
 float CO2Scale::getHumanMax() { return _human_max; }
 
 bool CO2Scale::needAlarm(uint16_t value) { 
-    float co2_lvl = (*_db)[kk::co2_danger_lvl].toFloat();
+    float co2_lvl = (*_db)[kk::co2_alarm_lvl].toFloat();
     if (co2_lvl <= 0) {
         return false;
     }
 
-    return value >= co2_lvl + 100; 
+    return value >= co2_lvl + 10; 
 }
 
 void CO2Scale::_initScales() {

@@ -7,7 +7,7 @@ RGBController::RGBController(uint32_t ms, SettingsDB& settingsDb)
       _pin(RGB_PIN),
       _num_leds(RGB_NUMPIXELS),
       _leds(nullptr),
-      _db(&settingsDb.getDB()),
+      _db(&settingsDb.db()),
       _co2_scale(&CO2Scale::getInstance()),
       _blink(false)
       {
@@ -15,7 +15,7 @@ RGBController::RGBController(uint32_t ms, SettingsDB& settingsDb)
 
         _leds = new Adafruit_NeoPixel(_num_leds, _pin, NEO_GRB + NEO_KHZ800);
         _leds->begin();
-        _leds->setBrightness(100);
+        _leds->setBrightness(50);
         clear();
 
         _co2_scale->init(_db);
@@ -45,33 +45,28 @@ void RGBController::exec() {
         return;
     }
 
-    if (_u_cb) {
-        uint16_t co2_value = _u_cb();
-
-        if (_co2_scale->needAlarm(co2_value)) {
-            if (_curr_period != SEC_1) {
-                this->updateInterval(SEC_1);
-            }
-
-            if (_blink) {
-                _blink = false;
-                clear();
-                return;
-            }
-        } else {
-            if (_curr_period != _default_period) {
-                this->updateInterval(_default_period);
-            }
-        }
-
-        _blink = true;
-        renderLevel(co2_value, _co2_scale->getMin(), _co2_scale->getMax());
+    if (!_u_cb) {
+        return;
     }
+
+    uint16_t co2_value = _u_cb();
+    if (_co2_scale->needAlarm(co2_value)) {
+        _renderAlarm(co2_value);
+        return;
+    }
+
+    if (_curr_period != _default_period) {
+        this->updateInterval(_default_period);
+    }
+
+    _blink = false;
+    renderLevel(co2_value);
 }
 
 void RGBController::toggle(bool value) {
     _enabled = value;
-    clear();
+    
+    if (!_enabled) clear();
 
     if (value) {
         LOG_DEBUG("enabled");
@@ -81,7 +76,7 @@ void RGBController::toggle(bool value) {
     LOG_DEBUG("disabled");
 }
 
-void RGBController::renderLevel(float value, float min, float max) {
+void RGBController::renderLevel(float value) {
     if (!_enabled || _num_leds <= 0 || !_is_initialized || _leds == nullptr) return;
 
     uint8_t r, g, b;
@@ -94,10 +89,34 @@ void RGBController::renderLevel(float value, float min, float max) {
     _leds->show();
 }
 
+void RGBController::_renderAlarm(float value) {
+    if (!_enabled || _num_leds <= 0 || !_is_initialized || _leds == nullptr) return;
+
+    uint8_t r = 255;
+    uint8_t g = 0;
+    uint8_t b = 0;
+
+    if (_curr_period != SEC_1) {
+        this->updateInterval(SEC_1);
+    }
+
+    if (_blink) {
+        _blink = false;
+        clear();
+        return;
+    }
+
+    _blink = true;
+    for (int i = 0; i < _num_leds; i++) {
+        _leds->setPixelColor(i, r, g, b);
+    }
+
+    _leds->show();
+}
+
 void RGBController::clear() {
     if (_leds != nullptr) {
         LOG_DEBUG("cleared");
-        
         _leds->clear();
         _leds->show();
     }

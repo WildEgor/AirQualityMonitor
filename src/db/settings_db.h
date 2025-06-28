@@ -17,10 +17,10 @@ enum kk : size_t {
     co2_measure_prd,
     co2_pub_prd,
     co2_scale_type,
-    co2_danger_lvl,
+    co2_alarm_lvl,
     rgb_enabled,
     use_dark_theme,
-    log_level,
+    log_lvl,
 };
 
 extern String co2_scale_types;
@@ -32,7 +32,7 @@ public:
 
     void setup();
     void exec() override;
-    GyverDBFile& getDB();
+    GyverDBFile& db();
 
 private:
     GyverDBFile _db;

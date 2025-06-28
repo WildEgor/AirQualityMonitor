@@ -2,11 +2,11 @@
 #include "services/logger.h"
 #include "wifi_conn.h"
 
-WiFiConn::WiFiConn(SettingsDB& settingsDb, WiFiAdapter& wifiAdapter) : LoopTickerBase(), _db(&settingsDb.getDB()), _wifi_adapter(&wifiAdapter), _is_initialized(false) {
+WiFiConn::WiFiConn(SettingsDB& settingsDb, WiFiAdapter& wifiAdapter) : LoopTickerBase(), _db(&settingsDb.db()), _wifi_adapter(&wifiAdapter), _is_initialized(false) {
     LOG_INFO("init...");
     
     if (!connected()) {
-        _connect((*_db)[kk::wifi_ssid], (*_db)[kk::wifi_pass]);
+        connect();
     }
 
     LOG_INFO("init ok!");

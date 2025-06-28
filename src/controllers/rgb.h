@@ -15,18 +15,20 @@ public:
     void toggle(bool value) override;
 
     void setUpdaterCb(UpdaterCallback cb);
-    void renderLevel(float value, float min, float max);
+    void renderLevel(float value);
     void clear();
     const char* getType() const override;
 
 private:
-    uint8_t _pin;
-    uint8_t _num_leds;
     Adafruit_NeoPixel* _leds;
     GyverDBFile* _db;
     UpdaterCallback _u_cb;
     CO2Scale* _co2_scale;
     bool _blink;
+    uint8_t _pin;
+    uint8_t _num_leds;
     uint16_t _default_period;
     uint16_t _curr_period;
+
+    void _renderAlarm(float value);
 };

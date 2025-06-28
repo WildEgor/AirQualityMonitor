@@ -4,13 +4,15 @@
 #define APP_NAME "AirQualityMonitor"
 #define APP_VERSION "1.1"
 #define APP_PLATFORM esp_32_d1_mini // "esp_32_d1_mini" "esp_32_s2_mini"
-#define APP_LOG_LEVEL "DEBUG"
-// #define ENABLE_TEST
+#define APP_LOG_LEVEL "ERROR" // DEBUG, ERROR, WARN, INFO
+// #define ENABLE_TEST // mock sensor reading
 #define APP_DARK_THEME true // Choose color theme
+// app
 
 // maint
 // #define DB_RESET // Factory reset db
 #define DB_NAME "/settings.db"
+// maint
 
 // system (dont change)
 #define MS_100 100
@@ -19,25 +21,30 @@
 #define SEC_5 5000
 #define SEC_10 10000
 #define SEC_30 30000
+// system
 
 // mqtt service to interact with yandex (see wqtt.ru)
+#define MQTT_ENABLED true
 #define MQTT_SERVER "m8.wqtt.ru"
 #define MQTT_PORT 20336
-#define MQTT_DEFAULT_DEVICE_ID "aqm"
+#define MQTT_DEFAULT_DEVICE_ID "common/aqm" // used as topic prefix for unique
 #define MQTT_DEFAULT_CO2_TOPIC "co2"
 #define MQTT_DEFAULT_TVOC_TOPIC "tvoc"
 #define MQTT_DEFAULT_TEMP_TOPIC "temp"
 #define MQTT_DEFAULT_PRESSURE_TOPIC "pressure"
+// mqtt
 
 // wifi settings (see secrets.example.h too)
 #define WIFI_AP_NAME "AQM_AP" // Prefix for wi-fi point with settings
 #define WIFI_AP_PASS "adminadmin"
 #define WIFI_CONN_RETRY_TIMEOUT 15 // sec
+// wifi
 
 // rgb settings
 #define RGB_PIN         19
 #define RGB_NUMPIXELS   4 // Number of LEDs in the strip. Min: 1, Max: 255
-#define RGB_DEFAULT_ALERT_TRHLD 1200
+#define RGB_DEFAULT_ALERT_TRHLD 1200 // When blink with red led
+// rgb settings
 
 // hmi
 /**
@@ -78,3 +85,4 @@
 #define LOAD_FONT8  // Font 8. Large 75 pixel font needs ~3256 bytes in FLASH, only characters 1234567890:-.
 #define LOAD_GFXFF  // FreeFonts. Include access to the 48 Adafruit_GFX free fonts FF1 to FF48 and custom fonts
 #define SMOOTH_FONT
+// hmi
