@@ -105,6 +105,10 @@ private:
             delay(500);
             return;
         }
+
+        if (!_co2_sensor.hasChanges()) {
+            return;
+        }
     
         float value = static_cast<float>(_co2_sensor.getCO2());
         if (value > _co2_scale->getHumanMax()){

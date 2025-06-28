@@ -2,6 +2,10 @@
 #include "services/logger.h"
 #include "settings.h"
 #include "services/publisher.h"
+#include "configs/config.h"
+
+// HINT: hack to prevent web ui freezing
+#define GS_CLIENT_TOUT 10000
 
 Settings::Settings(
     SettingsDB& settingsDb, 
@@ -47,7 +51,7 @@ Settings::Settings(
         LOG_INFO("init...");
 
         _sett = SettingsGyver("AirQualityMonitor v" APP_VERSION, _db);
-        _sett.begin();
+        _sett.begin(false);
 
         _sett.onUpdate([this](sets::Updater& u) {
             this->_update(u);
@@ -56,6 +60,13 @@ Settings::Settings(
         _sett.onBuild([this](sets::Builder& b) {
             this->_build(b);
         });
+
+        _sett.onFocusChange([this]() {
+            LOG_INFO("browser connected!");
+        });
+
+        _sett.config.requestTout = SEC_10;
+        _sett.config.pingTout = SEC_10;
 
         LOG_INFO("init ok!");
 

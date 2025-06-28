@@ -5,7 +5,7 @@
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms) {
     LOG_INFO("init...");
     this->addLoop();
-    
+
     if (!_enable_test && !_init()) {
         LOG_ERROR("init failed! please check your wiring.");
         return;
@@ -68,6 +68,19 @@ void CO2Sensor::_check_data() {
     if (_enable_test) {
         _data.co2 = 800.1;
         _data.tvoc = 3000.1;
+
+        _data.changed = false;
+
+        if (_data.co2_old != _data.co2) {
+            _data.changed = true;
+            _data.co2_old = _data.co2;
+        }
+
+        if (_data.tvoc_old != _data.tvoc) {
+            _data.changed = true;
+            _data.tvoc_old = _data.tvoc;
+        }
+
         _print_data();
         return;
     }
@@ -90,6 +103,19 @@ void CO2Sensor::_check_data() {
         if (_data.tvoc < getTVOCMin()) {
             _data.tvoc = getTVOCMin();
         }
+
+        _data.changed = false;
+
+        if (_data.co2_old != _data.co2) {
+            _data.changed = true;
+            _data.co2_old = _data.co2;
+        }
+
+        if (_data.tvoc_old != _data.tvoc) {
+            _data.changed = true;
+            _data.tvoc_old = _data.tvoc;
+        }
+
         _print_data();
     }
 }
