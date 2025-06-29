@@ -23,7 +23,7 @@ public:
         _dark_theme(false),
         _last_co2_value(-1),
         _last_wifi_state(false),
-        _intro_shown(false),
+        _intro_shown(true),
         _force_redraw(true),
         _last_render_time(0) {
 

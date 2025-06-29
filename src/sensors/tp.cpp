@@ -5,6 +5,9 @@
 TPSensor::TPSensor(uint32_t ms) 
     : SensorBase(ms) {
     LOG_INFO("init...");
+
+    _data.pressure = 0.0;
+    _data.temp = 0.0;
     
     if (!_enable_test && !_init()) {
         LOG_ERROR("init failed! please check your wiring.");
@@ -23,7 +26,7 @@ void TPSensor::setup() {}
 
 void TPSensor::exec() {
     if (!_is_initialized) {
-        init();
+        _init();
         return;
     }
     
@@ -60,7 +63,7 @@ float TPSensor::getPressureMax() {
 
 bool TPSensor::_init() {
     if (!_sensor.begin(BMP280_ADDR)) {
-        LOG_ERROR("failed to begin() sensor! please check your wiring.");
+        LOG_ERROR("init failed! please check your wiring.");
         return false;
     }
 
