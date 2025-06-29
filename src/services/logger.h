@@ -1,5 +1,7 @@
 #pragma once
 #include <Arduino.h>
+#include <SettingsGyver.h>
+
 #include "configs/config.h"
 
 enum class LogLevel {
@@ -15,12 +17,14 @@ public:
     
     void setLevel(const String& level);
     void log(LogLevel level, const char* component, const String& message);
+    void initWebLogger(sets::Logger& wl);
     
 private:
     Logger();
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
     LogLevel _current_level;
+    sets::Logger* _wl;
 };
 
 #ifndef LOG_COMPONENT

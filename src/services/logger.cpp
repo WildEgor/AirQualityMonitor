@@ -5,7 +5,11 @@ Logger& Logger::getInstance() {
     return instance;
 }
 
-Logger::Logger() : _current_level(LogLevel::DEBUG) {}
+Logger::Logger() : _current_level(LogLevel::DEBUG), _wl(nullptr) {}
+
+void Logger::initWebLogger(sets::Logger& wl) {
+    _wl = &wl;
+}
 
 void Logger::setLevel(const String& level) {
     String levelUpper = level;
@@ -49,4 +53,7 @@ void Logger::log(LogLevel level, const char* component, const String& message) {
     }
     String reset_code = "\033[0m";
     Serial.println(color_code + "[" + level_str + "][" + component + "] " + message + reset_code);
+    if (_wl) {
+        _wl->println("[" + level_str + "][" + component + "] " + message);
+    }
 }

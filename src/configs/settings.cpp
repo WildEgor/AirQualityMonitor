@@ -4,6 +4,8 @@
 #include "services/publisher.h"
 #include "configs/config.h"
 
+sets::Logger webLogger(255);
+
 Settings::Settings(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn
@@ -44,6 +46,8 @@ void Settings::exec() {
 void Settings::_init() {
     LOG_INFO("init...");
 
+    Logger::getInstance().initWebLogger(webLogger);
+
     _sett = SettingsGyver(String(APP_NAME) + " v" + String(APP_VERSION), _db);
     _sett.config.requestTout = SEC_10;
     _sett.config.pingTout = SEC_30;
@@ -69,42 +73,48 @@ void Settings::_init() {
     _is_initialized = true;
 }
 
-void Settings::_update(sets::Updater& u) {}
+void Settings::_update(sets::Updater& u) {
+    u.update(H(log), webLogger);
+}
 
 void Settings::_build(sets::Builder& b) {
-    {
-        sets::Group g(b, "Настройки");
-        {
-            sets::Menu m(b, "WiFi");
-            b.Input(kk::wifi_ssid, "SSID");
-            b.Pass(kk::wifi_pass, "*****");
-            b.Button(SH("wifi_save"), "Подключить");
-        }
-        {
-            sets::Menu m(b, "MQTT");
-            b.Switch(kk::mqtt_enabled, "Включить");
-            b.Input(kk::mqtt_server, "server");
-            b.Number(kk::mqtt_port, "port");
-            b.Input(kk::mqtt_username, "user");
-            b.Pass(kk::mqtt_pass, "pass");
-            b.Input(kk::mqtt_device_id, "device id");
-            b.Button(SH("mqtt_save"), "Подключить");
-        }
-        {
-            sets::Menu m(b, "Датчик CO2");
-            b.Number(kk::co2_alarm_lvl, "Значение тревоги", nullptr, 0, 8000);
-            b.Select(kk::co2_scale_type, "Тип шкалы CO2", co2_scale_types);
-            b.Button(SH("co2_save"), "Сохранить");
-        }
-        {
-            sets::Menu m(b, "Системные");
-            b.Switch(kk::rgb_enabled, "rgb");
-            b.Switch(kk::use_dark_theme, "dark theme");
-            b.Select(kk::log_lvl, "Уровень логирования", log_levels);
-            b.Button(SH("common_save"), "Сохранить");
-        }
-    }
-
+    SUB_BUILD_BEGIN
+    sets::Group g(b, "Settings");
+    
+    sets::Menu m(b, "WiFi");
+    b.Input(kk::wifi_ssid, "SSID");
+    b.Pass(kk::wifi_pass, "*****");
+    b.Button(SH("wifi_save"), "Save");
+    SUB_BUILD_END   
+    
+    SUB_BUILD_BEGIN
+    sets::Menu m(b, "MQTT");
+    b.Switch(kk::mqtt_enabled, "Enabled");
+    b.Input(kk::mqtt_server, "server");
+    b.Number(kk::mqtt_port, "port");
+    b.Input(kk::mqtt_username, "user");
+    b.Pass(kk::mqtt_pass, "pass");
+    b.Input(kk::mqtt_device_id, "device id");
+    b.Button(SH("mqtt_save"), "Save");
+    SUB_BUILD_END    
+    
+    SUB_BUILD_BEGIN
+    sets::Menu m(b, "CO2");
+    b.Number(kk::co2_alarm_lvl, "Alarm value", nullptr, 0, 8000);
+    b.Select(kk::co2_scale_type, "Scale type", co2_scale_types);
+    b.Button(SH("co2_save"), "Save");
+    SUB_BUILD_END  
+    
+    SUB_BUILD_BEGIN
+    sets::Menu m(b, "System");
+    b.Switch(kk::rgb_enabled, "rgb");
+    b.Switch(kk::use_dark_theme, "dark theme");
+    b.Select(kk::log_lvl, "Log level", log_levels);
+    b.Button(SH("common_save"), "Save");
+    b.Log(H(log), webLogger);
+    SUB_BUILD_END   
+    
+    SUB_BUILD_BEGIN
     if (b.build.isAction()) {
         switch (b.build.id) {
             case SH("wifi_save"):
@@ -157,4 +167,5 @@ void Settings::_build(sets::Builder& b) {
                 break;
         }
     }
+    SUB_BUILD_END
 }
