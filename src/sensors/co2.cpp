@@ -4,6 +4,7 @@
 
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms) {
     LOG_INFO("init...");
+    _data.mock = true;
     _data.co2 = 0.0;
     _data.tvoc = 0.0;
 
@@ -16,6 +17,8 @@ CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms) {
     _is_initialized = true;
     LOG_INFO("init ok!");
     this->addLoop();
+    
+    exec();
 }
 
 void CO2Sensor::setup() {}
@@ -71,7 +74,14 @@ bool CO2Sensor::_init() {
 
 void CO2Sensor::_check_data() {
     if (_enable_test) {
-        _data.co2 = 800.1;
+        if (_data.mock) {
+            _data.mock = false;
+            _data.co2 = 1300.10;
+        } else {
+             _data.mock = true;
+            _data.co2 = 800.10;
+        }
+        
         _data.tvoc = 3000.1;
 
         _print_data();

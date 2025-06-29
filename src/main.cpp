@@ -42,6 +42,7 @@ void setup() {
   tp->enableTest();
 #endif
 
+#ifndef ENABLE_TEST
   MQTTPublisher* co2p = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_CO2_TOPIC);
   co2p->setValueCb([co2]() -> float {
     return co2->getCO2();
@@ -61,6 +62,7 @@ void setup() {
   pp->setValueCb([tp]() -> float {
     return tp->getPressure();
   });
+#endif
 
   HMI* hmi = new HMI(SEC_1, *sdb, *co2, *tp, *wifi);
 

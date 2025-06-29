@@ -97,16 +97,20 @@ private:
             return true;
         }
 
-        bool current_wifi_state = _wifi->connected();
-        if (current_wifi_state != _last_wifi_state) {
-            _last_wifi_state = current_wifi_state;
-            return true;
+        if (_wifi && _wifi->isInitialized()) {
+            bool current_wifi_state = _wifi->connected();
+            if (current_wifi_state != _last_wifi_state) {
+                _last_wifi_state = current_wifi_state;
+                return true;
+            }
         }
 
-        float current_co2 = _co2_sensor.getCO2();
-        if (abs(current_co2 - _last_co2_value) > 5.0) {
-            _last_co2_value = current_co2;
-            return true;
+        if (_co2_sensor && _co2_sensor.isInitialized()) {
+            float current_co2 = _co2_sensor.getCO2();
+            if (abs(current_co2 - _last_co2_value) > 5.0) {
+                _last_co2_value = current_co2;
+                return true;
+            }
         }
 
         if ((millis() - _last_render_time) > SEC_5) {

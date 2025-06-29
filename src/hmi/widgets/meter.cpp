@@ -190,13 +190,10 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
   int value = (val - scaleStart) * factor;
   old_value = value;
   char buf[8];
-  if (val >= 1000 || val <= -1000)
-    dtostrf(val, 7, 1, buf);
-  else {
-    char temp_buf[8];
-    dtostrf(val, 6, 1, temp_buf);
-    snprintf(buf, sizeof(buf), "%s", temp_buf + 1);
-  }
+  dtostrf(val, 6, 1, buf);
+
+  char* p = buf;
+  while (*p == ' ') p++;
 
   if (dark_theme) {
     ntft->setTextColor(TFT_WHITE, TFT_BLACK);
@@ -204,7 +201,13 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
     ntft->setTextColor(TFT_BLACK, TFT_WHITE);
   }
 
-  ntft->drawRightString(buf, mx + 50, my + 119 - 20, 2);
+  int clearWidth = 60;
+  int clearHeight = 20;
+
+  uint16_t bgColor = dark_theme ? TFT_BLACK : TFT_WHITE;
+
+  ntft->fillRect(mx + 50 - clearWidth, my + 119 - 20, clearWidth, clearHeight, bgColor);
+  ntft->drawRightString(p, mx + 50, my + 119 - 20, 2);
 
   if (value < -10) value = -10; // Limit value to emulate needle end stops
   if (value > 110) value = 110;

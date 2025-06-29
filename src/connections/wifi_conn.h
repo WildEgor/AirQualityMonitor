@@ -34,6 +34,9 @@ public:
     void connect();
     // return state
     bool connected();
+    bool isInitialized() {
+        return _is_initialized;
+    };
     // call in loop
     void exec() override;
     // return ip (softAP or local)
