@@ -4,15 +4,18 @@
 
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms) {
     LOG_INFO("init...");
-    this->addLoop();
+    _data.co2 = 0.0;
+    _data.tvoc = 0.0;
 
     if (!_enable_test && !_init()) {
         LOG_ERROR("init failed! please check your wiring.");
+        this->addLoop();
         return;
     }
 
     _is_initialized = true;
     LOG_INFO("init ok!");
+    this->addLoop();
 }
 
 void CO2Sensor::setup() {}
@@ -79,18 +82,18 @@ void CO2Sensor::_check_data() {
         _sensor.readAlgorithmResults();
 
         _data.co2 = static_cast<float>(_sensor.getCO2());
-        if (_data.co2 > getCO2Max()) {
+        if (_data.co2 >= getCO2Max()) {
             _data.co2 = getCO2Max();
         }
-        if (_data.co2 < getCO2Min()) {
+        if (_data.co2 <= getCO2Min()) {
             _data.co2 = getCO2Min();
         }
 
         _data.tvoc = static_cast<float>(_sensor.getTVOC());
-        if (_data.tvoc > getTVOCMax()) {
+        if (_data.tvoc >= getTVOCMax()) {
             _data.tvoc = getTVOCMax();
         }
-        if (_data.tvoc < getTVOCMin()) {
+        if (_data.tvoc <= getTVOCMin()) {
             _data.tvoc = getTVOCMin();
         }
 

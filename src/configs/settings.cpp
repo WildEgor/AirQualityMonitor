@@ -97,7 +97,7 @@ void Settings::_build(sets::Builder& b) {
             b.Button(SH("co2_save"), "Сохранить");
         }
         {
-            sets::Menu m(b, "Common");
+            sets::Menu m(b, "Системные");
             b.Switch(kk::rgb_enabled, "rgb");
             b.Switch(kk::use_dark_theme, "dark theme");
             b.Select(kk::log_lvl, "Уровень логирования", log_levels);
@@ -143,8 +143,11 @@ void Settings::_build(sets::Builder& b) {
                 if (_db && _db->update()) {
                     SET_LOG_LEVEL((*_db)[kk::log_lvl].toString());
 
-                    if (_rgb_controller && _hmi) {
+                    if (_rgb_controller) {
                         _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
+                    }
+
+                    if (_hmi) {
                         _hmi->setTheme((*_db)[kk::use_dark_theme].toBool());
                     }
                 

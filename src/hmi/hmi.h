@@ -85,43 +85,33 @@ private:
         }
 
         LOG_DEBUG("render started...");
-
-        _print_gauge();
         _print_wifi_info();
-
+        _print_gauge();
         LOG_DEBUG("rendered ok!");
         
-        _last_render_time = millis();
         _force_redraw = false;
     }
 
     bool _should_render() {
-        // Force redraw if theme changed
         if (_force_redraw) {
             return true;
         }
 
-        // Check if WiFi state changed
         bool current_wifi_state = _wifi->connected();
         if (current_wifi_state != _last_wifi_state) {
             _last_wifi_state = current_wifi_state;
             return true;
         }
 
-        // Check if CO2 value changed
         float current_co2 = _co2_sensor.getCO2();
-
-        LOG_DEBUG("new co2 value: " + String(current_co2));
-        LOG_DEBUG("last co2 value: " + String(_last_co2_value));
-
         if (abs(current_co2 - _last_co2_value) > 5.0) {
             _last_co2_value = current_co2;
             return true;
         }
 
-        // Show intro message periodically (every 5 seconds) if not shown
         if ((millis() - _last_render_time) > SEC_5) {
-            _intro_shown = true;
+            _last_render_time = millis();
+            _force_redraw = true;
             return true;
         }
 
@@ -131,38 +121,40 @@ private:
     void _print_wifi_info() {
         if (_intro_shown || _force_redraw) {
             _intro_shown = false;
-
+            
+            _tft.setCursor(100, 145);
             if (_dark_theme) {
                 _tft.fillRect(100, 145, 60, 10, TFT_BLACK);
             } else {
                 _tft.fillRect(100, 145, 60, 10, TFT_WHITE);
             }
-
-            _tft.setCursor(100, 145);
-        
+            
             if (!_last_wifi_state) {
                 _tft.setTextColor(TFT_RED);
-                _tft.println("WIFI X");
+                _tft.setCursor(100, 145);
+                _tft.println(F("WIFI X"));
                 LOG_ERROR("wifi not connected");
             } else {
                 _tft.setTextColor(TFT_DARKGREEN);
-                _tft.println("WIFI OK");
+                _tft.setCursor(100, 145);
+                _tft.println(F("WIFI OK"));
             }
-        }
 
-        if (!_intro_shown || _force_redraw) {
             if (_dark_theme) {
-                _tft.fillRect(20, 130, 200, 10, TFT_BLACK);
                 _tft.setTextColor(TFT_LIGHTGREY);
+                _tft.setCursor(20, 130);
+                _tft.fillRect(20, 130, 200, 10, TFT_BLACK);
             } else {
+                _tft.setTextColor(TFT_LIGHTGREY);
+                _tft.setCursor(20, 130);
                 _tft.fillRect(20, 130, 200, 10, TFT_WHITE);
-                _tft.setTextColor(TFT_BLACK);
             }
+
+            LOG_INFO("admin panel: http://" + _wifi->ip());
 
             _tft.setCursor(20, 130);
-            String adminURL = "Admin panel: http://" + _wifi->ip();
-            _tft.println(adminURL);
-            LOG_INFO(adminURL);
+            _tft.print(F("admin panel: http://"));
+            _tft.println(_wifi->ip());
         }
     }
 

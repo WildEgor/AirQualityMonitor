@@ -4,7 +4,7 @@
 #define APP_NAME "AirQualityMonitor"
 #define APP_VERSION "1.1"
 #define APP_PLATFORM esp_32_d1_mini // "esp_32_d1_mini" "esp_32_s2_mini"
-#define APP_LOG_LEVEL "ERROR" // DEBUG, ERROR, WARN, INFO
+#define APP_LOG_LEVEL "DEBUG" // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // mock sensor reading
 #define APP_DARK_THEME true // Choose color theme
 // app
@@ -41,6 +41,7 @@
 // wifi
 
 // rgb settings
+#define RGB_ENABLED false
 #define RGB_PIN         19
 #define RGB_NUMPIXELS   4 // Number of LEDs in the strip. Min: 1, Max: 255
 #define RGB_DEFAULT_ALERT_TRHLD 1200 // When blink with red led

@@ -27,7 +27,7 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
 #endif
 
     // ============================== APP ==============================
-    _db.init(kk::rgb_enabled, !APP_DARK_THEME);
+    _db.init(kk::rgb_enabled, RGB_ENABLED);
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
     _db.init(kk::log_lvl, APP_LOG_LEVEL);
 
