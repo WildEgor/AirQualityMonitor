@@ -189,19 +189,19 @@ private:
 
     void _print_sensor_state() {
         if (_force_redraw) {
-            _tft.setCursor(150, 145);
+            _tft.setCursor(80, 160);
 
             _tft.setTextColor(TFT_CYAN);
             if (_dark_theme) {
-                _tft.fillRect(150, 145, 60, 10, TFT_BLACK);
+                _tft.fillRect(80, 160, 60, 10, TFT_BLACK);
             } else {
-                _tft.fillRect(150, 145, 60, 10, TFT_WHITE);
+                _tft.fillRect(80, 145, 60, 10, TFT_WHITE);
             }
 
             if (_last_co2_sensor_state) {
                 _tft.println(F("CALIBRATION"));
             } else {
-                _tft.println(F("           "));
+                _tft.println(F("            "));
             }
         }
     }
