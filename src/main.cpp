@@ -71,7 +71,7 @@ void setup() {
     return co2->getCO2();
   });
 
-  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *rgb, *hmi);
+  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *rgb, *hmi, *co2);
 
   LOG_INFO("init ok!");
 }

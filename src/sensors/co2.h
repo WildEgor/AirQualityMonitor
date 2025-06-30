@@ -8,12 +8,21 @@
 #include "model/co2_data.h"
 #include "db/settings_db.h"
 
+#define LOG_COMPONENT "CO2Sensor"
+#include "services/logger.h"
+
 #define CCS811_ADDR 0x5A
 
 struct ColorThreshold {
     uint16_t threshold;
     uint8_t r, g, b;
 };
+
+typedef enum {
+    CO2Sensor_INIT,
+    CO2Sensor_RUNNING,
+    CO2Sensor_CALIBRATING,
+} CO2Sensor_State;
 
 class CO2Sensor : public SensorBase {
 public:
@@ -29,9 +38,54 @@ public:
     float getTVOC();
     const char* getType() const override;
 
+    bool isCalibrating() {
+        return _state == CO2Sensor_CALIBRATING;
+    }
+
+    void startCalibration() {
+        LOG_DEBUG("force start calibration");
+
+        if (_data.current_baseline == 0x01) {
+            _data.current_baseline = 0x00;
+        }
+
+        _state = CO2Sensor_CALIBRATING;
+
+        if (_data.current_baseline == 0x00) {
+            _data.current_baseline = _sensor.getBaseline();
+        }
+
+        delay(5000);
+    };
+
+    void forceStopCalibration() {
+        if (_state != CO2Sensor_CALIBRATING || _data.current_baseline == 0x01) {
+            return;
+        }
+
+        LOG_DEBUG("force stop calibration");
+
+        CCS811Core::CCS811_Status_e errorStatus = _sensor.setBaseline(_data.current_baseline);
+        if (errorStatus == CCS811Core::CCS811_Stat_SUCCESS){
+          LOG_INFO("baseline written to sensor");
+        } else {
+            LOG_ERROR("set baseline failed!");
+            LOG_ERROR(_sensor.statusString(errorStatus));
+        }
+
+        _data.current_baseline = 0x01;
+
+        delay(5000);
+
+        _state = CO2Sensor_RUNNING;
+
+        LOG_INFO("calibration success");
+    };
+
 private:
     CCS811 _sensor;
     CO2Data _data;
+    CO2Sensor_State _state;
 
     bool _init();
     void _check_data();

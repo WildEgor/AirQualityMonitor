@@ -17,7 +17,8 @@ public:
         WiFiConn& wifiConn, 
         MQTTConn& mqttConn, 
         RGBController& rgbCtrl,
-        HMI& hmi
+        HMI& hmi,
+        CO2Sensor& co2sensor
     );
     Settings(SettingsDB& settingsDb, 
         WiFiConn& wifiConn
@@ -36,5 +37,7 @@ private:
     MQTTConn* _mqtt_conn;
     RGBController* _rgb_controller;
     HMI* _hmi;
+    CO2Sensor* _co2_sensor;
+
     bool _is_initialized;
 };
