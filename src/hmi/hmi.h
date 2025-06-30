@@ -23,6 +23,7 @@ public:
         _dark_theme(false),
         _last_co2_value(-1),
         _last_wifi_state(false),
+        _last_co2_sensor_state(false),
         _intro_shown(true),
         _force_redraw(true),
         _last_render_time(0) {
@@ -74,6 +75,7 @@ private:
     bool _dark_theme = false;
     float _last_co2_value = -1;
     bool _last_wifi_state = false;
+    bool _last_co2_sensor_state = false;
     bool _intro_shown = false;
     bool _force_redraw = false;
     unsigned long _last_render_time = 0;
@@ -87,6 +89,7 @@ private:
         LOG_DEBUG("render started...");
         _print_wifi_info();
         _print_gauge();
+        _print_sensor_state();
         LOG_DEBUG("rendered ok!");
         
         _force_redraw = false;
@@ -100,6 +103,13 @@ private:
         bool current_wifi_state = _wifi->connected();
         if (current_wifi_state != _last_wifi_state) {
             _last_wifi_state = current_wifi_state;
+            return true;
+        }
+
+        bool current_co2_sensor_state = _co2_sensor.isCalibrating();
+        if (current_co2_sensor_state != _last_co2_sensor_state) {
+            _last_co2_sensor_state = current_co2_sensor_state;
+            _force_redraw = true;
             return true;
         }
 
@@ -175,6 +185,25 @@ private:
         // Reduce animation delay for better performance
         LOG_DEBUG("update gauge value: " + String(value));
         _co2_meter.updateNeedle(value, 20);
+    }
+
+    void _print_sensor_state() {
+        if (_force_redraw) {
+            _tft.setCursor(150, 145);
+
+            _tft.setTextColor(TFT_CYAN);
+            if (_dark_theme) {
+                _tft.fillRect(150, 145, 60, 10, TFT_BLACK);
+            } else {
+                _tft.fillRect(150, 145, 60, 10, TFT_WHITE);
+            }
+
+            if (_last_co2_sensor_state) {
+                _tft.println(F("CALIBRATION"));
+            } else {
+                _tft.println(F("           "));
+            }
+        }
     }
 
     void _init_theme(bool fill) {

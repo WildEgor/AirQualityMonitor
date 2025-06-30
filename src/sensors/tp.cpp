@@ -1,6 +1,4 @@
 #include "tp.h"
-#define LOG_COMPONENT "TPSensor"
-#include "services/logger.h"
 
 TPSensor::TPSensor(uint32_t ms) 
     : SensorBase(ms) {

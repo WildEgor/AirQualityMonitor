@@ -8,6 +8,9 @@
 #include "model/tp_data.h"
 #include "db/settings_db.h"
 
+#define LOG_COMPONENT "TPSensor"
+#include "services/logger.h"
+
 #define BMP280_ADDR 0x76  // Default I2C address (0x77 alternative)
 
 class TPSensor : public SensorBase {

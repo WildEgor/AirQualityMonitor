@@ -1,5 +1,6 @@
 #define LOG_COMPONENT "Settings"
 #include "services/logger.h"
+
 #include "settings.h"
 #include "services/publisher.h"
 #include "configs/config.h"
@@ -22,7 +23,8 @@ Settings::Settings(
     WiFiConn& wifiConn, 
     MQTTConn& mqttConn, 
     RGBController& rgbController,
-    HMI& hmi
+    HMI& hmi,
+    CO2Sensor& co2sensor
 ) 
     : LoopTickerBase(), 
     _db(&settingsDb.db()), 
@@ -30,6 +32,7 @@ Settings::Settings(
     _mqtt_conn(&mqttConn), 
     _rgb_controller(&rgbController), 
     _hmi(&hmi),
+    _co2_sensor(&co2sensor),
     _is_initialized(false) {
         _init();
     }
@@ -103,6 +106,8 @@ void Settings::_build(sets::Builder& b) {
     b.Number(kk::co2_alarm_lvl, "Alarm value", nullptr, 0, 8000);
     b.Select(kk::co2_scale_type, "Scale type", co2_scale_types);
     b.Button(SH("co2_save"), "Save");
+    b.Button(SH("co2_calibrate_run"), "run calibrate", sets::Colors::Red);
+    b.Button(SH("co2_calibrate_stop"), "stop calibrate", sets::Colors::Green);
     SUB_BUILD_END  
     
     SUB_BUILD_BEGIN
@@ -146,7 +151,19 @@ void Settings::_build(sets::Builder& b) {
                 }
 
                 break;
+            
+            case SH("co2_calibrate_run"):
+                LOG_DEBUG("co2_calibrate_run pressed");
                 
+                _co2_sensor->startCalibration();
+                break;
+
+            case SH("co2_calibrate_stop"):
+                LOG_DEBUG("co2_calibrate_stop pressed");
+
+                _co2_sensor->forceStopCalibration();
+                break;
+
             case SH("common_save"):
                 LOG_DEBUG("common_save pressed");
                 

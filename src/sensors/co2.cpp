@@ -1,12 +1,11 @@
-#define LOG_COMPONENT "CO2Sensor"
-#include "services/logger.h"
 #include "co2.h"
 
-CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms) {
+CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _state(CO2Sensor_INIT) {
     LOG_INFO("init...");
     _data.mock = true;
     _data.co2 = 0.0;
     _data.tvoc = 0.0;
+    _data.current_baseline = 0x00;
 
     if (!_enable_test && !_init()) {
         LOG_ERROR("init failed! please check your wiring.");
@@ -15,6 +14,8 @@ CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms) {
     }
 
     _is_initialized = true;
+    _state = CO2Sensor_RUNNING;
+
     LOG_INFO("init ok!");
     this->addLoop();
     
@@ -29,7 +30,11 @@ void CO2Sensor::exec() {
         return;
     }
 
-    _check_data();
+    if (_state != CO2Sensor_CALIBRATING) {
+        _state = CO2Sensor_RUNNING;
+
+        _check_data();
+    }
 }
 
 float CO2Sensor::getCO2() { return _data.co2; }
@@ -63,7 +68,8 @@ bool CO2Sensor::_init() {
     _sensor = CCS811(CCS811_ADDR);
         
     Wire.begin();
-    if (!_sensor.begin()) {
+    if (_sensor.beginWithStatus() != CCS811Core::CCS811_Stat_SUCCESS) {
+        LOG_ERROR("init failed!");
         return false;
     }
 
@@ -108,6 +114,22 @@ void CO2Sensor::_check_data() {
         }
 
         _print_data();
+    } else if (_sensor.checkForStatusError()) {
+        uint8_t error = _sensor.getErrorRegister();
+
+        if (error == 0xFF) //comm error
+        {
+            LOG_ERROR("failed to get ERROR_ID register.");
+        } else {
+            String errMsg = "Error: ";
+            if (error & 1 << 5) errMsg += "HeaterSupply";
+            if (error & 1 << 4) errMsg += " HeaterFault ";
+            if (error & 1 << 3) errMsg += " MaxResistance ";
+            if (error & 1 << 2) errMsg += " MeasModeInvalid ";
+            if (error & 1 << 1) errMsg += " ReadRegInvalid ";
+            if (error & 1 << 0) errMsg +="MsgInvalid";
+            if (!errMsg.isEmpty()) LOG_ERROR(errMsg);
+        }
     }
 }
 
