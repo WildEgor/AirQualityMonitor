@@ -2,7 +2,7 @@
 
 // app 
 #define APP_NAME "AirQualityMonitor"
-#define APP_VERSION "1.2.5" // change version via project.json also!
+#define APP_VERSION "1.2.6" // change version via project.json also!
 #define APP_PLATFORM esp_32_d1_mini // "esp_32_d1_mini" "esp_32_s2_mini" "esp8266_d1_mini"
 #define APP_LOG_LEVEL "INFO" // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // mock sensor reading
@@ -10,7 +10,7 @@
 // app
 
 // maint
-#define DB_RESET // Factory reset db
+// #define DB_RESET // Factory reset db
 #define DB_NAME "/settings.db"
 #define PROJECT_PATH "WildEgor/AirQualityMonitor/develop/project.json"
 // maint

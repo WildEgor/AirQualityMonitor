@@ -86,18 +86,18 @@ void Settings::_build(sets::Builder& b) {
     SUB_BUILD_BEGIN   
     sets::Menu m(b, "WiFi");
     b.Input(kk::wifi_ssid, "SSID");
-    b.Pass(kk::wifi_pass, "*****");
+    b.Pass(kk::wifi_pass, "Password");
     b.Button(SH("wifi_save"), "Save");
     SUB_BUILD_END   
     
     SUB_BUILD_BEGIN
     sets::Menu m(b, "MQTT");
     b.Switch(kk::mqtt_enabled, "Enabled");
-    b.Input(kk::mqtt_server, "server");
-    b.Number(kk::mqtt_port, "port");
-    b.Input(kk::mqtt_username, "user");
-    b.Pass(kk::mqtt_pass, "pass");
-    b.Input(kk::mqtt_device_id, "device id");
+    b.Input(kk::mqtt_server, "Server");
+    b.Number(kk::mqtt_port, "Port");
+    b.Input(kk::mqtt_username, "Username");
+    b.Pass(kk::mqtt_pass, "Password");
+    b.Input(kk::mqtt_device_id, "Device ID");
     b.Button(SH("mqtt_save"), "Save");
     SUB_BUILD_END    
     
@@ -106,20 +106,25 @@ void Settings::_build(sets::Builder& b) {
     b.Number(kk::co2_alarm_lvl, "Alarm value", nullptr, 0, 8000);
     b.Select(kk::co2_scale_type, "Scale type", co2_scale_types);
     b.Button(SH("co2_save"), "Save");
-    b.Button(SH("co2_calibrate_run"), "run calibrate", sets::Colors::Red);
-    b.Button(SH("co2_calibrate_stop"), "stop calibrate", sets::Colors::Green);
+
+    sets::Group g(b, "Calibration");
+    if (b.beginButtons()) {
+        b.Button(SH("co2_calibrate_run"), "Run", sets::Colors::Green);
+        b.Button(SH("co2_calibrate_stop"), "Stop", sets::Colors::Red);
+        b.endButtons();
+    }
     SUB_BUILD_END  
     
     SUB_BUILD_BEGIN
     sets::Menu m(b, "System");
-    b.Switch(kk::rgb_enabled, "rgb");
-    b.Switch(kk::use_dark_theme, "dark theme");
-    b.Select(kk::log_lvl, "Log level", log_levels);
+    b.Switch(kk::rgb_enabled, "RGB Enabled");
+    b.Switch(kk::use_dark_theme, "Use dark theme");
+    b.Select(kk::log_lvl, "Log", log_levels);
     b.Button(SH("common_save"), "Save");
     b.Log(H(log), webLogger);
     if (b.Button(SH("update_fw"), "Update firmware") || b.Confirm("update"_h)) {
         if (_ota) {
-            LOG_DEBUG("ota update start");
+            LOG_INFO("ota update start");
             _ota->update(true);
         }
     }

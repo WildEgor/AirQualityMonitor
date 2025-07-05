@@ -22,17 +22,17 @@ public:
         _co2_meter(nullptr), 
         _co2_scale(&CO2Scale::getInstance()), 
         _wifi(&wifiConn), 
-        _ota(&ota),
-        _intro_shown(true),
-        _force_redraw(true) {
-
-        LOG_INFO("init tft...");
+        _ota(&ota) {
+        _force_redraw = true;
+        _intro_shown = true;
         _state.dark_theme = false;
         _state.last_co2_value = -1;
         _state.last_wifi_state = false;
         _state.last_co2_sensor_state = false;
         _state.last_render_time = 0;
         _state.last_fw_ver = _ota->version();
+
+        LOG_INFO("init tft...");
 
         _tft.init();
         _tft.setRotation(0);
@@ -206,18 +206,18 @@ private:
 
             _tft.setTextColor(TFT_CYAN);
             if (_state.dark_theme) {
-                _tft.fillRect(80, 165, 60, 10, TFT_BLACK);
+                _tft.fillRect(80, 165, 80, 10, TFT_BLACK);
             } else {
-                _tft.fillRect(80, 165, 60, 10, TFT_WHITE);
+                _tft.fillRect(80, 165, 80, 10, TFT_WHITE);
             }
 
             if (_state.last_co2_sensor_state) {
                 _tft.println(F("CALIBRATION"));
             } else {
                 if (_state.dark_theme) {
-                    _tft.fillRect(80, 165, 60, 10, TFT_BLACK);
+                    _tft.fillRect(80, 165, 80, 10, TFT_BLACK);
                 } else {
-                    _tft.fillRect(80, 165, 60, 10, TFT_WHITE);
+                    _tft.fillRect(80, 165, 80, 10, TFT_WHITE);
                 }
             }
         }
