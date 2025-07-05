@@ -1,7 +1,7 @@
 {
     "name": "AirQualityMonitor",
     "about": "Умный монитор качества воздуха",
-    "version": "1.1",
+    "version": "1.2",
     "notes": "",
     "builds": [
       {
