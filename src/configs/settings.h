@@ -10,11 +10,16 @@
 #include "hmi/hmi.h"
 #include "connections/wifi_conn.h"
 #include "services/publisher.h"
+#include "services/ota.h"
+
+#define LOG_COMPONENT "Settings"
+#include "services/logger.h"
 
 class Settings : public LoopTickerBase {
 public:
     Settings(SettingsDB& settingsDb, 
         WiFiConn& wifiConn, 
+        OTA& ota,
         MQTTConn& mqttConn, 
         RGBController& rgbCtrl,
         HMI& hmi,
@@ -34,6 +39,7 @@ private:
     SettingsGyver _sett;
     GyverDBFile* _db;
     WiFiConn* _wifi_conn;
+    OTA* _ota;
     MQTTConn* _mqtt_conn;
     RGBController* _rgb_controller;
     HMI* _hmi;

@@ -1,11 +1,9 @@
-#define LOG_COMPONENT "Settings"
-#include "services/logger.h"
-
 #include "settings.h"
 #include "services/publisher.h"
 #include "configs/config.h"
 
 sets::Logger webLogger(255);
+bool cfm_fw = false;
 
 Settings::Settings(
     SettingsDB& settingsDb, 
@@ -21,6 +19,7 @@ Settings::Settings(
 Settings::Settings(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn, 
+    OTA& ota,
     MQTTConn& mqttConn, 
     RGBController& rgbController,
     HMI& hmi,
@@ -28,7 +27,8 @@ Settings::Settings(
 ) 
     : LoopTickerBase(), 
     _db(&settingsDb.db()), 
-    _wifi_conn(&wifiConn), 
+    _wifi_conn(&wifiConn),
+    _ota(&ota), 
     _mqtt_conn(&mqttConn), 
     _rgb_controller(&rgbController), 
     _hmi(&hmi),
@@ -78,6 +78,12 @@ void Settings::_init() {
 
 void Settings::_update(sets::Updater& u) {
     u.update(H(log), webLogger);
+    if (_ota && _ota->hasUpdate()) u.update("update"_h, "New updates available. Try update firmware?");
+    if (cfm_fw) {
+        LOG_DEBUG("button update_fw pressed");
+        cfm_fw = false;
+        u.update("update"_h, "Try update firmware?");
+    }
 }
 
 void Settings::_build(sets::Builder& b) {
@@ -117,6 +123,13 @@ void Settings::_build(sets::Builder& b) {
     b.Select(kk::log_lvl, "Log level", log_levels);
     b.Button(SH("common_save"), "Save");
     b.Log(H(log), webLogger);
+    // if (b.Button(SH("update_fw"), "Update firmware")) cfm_fw = true;
+    if (b.Button(SH("update_fw"), "Update firmware") || b.Confirm("update"_h)) {
+        if (_ota) {
+            LOG_DEBUG("ota update start");
+            _ota->update(true);
+        }
+    }
     SUB_BUILD_END   
     
     SUB_BUILD_BEGIN

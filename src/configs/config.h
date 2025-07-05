@@ -12,6 +12,7 @@
 // maint
 // #define DB_RESET // Factory reset db
 #define DB_NAME "/settings.db"
+#define PROJECT_PATH "WildEgor/AirQualityMonitor/develop/project.json"
 // maint
 
 // system (dont change)

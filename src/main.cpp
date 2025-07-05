@@ -15,6 +15,7 @@
 #include "controllers/rgb.h"
 #include "services/logger.h"
 #include "services/publisher.h"
+#include "services/ota.h"
 
 void setup() {
   Serial.begin(115200);
@@ -31,6 +32,8 @@ void setup() {
     false
   );
   WiFiConn* wifi = new WiFiConn(*sdb, *wifia);
+
+  OTA* ota = new OTA();
 
   MQTTConn* mqtt = new MQTTConn(*sdb, *wifi);
 
@@ -71,7 +74,7 @@ void setup() {
     return co2->getCO2();
   });
 
-  Settings* sett = new Settings(*sdb, *wifi, *mqtt, *rgb, *hmi, *co2);
+  Settings* sett = new Settings(*sdb, *wifi, *ota, *mqtt, *rgb, *hmi, *co2);
 
   LOG_INFO("init ok!");
 }
