@@ -2,7 +2,7 @@
 
 // app 
 #define APP_NAME "AirQualityMonitor"
-#define APP_VERSION "1.0" // change version via project.json!
+#define APP_VERSION "1.2" // change version via project.json also!
 #define APP_PLATFORM esp_32_d1_mini // "esp_32_d1_mini" "esp_32_s2_mini"
 #define APP_LOG_LEVEL "DEBUG" // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // mock sensor reading
