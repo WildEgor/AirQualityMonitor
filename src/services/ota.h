@@ -17,5 +17,7 @@ public:
 
 private:
    AutoOTA _ota = AutoOTA(APP_VERSION, PROJECT_PATH);
-   bool _is_initialized = false; 
+   bool _is_initialized = false;
+   String _ver = "";
+   String _notes = "";
 };
