@@ -124,7 +124,7 @@ void MQTTConn::_connectToMQTT(const String& mqtt_server, uint16_t mqtt_port, con
 
     const int max_retries = 3;
     for (int retry_count = 0; retry_count < max_retries; retry_count++) {
-        LOG_INFO("attempting connection client...");
+        LOG_DEBUG("attempting connection client...");
 
         if (_pub_client.connect(client_id.c_str(), mqtt_user.c_str(), mqtt_password.c_str())) {
             LOG_INFO("connected");

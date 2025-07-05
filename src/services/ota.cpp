@@ -18,14 +18,17 @@ bool OTA::hasUpdate() {
 bool OTA::update(bool now) {
     if (_ota.checkUpdate(&_ver, &_notes)) {
         LOG_INFO("update to " + _ver);
-        LOG_INFO("notes: " + _notes);
-
+        if (!_notes.isEmpty()) LOG_INFO("notes: " + _notes);
+        
         if (!now) {
             _ota.update();
             return true;
         }
 
         return _ota.updateNow();
+    } else {
+        LOG_INFO("no updates");
+        return true;
     }
 
     LOG_ERROR("update failed");

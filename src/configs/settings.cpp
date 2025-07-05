@@ -10,6 +10,7 @@ Settings::Settings(
     WiFiConn& wifiConn
 ) 
     : LoopTickerBase(), 
+    _sett(String(APP_NAME) + " v" + String(APP_VERSION), &settingsDb.db()),
     _db(&settingsDb.db()), 
     _wifi_conn(&wifiConn), 
     _is_initialized(false) {
@@ -26,6 +27,7 @@ Settings::Settings(
     CO2Sensor& co2sensor
 ) 
     : LoopTickerBase(), 
+    _sett(String(APP_NAME) + " v" + ota.version(), &settingsDb.db()),
     _db(&settingsDb.db()), 
     _wifi_conn(&wifiConn),
     _ota(&ota), 
@@ -51,7 +53,6 @@ void Settings::_init() {
 
     Logger::getInstance().initWebLogger(webLogger);
 
-    _sett = SettingsGyver(String(APP_NAME) + " v" + _ota->version(), _db);
     _sett.config.requestTout = SEC_10;
     _sett.config.pingTout = SEC_30;
     _sett.config.updateTout = 0;
@@ -67,7 +68,7 @@ void Settings::_init() {
     });
 
     _sett.onFocusChange([this]() {
-        LOG_INFO("browser connected!");
+        LOG_DEBUG("browser connected!");
     });
 
     LOG_INFO("init ok!");

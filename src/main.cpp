@@ -67,7 +67,7 @@ void setup() {
   });
 #endif
 
-  HMI* hmi = new HMI(SEC_1, *sdb, *co2, *tp, *wifi);
+  HMI* hmi = new HMI(SEC_1, *sdb, *co2, *tp, *wifi, *ota);
 
   RGBController* rgb = new RGBController(SEC_1, *sdb);
   rgb->setUpdaterCb([co2]() -> float {

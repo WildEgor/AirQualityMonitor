@@ -67,10 +67,12 @@ public:
 
         CCS811Core::CCS811_Status_e errorStatus = _sensor.setBaseline(_data.current_baseline);
         if (errorStatus == CCS811Core::CCS811_Stat_SUCCESS){
-          LOG_INFO("baseline written to sensor");
+            LOG_DEBUG("baseline written to sensor");
+            LOG_INFO("calibration success");
         } else {
-            LOG_ERROR("set baseline failed!");
-            LOG_ERROR(_sensor.statusString(errorStatus));
+            LOG_DEBUG("set baseline failed!");
+            LOG_DEBUG(_sensor.statusString(errorStatus));
+            LOG_INFO("calibration failed");
         }
 
         _data.current_baseline = 0x01;
@@ -78,8 +80,6 @@ public:
         delay(5000);
 
         _state = CO2Sensor_RUNNING;
-
-        LOG_INFO("calibration success");
     };
 
 private:
