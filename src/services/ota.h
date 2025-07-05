@@ -13,6 +13,7 @@ public:
     void exec() override;
     bool hasUpdate();
     bool update(bool now);
+    String version();
 
 private:
    AutoOTA _ota = AutoOTA(APP_VERSION, PROJECT_PATH);

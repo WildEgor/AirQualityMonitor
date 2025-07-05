@@ -51,7 +51,7 @@ void Settings::_init() {
 
     Logger::getInstance().initWebLogger(webLogger);
 
-    _sett = SettingsGyver(String(APP_NAME) + " v" + String(APP_VERSION), _db);
+    _sett = SettingsGyver(String(APP_NAME) + " v" + _ota->version(), _db);
     _sett.config.requestTout = SEC_10;
     _sett.config.pingTout = SEC_30;
     _sett.config.updateTout = 0;

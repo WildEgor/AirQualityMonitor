@@ -32,6 +32,10 @@ bool OTA::update(bool now) {
     return false;
 };
 
+String OTA::version() {
+    return _ota.version();
+}
+
 void OTA::exec() {
     _ota.tick();
 }
