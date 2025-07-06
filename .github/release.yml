@@ -1,0 +1,25 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release-notes
+    authors:
+      - WildEgor
+  categories:
+    - title: New Feature
+      labels:
+        - feat
+    - title: Improvement
+      labels:
+        - impr
+    - title: Bug Fixes
+      labels:
+        - bug
+    - title: Documentation
+      labels:
+        - doc
+    - title: Development
+      labels:
+        - dev    
+    - title: Other Changes
+      labels:
+        - "*"

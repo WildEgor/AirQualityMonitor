@@ -1,8 +1,14 @@
 #pragma once
+#include <Arduino.h>
+// #include "configs/secrets.h"
+#include "configs/secrets.example.h"
+
+#define STRINGIZER(arg) #arg
+#define STR_VALUE(arg) STRINGIZER(arg)
 
 // app 
 #define APP_NAME "AirQualityMonitor"
-#define APP_VERSION "1.0.0" // change version via project.json also!
+#define APP_VERSION STR_VALUE(BUILD_VERSION) // change version via project.json!
 #define APP_PLATFORM esp_32_d1_mini // "esp_32_d1_mini" "esp_32_s2_mini" "esp8266_d1_mini"
 #define APP_LOG_LEVEL "INFO" // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // mock sensor reading
