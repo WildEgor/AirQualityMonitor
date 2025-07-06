@@ -1,5 +1,7 @@
 #pragma once
 #include <Arduino.h>
+// #include "configs/secrets.h"
+#include "configs/secrets.example.h"
 
 #define STRINGIZER(arg) #arg
 #define STR_VALUE(arg) STRINGIZER(arg)

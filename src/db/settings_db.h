@@ -3,7 +3,6 @@
 #include <LittleFS.h>
 #include <Looper.h>
 #include "configs/config.h"
-#include "configs/secrets.h"
 
 enum kk : size_t {
     wifi_ssid,
