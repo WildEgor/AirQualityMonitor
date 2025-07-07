@@ -1,5 +1,9 @@
 # AirQualityMonitor
 
+<p align="center">
+  <img src="./docs/images/showcase.jpg" width="250" title="showcase">
+</p>
+
 A smart air quality monitor based on ESP32 and CCS811 sensor
 
 ## Features
