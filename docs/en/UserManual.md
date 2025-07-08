@@ -1,136 +1,186 @@
-# [ENG] Air Quality Monitor (AQM) User Manual  
-
+# User Manual  
 ---
-
 ## Table of Contents  
 1. [Introduction](#introduction)  
 2. [Device Overview](#device-overview)  
-   - 2.1 [Physical Components](#physical-components)  
-   - 2.2 [Display UI](#display-ui)  
+   - 2.1 [Components](#components)  
+   - 2.2 [Interface](#interface)  
 3. [Getting Started](#getting-started)  
-   - 3.1 [Unboxing and Setup](#unboxing-and-setup)  
-   - 3.2 [Initial Power-On](#initial-power-on)  
-   - 3.3 [Connecting to Wi-Fi](#connecting-to-wifi)  
-4. [Understanding the UI](#understanding-the-ui)  
-   - 4.1 [Device Interface](#device-interface)  
-   - 4.2 [Web Admin Panel](#web-admin-panel)  
-5. [Advanced Configuration](#advanced-configuration)  
-6. [Maintenance & Safety](#maintenance--safety)   
+   - 3.1 [Installation](#installation)  
+   - 3.2 [First Power-On](#first-power-on)  
+   - 3.3 [Connecting to Wi-Fi](#connecting-to-wi-fi)  
+4. [Interface Overview](#interface-overview)    
+5. [Advanced Settings](#advanced-settings)  
 
----
+<p align="center">
+  <img src="../images/showcase.jpg" width="250" title="usage example">
+</p>
 
 ## Introduction  
-The Air Quality Monitor (AQM) is an IoT-enabled device designed to measure indoor CO₂ levels and provide real-time feedback via visual, haptic (RGB LED), and remote (MQTT) feedback.
-
----
+Air Quality Monitor (AQM) is an IoT (Internet of Things) device designed to measure indoor CO₂ levels and transmit real-time data visually via an RGB LED and remotely to Yandex via MQTT.  
 
 ## Device Overview  
-### Physical Components  
+### Components  
 1. **Front Panel**:  
-   - 1.28" IPS round display  
+   - 1.28" IPS Round Display  
 2. **Rear Panel**:  
-   - Micro-USB port (power and firmware update)   
-3. **Internal Hardware**:  
-   - CO₂ sensor (CCS811)  
-   - Microcontroller (ESP32 based) 
-   - RGB indicator    
-
-### Display UI  
-On startup, the round display shows:  
-1. **CO₂ Meter**: Circular gauge with color zones (Green/Yellow/Orange/Red).  
-2. **Current CO₂ Value**: Numeric readout (e.g., "850 ppm") in left corner of gauge.  
-3. **Network Status**:  
-   - "WIFI" (green - connected, red - disconnected)  
-4. **Admin panel**: Local IP address (e.g., `http://192.168.1.100`).  
-5. **Calibration Status**: "CALIBRATION" label.  
-6. **Firmware Version**: Shown at the bottom (e.g., "v1.0.0").  
-
----
+   - Micro-USB Port (for power and firmware updates)  
+3. **Internal Components**:  
+   - CO₂ Sensor (CCS811)  
+   - Microcontroller (ESP32-based)  
+   - RGB Indicator  
 
 ## Getting Started  
-### Unboxing and Setup  
-1. **Package Contents**:  
-   - AQM Device  
-   - Micro-USB cable  
-   - Quick Start Guide  
-   - Mounting parts  
+### Installation  
+1. Place the device on a flat surface (desk or wall) at 1-2 meters above breathing level.  
+2. Ensure no obstructions block ventilation holes.  
 
-2. **Assembly**:  
-   - Place the device on a flat surface (table or wall), 1-2 meters from breathing height.  
-   - Ensure there are no obstructions to air vents.  
+### First Power-On  
+1. Connect the Micro-USB cable to a 5V/1A power source and the device.  
+2. The screen will display sequentially:  
+    - Step 1: Wi-Fi Status (see [Connecting to Wi-Fi](#connecting-to-wi-fi))  
+    - Step 2: CO₂ Initialization  
+<p style="text-align:center">
+  <img src="../images/first_start.jpg" width="250">
+  <h5 style="text-align:center"></h5>
+</p>  
 
-### Initial Power-On  
-1. Plug in the Micro-USB cable to a 5V/1A power adapter.  
-2. **First Boot Sequence**:  
-   - The display will show:  
-      - Step 1: CO₂ sensor meter  
-      - Step 2: Wi-Fi status (see [Section 3.3](#how-to-connect-the-device-to-wi-fi))  
+### Connecting to Wi-Fi  
+1. Connect to the device’s access point (`AQM-AP`).  
+<p style="text-align:center">
+  <img src="../images/aqm_ap.jpg" width="250">
+  <h5 style="text-align:center">Device creates an access point</h5>
+</p>  
+2. Open a web browser and navigate to the address shown on the display (usually `http://192.168.4.1`; actual address may vary).  
+<p style="text-align:center">
+  <img src="../images/web_ui_main_menu_local.jpg" width="250">
+  <h5 style="text-align:center"></h5>
+</p>  
+3. Select the **WIFI** menu item, enter your Wi-Fi network credentials (name and password), and click **Save**.  
+**Note**: After saving, the device will reboot and attempt to connect. Connection status updates will appear within seconds.  
 
-### How to Connect the Device to Wi-Fi  
-1. Connect to the device’s hotspot (SSID: `AQM-AP`).  
-2. Open a web browser and enter `http://192.168.4.1`.  
-3. Select the **WIFI** menu item and input your Wi-Fi credentials. Click **Save** button.  
-**Note**: After saving, the device will reboot and attempt to join the network. Status updates will appear in several seconds.  
-
----
-
-## Understanding the UI  
+## Interface Overview  
 ### Device Interface  
-| Element          | Description                                                                 |  
-|-------------------|-----------------------------------------------------------------------------|  
-| **CO₂ meter**     | Visual gauge with colors: Green, Yellow, Orange, Red                       |  
-| **CO₂ value**     | Current eCO₂ value in format (e.g., "850 ppm")                              |  
-| **Admin panel link** | Link to web admin panel (e.g., `http://192.168.1.100`)                   |  
-| **WIFI status**   | Internet connection status (green - connected, red - disconnected)         |  
-| **Calibration status** | Sensor calibration label (e.g., "CALIBRATION")                         |  
-| **Firmware version** | Firmware version number (e.g., "v1.0.0")                                 |  
+| Element                   | Description                                                                 |
+|---------------------------|-----------------------------------------------------------------------------|
+| **CO₂ Meter**             | Visual gradient with color zones: green, yellow, orange, red               |
+| **Current CO₂ Value**     | Current eCO₂ value (e.g., "850.0"). Min/max display values: 400.0 / 1500.0 |
+| **Web Panel Link**        | URL to the web panel (e.g., `http://192.168.1.100`)                       |
+| **Network Status**        | Internet connection status (green = connected, red = disconnected)        |
+| **Calibration Status**    | Teal "CALIBRATION" text during calibration                                |
+| **Firmware Version**      | Current firmware version (e.g., "v1.0.0")                                |
 
-### Web Admin Panel  
-Accessible via `http://[device-ip]`, the web UI includes:   
-1. **Wi-Fi Settings**:  
-   - SSID (network name) and password.  
-2. **MQTT Configuration**:  
-   - **Broker details**:  
-     - **Enable**: Enable publishing to topics.  
-     - **Host**: Server host.  
-     - **Port**: Server port.  
-     - **Username**: Account username.  
-     - **Password**: Account password.  
-     - **Device ID**: Used for unique ID for server and topic prefix.  
-3. **CO₂ Settings**:  
-   - **Alarm value**: Set alarm thresholds.  
-   - **Scale types**: Choose between DEFAULT (4 colors) or EASY (3 colors) gauge.  
-   - **Calibration**: Buttons to start/stop calibration.  
-4. **System Settings**:  
-   - **Use dark theme**: Toggle between light and dark themes.  
-   - **Update firmware**: Download and install the latest firmware version.   
+### Web Panel  
+Accessible at `http://[device-address]`, includes:  
+1. **Wi-Fi**:  
+   - SSID and password settings.  
+<p style="text-align:center">
+  <img src="../images/web_ui_wifi_menu.jpg" width="250">
+  <h5 style="text-align:center"></h5>
+</p>  
+2. **MQTT**:  
+    - **Enable**: Toggle message publishing.  
+    - **Host**: Server IP/URL.  
+    - **Port**: Server port.  
+    - **Username/Password**: MQTT credentials.  
+    - **Device ID**: Unique server identifier and topic prefix.  
+<p style="text-align:center">
+  <img src="../images/web_ui_mqtt_menu.jpg" width="250">
+  <h5 style="text-align:center"></h5>
+</p>  
+3. **CO₂**:  
+   - **Alarm value**: Set warning thresholds.  
+   - **Scale type**: Choose DEFAULT (4-color) or EASY (3-color) gradient.  
+   - **Calibration**: Start/stop calibration buttons.  
+<p style="text-align:center">
+  <img src="../images/web_ui_co2_menu.jpg" width="250">
+  <h5 style="text-align:center"></h5>
+</p>  
+4. **System**:  
+   - **Use dark theme**: Toggle light/dark mode.  
+   - **Log**: Set logging level.  
+   - **Firmware update**: Upload and install new firmware.  
+<p style="text-align:center">
+  <img src="../images/web_ui_system_menu.jpg" width="250">
+  <h5 style="text-align:center"></h5>
+</p>  
 
----
+## Advanced Settings  
+### MQTT Configuration  
+- Configure connection to your MQTT broker (host, port, credentials).  
+- Set a unique device ID to avoid topic conflicts.  
+<p style="text-align:center">
+  <img src="../images/web_ui_mqtt_menu.jpg" width="250">
+  <h5 style="text-align:center">MQTT broker settings</h5>
+</p>  
 
-## Advanced Configuration  
-### Custom MQTT  
-- Choose your own host, port, and credentials for connection.  
-- Specify a device ID to prevent topic duplicates.  
+## Example Using [wqtt.ru](https://wqtt.ru) (Freemium Broker)
+### Broker Configuration  
+1. Go to the [wqtt.ru](https://wqtt.ru) homepage.  
+2. Sign up or log into your account.  
+3. Navigate to [Settings](https://dash.wqtt.ru/settings/).  
+<p style="text-align:center">
+  <img src="../images/wqtt_settings.png" width="250">
+  <h5 style="text-align:center"></h5>
+</p>  
+4. Click **Add Device > Sensor**.  
+5. Enter a **Device name** (e.g., "AQM") and **Room name**.  
+6. Under **Advanced Settings**, select **Sensors > Add > Float**.  
+7. Choose **Type > Carbon Dioxide** and set **Topic** to `common/aqm/co2`.  
+8. Repeat step 6 for TVOC, setting the topic to `common/aqm/tvoc`.  
+**Note**: The prefix `common/aqm` corresponds to the **Device ID** specified in the MQTT settings.  
+<p style="text-align:center">
+  <img src="../images/wqtt_dashboard.png" width="250">
+  <h5 style="text-align:center">Device appears after successful setup</h5>
+</p>  
+9. Copy broker details from the **Broker** section and enter them into the web panel's MQTT menu:  
+    - **Address** → Server  
+    - **Port** → Port  
+    - **User** → Username  
+    - **Password** → Password  
+<p style="text-align:center">
+  <img src="../images/wqtt_broker.png" width="250">
+  <h5 style="text-align:center">Broker settings</h5>
+</p>  
 
-### Theme Customization  
-- Choose **Dark Mode** in **System > Use dark theme**.  
+### Yandex Smart Home Integration  
+1. Open the **Yandex Smart Home** app.  
+2. Go to **Smart Home Devices**.  
+3. Search for **WQTT.RU** and click **Link to Yandex**.  
+4. Log in with your [wqtt.ru](https://wqtt.ru) account credentials.  
+5. Click **Refresh Device List**; your **AQM** should appear.  
+6. Assign a unique Cyrillic name (e.g., "Датчик воздуха").  
+7. Reboot the device. Data will sync within minutes. Configure scenarios like CO₂ level alerts.  
 
----
+### MQTT Testing (Without Sensor)  
+A sample Go script in `scripts/mqtt_tester` can publish random values to the topic.  
 
-## Maintenance & Safety  
-- **Sensor Calibration**:  
-  - The sensor can perform auto-calibration every 24 hours after start. However, during the first week of operation, it is recommended to save a new baseline every 24 hours. After one week of operation, it can be saved every 1-28 days. Periodically re-calibrate the sensor, e.g., every 7 days.  
-  - To calibrate:  
-    - Put the sensor in clean air conditions.  
-    - Press the `run` button, and ensure the "CALIBRATION" label appears.  
-    - Wait approximately 20 minutes and press the `stop` button.  
-    - The "CALIBRATION" label should disappear.  
-    - Power off and then power on the device. If any issues arise (e.g., power corruption), the sensor will still read and save the calibrated value. You can try recalibrating at any time.  
+### Dark Theme  
+- Toggle theme under **System > Use dark theme**.  
+<p style="text-align:center">
+  <img src="../images/web_ui_system_menu.jpg" width="250">
+  <h5 style="text-align:center">Theme toggle</h5>
+</p>  
 
-- **Firmware Updates**:  
-  - In the menu, select **System** and press `Update firmware`.  
-  - Wait a few minutes. The device will restart, and the new version will be updated in the header section.  
+### Sensor Calibration  
+- Manual calibration is recommended even with automatic calibration:  
+  - Daily for the first 7 days.  
+  - Every 1-28 days after the first week.  
+- **To calibrate**:  
+  - Place the device in clean air.  
+  - Go to **System > Calibration** and click `run`. Confirm "CALIBRATION" appears.  
+  - Wait ~20 minutes, then click `stop`.  
+  - Reboot the device. If issues arise, the sensor will restore the last calibration.  
+<p style="text-align:center">
+  <img src="../images/calibration.jpg" width="250">
+  <h5 style="text-align:center">Device in calibration mode</h5>
+</p>  
 
-- **Warnings**:  
-  - Do not block air vents.  
-  - Avoid exposing the device to direct sunlight or water.
+### Firmware Update  
+- Navigate to **System > Update firmware**.  
+- Wait for the device to reboot. The new firmware version will appear in the web panel header.  
+- Alternatively, download the firmware (in `bin` folder) and upload `firmware.bin` via **OTA** menu.  
+<p style="text-align:center">
+  <img src="../images/web_ui_maintenance.jpg" width="250">
+  <h5 style="text-align:center">Maintenance menu (accessible via top-right icon)</h5>
+</p>  
