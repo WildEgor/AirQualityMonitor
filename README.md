@@ -4,7 +4,7 @@
   <img src="./docs/images/showcase.jpg" width="250" title="showcase">
 </p>
 
-A smart air quality monitor based on ESP32 and CCS811 sensor
+Air Quality Monitor based on ESP32 and CCS811 sensor
 
 ## Features
 
@@ -23,11 +23,9 @@ A smart air quality monitor based on ESP32 and CCS811 sensor
 
 ## Links
 
-- [Source Code](/src/)
-- [Wiring Diagram](/resources/)  
+- [Manual](/docs/en/UserManual.md)
+- [Wiring Diagram](/resources/) 
+- [Source Code](/src/) 
 - [3D Printed Case](/resources/3dprint/)  
 
 > WARNING! Reduce the model by 10 times before printing!
-
-## CMD
-- `cp .\.pio\build\mhetesp32devkit\firmware.bin .\bin\`;

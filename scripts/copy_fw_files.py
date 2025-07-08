@@ -28,7 +28,7 @@ def copy_fw_files(source, target, env):
 
 def createCommunityZipFile(source, target, env):
     original_folder_path = "./bin/"
-    zip_file_path = './dist/' + "fw" + firmware_version + '.zip'
+    zip_file_path = './dist/' + "fw_" + firmware_version + '.zip'
     createZIP(original_folder_path, zip_file_path)
 
 def createZIP(original_folder_path, zip_file_path):
