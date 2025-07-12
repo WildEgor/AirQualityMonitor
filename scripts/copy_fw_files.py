@@ -23,7 +23,7 @@ def copy_fw_files(source, target, env):
     if fw_file_name[-3:] == "bin":
         fw_file_name=fw_file_name[0:-3] + "bin"
 
-    shutil.copy(fw_file_name, "./bin/" + "/firmware.bin")
+    shutil.copy(fw_file_name, "./bin" + "/firmware.bin")
     createCommunityZipFile(source, target, env)
 
 def createCommunityZipFile(source, target, env):
