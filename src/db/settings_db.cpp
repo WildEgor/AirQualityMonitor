@@ -47,9 +47,7 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
     _db.init(kk::co2_scale_type, "DEFAULT");
     _db.init(kk::co2_alarm_lvl, RGB_DEFAULT_ALERT_TRHLD);
 
-#ifdef ENABLE_TEST
     _db.dump(Serial);
-#endif
 
     LOG_INFO("init ok!");
 

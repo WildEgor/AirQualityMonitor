@@ -67,14 +67,14 @@ void setup() {
   });
 #endif
 
-  Display* hmi = new Display(SEC_1, *sdb, *co2, *tp, *wifi, *ota);
+  Display* display = new Display(SEC_1, *sdb, *co2, *tp, *wifi, *ota);
 
   RGBController* rgb = new RGBController(SEC_1, *sdb);
   rgb->setUpdaterCb([co2]() -> float {
     return co2->getCO2();
   });
 
-  WebPanel* wp = new WebPanel(*sdb, *wifi, *ota, *mqtt, *rgb, *hmi, *co2);
+  WebPanel* wp = new WebPanel(*sdb, *wifi, *ota, *mqtt, *rgb, *display, *co2);
 
   LOG_INFO("init ok!");
 }

@@ -23,7 +23,7 @@ WebPanel::WebPanel(
     OTA& ota,
     MQTTConn& mqttConn, 
     RGBController& rgbController,
-    Display& hmi,
+    Display& display,
     CO2Sensor& co2sensor
 ) 
     : LoopTickerBase(), 
@@ -33,7 +33,7 @@ WebPanel::WebPanel(
     _ota(&ota), 
     _mqtt_conn(&mqttConn), 
     _rgb_controller(&rgbController), 
-    _hmi(&hmi),
+    _display(&display),
     _co2_sensor(&co2sensor),
     _is_initialized(false) {
         _init();
@@ -185,8 +185,8 @@ void WebPanel::_build(sets::Builder& b) {
                         _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
                     }
 
-                    if (_hmi) {
-                        _hmi->setTheme((*_db)[kk::use_dark_theme].toBool());
+                    if (_display) {
+                        _display->setTheme((*_db)[kk::use_dark_theme].toBool());
                     }
                 
                     return;

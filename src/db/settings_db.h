@@ -13,8 +13,6 @@ enum kk : size_t {
     mqtt_username,
     mqtt_pass,
     mqtt_device_id,
-    co2_measure_prd,
-    co2_pub_prd,
     co2_scale_type,
     co2_alarm_lvl,
     rgb_enabled,

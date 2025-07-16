@@ -7,7 +7,7 @@
 class WiFiConnectorAdapter : public WiFiAdapter {
 public:
     WiFiConnectorAdapter(
-        const String& APname = "ESP_AP", 
+        const String& APname = "AQM_AP", 
         const String& APpass = "",
         uint16_t timeout = 60,
         bool closeAP = false

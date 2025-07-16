@@ -8,7 +8,7 @@
 // WiFiAdapter abstract class for wifi connectors
 class WiFiAdapter {
 public:
-    WiFiAdapter(const String& APname = "ESP_AP", const String& APpass = "", uint16_t timeout = 60, bool closeAP = false) {}
+    WiFiAdapter(const String& APname = "AQM_AP", const String& APpass = "", uint16_t timeout = 60, bool closeAP = false) {}
     virtual ~WiFiAdapter() {}
 
     // try connect to network

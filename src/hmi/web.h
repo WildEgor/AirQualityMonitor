@@ -42,7 +42,7 @@ private:
     OTA* _ota;
     MQTTConn* _mqtt_conn;
     RGBController* _rgb_controller;
-    Display* _hmi;
+    Display* _display;
     CO2Sensor* _co2_sensor;
 
     bool _is_initialized;
