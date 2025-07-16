@@ -15,9 +15,9 @@
 #define LOG_COMPONENT "WebPannel"
 #include "services/logger.h"
 
-class WebPannel : public LoopTickerBase {
+class WebPanel : public LoopTickerBase {
 public:
-    WebPannel(SettingsDB& settingsDb, 
+    WebPanel(SettingsDB& settingsDb, 
         WiFiConn& wifiConn, 
         OTA& ota,
         MQTTConn& mqttConn, 
@@ -25,7 +25,7 @@ public:
         Display& hmi,
         CO2Sensor& co2sensor
     );
-    WebPannel(SettingsDB& settingsDb, 
+    WebPanel(SettingsDB& settingsDb, 
         WiFiConn& wifiConn
     );
 

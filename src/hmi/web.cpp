@@ -5,7 +5,7 @@
 sets::Logger webLogger(255);
 bool cfm_fw = false;
 
-WebPannel::WebPannel(
+WebPanel::WebPanel(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn
 ) 
@@ -17,7 +17,7 @@ WebPannel::WebPannel(
         _init();
     }
 
-WebPannel::WebPannel(
+WebPanel::WebPanel(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn, 
     OTA& ota,
@@ -39,7 +39,7 @@ WebPannel::WebPannel(
         _init();
     }
 
-void WebPannel::exec() {
+void WebPanel::exec() {
     if (!_is_initialized) {
         LOG_ERROR("call setup first!");
         return;
@@ -48,7 +48,7 @@ void WebPannel::exec() {
     _sett.tick();
 }
 
-void WebPannel::_init() {
+void WebPanel::_init() {
     LOG_INFO("init...");
 
     Logger::getInstance().initWebLogger(webLogger);
@@ -77,12 +77,12 @@ void WebPannel::_init() {
     _is_initialized = true;
 }
 
-void WebPannel::_update(sets::Updater& u) {
+void WebPanel::_update(sets::Updater& u) {
     u.update(H(log), webLogger);
     if (_ota && _ota->hasUpdate()) u.update("update"_h, "New updates available. Try update firmware?");
 }
 
-void WebPannel::_build(sets::Builder& b) {
+void WebPanel::_build(sets::Builder& b) {
     SUB_BUILD_BEGIN   
     sets::Menu m(b, "WiFi");
     b.Input(kk::wifi_ssid, "SSID");

@@ -74,7 +74,7 @@ void setup() {
     return co2->getCO2();
   });
 
-  WebPannel* wp = new WebPannel(*sdb, *wifi, *ota, *mqtt, *rgb, *hmi, *co2);
+  WebPanel* wp = new WebPanel(*sdb, *wifi, *ota, *mqtt, *rgb, *hmi, *co2);
 
   LOG_INFO("init ok!");
 }
