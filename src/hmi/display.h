@@ -2,19 +2,19 @@
 #include <Looper.h>
 #include <TFT_eSPI.h>
 
-#include "model/hmi_data.h"
+#include "model/display_data.h"
 #include "widgets/meter.h"
 #include "configs/config.h"
 #include "sensors/co2.h"
 #include "sensors/tp.h"
 #include "services/ota.h"
 
-#define LOG_COMPONENT "HMI"
+#define LOG_COMPONENT "Display"
 #include "services/logger.h"
 
-class HMI: public LoopTimerBase {
+class Display: public LoopTimerBase {
 public:
-    HMI(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, TPSensor& tp_sensor, WiFiConn& wifiConn, OTA& ota)
+    Display(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, TPSensor& tp_sensor, WiFiConn& wifiConn, OTA& ota)
         : LoopTimerBase(ms), 
         _db(&settingsDb.db()), 
         _co2_sensor(co2_sensor),
@@ -78,7 +78,7 @@ private:
     WiFiConn* _wifi;
     OTA* _ota;
 
-    HMIState _state;
+    DisplayState _state;
     bool _intro_shown = false;
     bool _force_redraw = false;
 

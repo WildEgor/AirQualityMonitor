@@ -1,7 +1,7 @@
 #pragma once
 #include "configs/config.h"
 
-struct HMIState {
+struct DisplayState {
     unsigned long last_render_time = 0;
     float last_co2_value = -1;
     String last_fw_ver = String(APP_VERSION);

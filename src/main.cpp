@@ -4,14 +4,14 @@
 #include "db/settings_db.h"
 #include "model/co2_data.h"
 #include "configs/config.h"
-#include "configs/settings.h"
 #include "connections/mqtt_conn.h"
 #include "connections/wifi_conn.h"
 #include "connections/wifi_connector_adapter.cpp"
 #include "sensors/sensor_base.h"
 #include "sensors/co2.h"
 #include "sensors/tp.h"
-#include "hmi/hmi.h"
+#include "hmi/display.h"
+#include "hmi/web.h"
 #include "controllers/rgb.h"
 #include "services/logger.h"
 #include "services/publisher.h"
@@ -67,14 +67,14 @@ void setup() {
   });
 #endif
 
-  HMI* hmi = new HMI(SEC_1, *sdb, *co2, *tp, *wifi, *ota);
+  Display* hmi = new Display(SEC_1, *sdb, *co2, *tp, *wifi, *ota);
 
   RGBController* rgb = new RGBController(SEC_1, *sdb);
   rgb->setUpdaterCb([co2]() -> float {
     return co2->getCO2();
   });
 
-  Settings* sett = new Settings(*sdb, *wifi, *ota, *mqtt, *rgb, *hmi, *co2);
+  WebPannel* wp = new WebPannel(*sdb, *wifi, *ota, *mqtt, *rgb, *hmi, *co2);
 
   LOG_INFO("init ok!");
 }

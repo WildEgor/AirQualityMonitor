@@ -1,11 +1,11 @@
-#include "settings.h"
+#include "web.h"
 #include "services/publisher.h"
 #include "configs/config.h"
 
 sets::Logger webLogger(255);
 bool cfm_fw = false;
 
-Settings::Settings(
+WebPannel::WebPannel(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn
 ) 
@@ -17,13 +17,13 @@ Settings::Settings(
         _init();
     }
 
-Settings::Settings(
+WebPannel::WebPannel(
     SettingsDB& settingsDb, 
     WiFiConn& wifiConn, 
     OTA& ota,
     MQTTConn& mqttConn, 
     RGBController& rgbController,
-    HMI& hmi,
+    Display& hmi,
     CO2Sensor& co2sensor
 ) 
     : LoopTickerBase(), 
@@ -39,7 +39,7 @@ Settings::Settings(
         _init();
     }
 
-void Settings::exec() {
+void WebPannel::exec() {
     if (!_is_initialized) {
         LOG_ERROR("call setup first!");
         return;
@@ -48,7 +48,7 @@ void Settings::exec() {
     _sett.tick();
 }
 
-void Settings::_init() {
+void WebPannel::_init() {
     LOG_INFO("init...");
 
     Logger::getInstance().initWebLogger(webLogger);
@@ -77,12 +77,12 @@ void Settings::_init() {
     _is_initialized = true;
 }
 
-void Settings::_update(sets::Updater& u) {
+void WebPannel::_update(sets::Updater& u) {
     u.update(H(log), webLogger);
     if (_ota && _ota->hasUpdate()) u.update("update"_h, "New updates available. Try update firmware?");
 }
 
-void Settings::_build(sets::Builder& b) {
+void WebPannel::_build(sets::Builder& b) {
     SUB_BUILD_BEGIN   
     sets::Menu m(b, "WiFi");
     b.Input(kk::wifi_ssid, "SSID");
