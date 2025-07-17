@@ -11,12 +11,13 @@
 #define LOG_COMPONENT "TPSensor"
 #include "services/logger.h"
 
-#define BMP280_ADDR 0x76  // Default I2C address (0x77 alternative)
+#define BMP280_ADDR 0x76 // Default I2C address (0x77 alternative)
 
-class TPSensor : public SensorBase {
+class TPSensor : public SensorBase
+{
 public:
     TPSensor(uint32_t ms);
-    
+
     void setup() override;
     void exec() override;
     float getTemperatureMin();
@@ -25,12 +26,12 @@ public:
     float getPressureMin();
     float getPressureMax();
     float getPressure();
-    const char* getType() const override;
+    const char *getType() const override;
 
 private:
     GyverBME280 _sensor;
     TPData _data;
-    
+
     bool _init();
     void _check_data();
     void _print_data();

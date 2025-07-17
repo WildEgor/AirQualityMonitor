@@ -1,12 +1,17 @@
-#define LOG_COMPONENT "MQTTConn"
-#include "services/logger.h"
 #include "mqtt_conn.h"
 
 WiFiClient _espClient;
 PubSubClient _pub_client(_espClient);
 
-MQTTConn::MQTTConn(SettingsDB& settingsDb, WiFiConn& wifiConn) : LoopTickerBase(), _db(&settingsDb.db()), _wifi(&wifiConn) {
-    if (!isEnabled()) return;
+/**
+ * @brief Constructor for MQTTConn
+ * @param settingsDb Reference to settings database
+ * @param wifiConn Reference to WiFi connection
+ */
+MQTTConn::MQTTConn(SettingsDB &settingsDb, WiFiConn &wifiConn) : LoopTickerBase(), _db(&settingsDb.db()), _wifi(&wifiConn)
+{
+    if (!isEnabled())
+        return;
 
     LOG_INFO("init...");
 
@@ -24,25 +29,33 @@ MQTTConn::MQTTConn(SettingsDB& settingsDb, WiFiConn& wifiConn) : LoopTickerBase(
     _is_initialized = true;
 }
 
-void MQTTConn::exec() {
-    if (!isEnabled()) return;
+void MQTTConn::exec()
+{
+    if (!isEnabled())
+        return;
 
-    if (!_wifi->connected()) {
+    if (!_wifi->connected())
+    {
         return;
     }
 
     bool pub_connected = _pub_client.loop();
-    if (!pub_connected) {
+    if (!pub_connected)
+    {
         connect();
     }
 }
 
-void MQTTConn::connect() {
-    if (!isEnabled()) return;
+void MQTTConn::connect()
+{
+    if (!isEnabled())
+        return;
 
-    if (!_wifi->connected()) return;
+    if (!_wifi->connected())
+        return;
 
-    if (!connected()) {
+    if (!connected())
+    {
         LOG_INFO("connect to server...");
 
         _connectToMQTT(
@@ -53,52 +66,73 @@ void MQTTConn::connect() {
     }
 }
 
-void MQTTConn::publish(const String& topic, const String& payload) {
-    if (!isEnabled()) return;
-    if (!_wifi->connected()) return;
+void MQTTConn::publish(const String &topic, const String &payload)
+{
+    if (!isEnabled())
+        return;
+    if (!_wifi->connected())
+        return;
 
     LOG_DEBUG("pub to topic: " + _device_id + "/" + topic + " value: " + payload);
 
     String t = _device_id + "/" + topic;
 
     bool ok = _pub_client.publish(t.c_str(), payload.c_str(), false);
-    if (!ok) {
+    if (!ok)
+    {
         LOG_ERROR("publish failed");
     }
 }
 
-void MQTTConn::setDeviceID(const String& id) {
-    if (id.isEmpty()) return;
-    
+void MQTTConn::setDeviceID(const String &id)
+{
+    if (id.isEmpty())
+        return;
+
     _device_id = id;
 }
 
-bool MQTTConn::isEnabled() const {
+bool MQTTConn::isEnabled() const
+{
     return (*_db)[kk::mqtt_enabled].toBool();
 }
 
-bool MQTTConn::connected() const {
+bool MQTTConn::connected() const
+{
     return _pub_client.connected();
 }
 
-bool MQTTConn::isInitialized() const {
+bool MQTTConn::isInitialized() const
+{
     return _is_initialized;
 }
 
-void MQTTConn::_connectToMQTT(const String& mqtt_server, uint16_t mqtt_port, const String& mqtt_user, const String& mqtt_password) {
-    if (!_wifi->connected()) return;
+/**
+ * @brief Internal connection logic
+ * @param mqtt_server MQTT host
+ * @param mqtt_port MQTT port
+ * @param mqtt_user MQTT user
+ * @param mqtt_password MQTT password
+ */
+void MQTTConn::_connectToMQTT(const String &mqtt_server, uint16_t mqtt_port, const String &mqtt_user, const String &mqtt_password)
+{
+    if (!_wifi->connected())
+        return;
 
-    if (mqtt_server.isEmpty()) {
+    if (mqtt_server.isEmpty())
+    {
         LOG_ERROR("server address is empty");
         return;
     }
 
-    if (mqtt_user.isEmpty() || mqtt_password.isEmpty()) {
+    if (mqtt_user.isEmpty() || mqtt_password.isEmpty())
+    {
         LOG_ERROR("server creds is empty");
         return;
     }
 
-    if (mqtt_port == 0 || mqtt_port > 65535) {
+    if (mqtt_port == 0 || mqtt_port > 65535)
+    {
         LOG_ERROR("invalid port");
         return;
     }
@@ -111,7 +145,8 @@ void MQTTConn::_connectToMQTT(const String& mqtt_server, uint16_t mqtt_port, con
 
     String client_id = "AQM-" + WiFi.macAddress() + String(random(0xffff), HEX);
 
-    if (client_id.isEmpty()) {
+    if (client_id.isEmpty())
+    {
         LOG_ERROR("failed to generate client ID");
         return;
     }
@@ -123,10 +158,12 @@ void MQTTConn::_connectToMQTT(const String& mqtt_server, uint16_t mqtt_port, con
     LOG_DEBUG("mqtt_port: " + String(mqtt_port));
 
     const int max_retries = 3;
-    for (int retry_count = 0; retry_count < max_retries; retry_count++) {
+    for (int retry_count = 0; retry_count < max_retries; retry_count++)
+    {
         LOG_DEBUG("attempting connection client...");
 
-        if (_pub_client.connect(client_id.c_str(), mqtt_user.c_str(), mqtt_password.c_str())) {
+        if (_pub_client.connect(client_id.c_str(), mqtt_user.c_str(), mqtt_password.c_str()))
+        {
             LOG_INFO("connected");
             return;
         }

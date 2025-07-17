@@ -12,17 +12,33 @@
 #define LOG_COMPONENT "Display"
 #include "services/logger.h"
 
-class Display: public LoopTimerBase {
+/**
+ * @name Display
+ * @details Class for managing the TFT display, rendering widgets and sensor data
+ */
+class Display : public LoopTimerBase
+{
 public:
-    Display(uint32_t ms, SettingsDB& settingsDb, CO2Sensor& co2_sensor, TPSensor& tp_sensor, WiFiConn& wifiConn, OTA& ota)
-        : LoopTimerBase(ms), 
-        _db(&settingsDb.db()), 
-        _co2_sensor(co2_sensor),
-        _tp_sensor(tp_sensor), 
-        _co2_meter(nullptr), 
-        _co2_scale(&CO2Scale::getInstance()), 
-        _wifi(&wifiConn), 
-        _ota(&ota) {
+    /**
+     * @name Display
+     * @param ms - update interval in milliseconds
+     * @param settingsDb - reference to settings database
+     * @param co2_sensor - reference to CO2 sensor
+     * @param tp_sensor - reference to temperature/pressure sensor
+     * @param wifiConn - reference to WiFi connection
+     * @param ota - reference to OTA update service
+     * @details Display class constructor, initializes display and widgets
+     */
+    Display(uint32_t ms, SettingsDB &settingsDb, CO2Sensor &co2_sensor, TPSensor &tp_sensor, WiFiConn &wifiConn, OTA &ota)
+        : LoopTimerBase(ms),
+          _db(&settingsDb.db()),
+          _co2_sensor(co2_sensor),
+          _tp_sensor(tp_sensor),
+          _co2_meter(nullptr),
+          _co2_scale(&CO2Scale::getInstance()),
+          _wifi(&wifiConn),
+          _ota(&ota)
+    {
         _force_redraw = true;
         _intro_shown = true;
         _state.dark_theme = false;
@@ -41,49 +57,111 @@ public:
 
         LOG_INFO("init widgets...");
         _co2_meter = MeterWidget(&_tft);
-        uint16_t rs,re,os,oe,ys,ye,gs,ge;
+        uint16_t rs, re, os, oe, ys, ye, gs, ge;
         _co2_scale->init(_db);
-        _co2_scale->getScale(rs,re,os,oe,ys,ye,gs,ge);
+        _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
         _co2_meter.setTheme(_state.dark_theme);
-        _co2_meter.setZones(rs,re,os,oe,ys,ye,gs,ge);
-        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", ""); 
+        _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
+        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", "");
         LOG_INFO("init widgets ok!");
 
         _render();
         this->addLoop();
     }
 
-    void exec() {
+    /**
+     * @name exec
+     * @details Main display update loop, triggers rendering
+     */
+    void exec()
+    {
         _render();
     }
 
-    void setTheme(bool dark) {
-        if (_state.dark_theme != dark) {
+    /**
+     * @name setTheme
+     * @param dark - true for dark theme, false for light theme
+     * @details Change display theme and force redraw
+     */
+    void setTheme(bool dark)
+    {
+        if (_state.dark_theme != dark)
+        {
             _state.dark_theme = dark;
             _init_theme(true);
             _co2_meter.setTheme(dark);
             _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", "");
-            _force_redraw = true; 
+            _force_redraw = true;
             _render();
         }
     }
 
 private:
+    /**
+     * @name _tft
+     * @details TFT display driver instance
+     */
     TFT_eSPI _tft = TFT_eSPI();
-    GyverDBFile* _db;
+    /**
+     * @name _db
+     * @details Pointer to settings database
+     */
+    GyverDBFile *_db;
+    /**
+     * @name _co2_meter
+     * @details CO2 meter widget instance
+     */
     MeterWidget _co2_meter;
-    CO2Sensor& _co2_sensor;
-    CO2Scale* _co2_scale;
-    TPSensor& _tp_sensor;
-    WiFiConn* _wifi;
-    OTA* _ota;
+    /**
+     * @name _co2_sensor
+     * @details Reference to CO2 sensor
+     */
+    CO2Sensor &_co2_sensor;
+    /**
+     * @name _co2_scale
+     * @details Pointer to CO2 scale instance
+     */
+    CO2Scale *_co2_scale;
+    /**
+     * @name _tp_sensor
+     * @details Reference to temperature/pressure sensor
+     */
+    TPSensor &_tp_sensor;
+    /**
+     * @name _wifi
+     * @details Pointer to WiFi connection
+     */
+    WiFiConn *_wifi;
+    /**
+     * @name _ota
+     * @details Pointer to OTA update service
+     */
+    OTA *_ota;
 
+    /**
+     * @name _state
+     * @details Display state structure
+     */
     DisplayState _state;
+    /**
+     * @name _intro_shown
+     * @details Flag for showing intro screen
+     */
     bool _intro_shown = false;
+    /**
+     * @name _force_redraw
+     * @details Flag to force display redraw
+     */
     bool _force_redraw = false;
 
-    void _render() {
-        if (!_should_render()) {
+    /**
+     * @name _render
+     * @details Render all display widgets and info
+     */
+    void _render()
+    {
+        if (!_should_render())
+        {
             return;
         }
 
@@ -92,41 +170,53 @@ private:
         _print_gauge();
         _print_sensor_state();
         LOG_DEBUG("rendered ok!");
-        
+
         _force_redraw = false;
     }
 
-    bool _should_render() {
-        if (_force_redraw) {
+    /**
+     * @name _should_render
+     * @details Check if display needs to be updated
+     * @return bool - true if update is needed
+     */
+    bool _should_render()
+    {
+        if (_force_redraw)
+        {
             return true;
         }
 
         bool current_wifi_state = _wifi->connected();
-        if (current_wifi_state != _state.last_wifi_state) {
+        if (current_wifi_state != _state.last_wifi_state)
+        {
             _state.last_wifi_state = current_wifi_state;
             return true;
         }
 
         bool current_co2_sensor_state = _co2_sensor.isCalibrating();
-        if (current_co2_sensor_state != _state.last_co2_sensor_state) {
+        if (current_co2_sensor_state != _state.last_co2_sensor_state)
+        {
             _state.last_co2_sensor_state = current_co2_sensor_state;
             _force_redraw = true;
             return true;
         }
 
         float current_co2 = _co2_sensor.getCO2();
-        if (abs(current_co2 - _state.last_co2_value) > 5.0) {
+        if (abs(current_co2 - _state.last_co2_value) > 5.0)
+        {
             _state.last_co2_value = current_co2;
             return true;
         }
 
         String current_fw_ver = _ota->version();
-        if (current_fw_ver != _state.last_fw_ver) {
+        if (current_fw_ver != _state.last_fw_ver)
+        {
             _state.last_fw_ver = current_fw_ver;
             return true;
         }
 
-        if ((millis() - _state.last_render_time) > SEC_5) {
+        if ((millis() - _state.last_render_time) > SEC_5)
+        {
             _state.last_render_time = millis();
             _force_redraw = true;
             return true;
@@ -135,14 +225,23 @@ private:
         return false;
     }
 
-    void _print_wifi_info() {
-        if (_intro_shown || _force_redraw) {
+    /**
+     * @name _print_wifi_info
+     * @details Print WiFi info and firmware version to display
+     */
+    void _print_wifi_info()
+    {
+        if (_intro_shown || _force_redraw)
+        {
             _intro_shown = false;
 
-            if (_state.dark_theme) {
+            if (_state.dark_theme)
+            {
                 _tft.setTextColor(TFT_LIGHTGREY);
                 _tft.fillRect(20, 130, 200, 10, TFT_BLACK);
-            } else {
+            }
+            else
+            {
                 _tft.setTextColor(TFT_LIGHTGREY);
                 _tft.fillRect(20, 130, 200, 10, TFT_WHITE);
             }
@@ -153,26 +252,35 @@ private:
             _tft.print(F("admin panel: http://"));
             _tft.println(_wifi->ip());
 
-            if (_state.dark_theme) {
+            if (_state.dark_theme)
+            {
                 _tft.fillRect(110, 145, 60, 10, TFT_BLACK);
-            } else {
+            }
+            else
+            {
                 _tft.fillRect(110, 145, 60, 10, TFT_WHITE);
             }
-            
+
             _tft.setCursor(110, 145);
-            if (!_state.last_wifi_state) {
+            if (!_state.last_wifi_state)
+            {
                 _tft.setTextColor(TFT_RED);
                 _tft.println(F("WIFI"));
                 LOG_ERROR("wifi not connected");
-            } else {
+            }
+            else
+            {
                 _tft.setTextColor(TFT_DARKGREEN);
                 _tft.println(F("WIFI"));
             }
 
             _tft.setCursor(100, 185);
-            if (_state.dark_theme) {
+            if (_state.dark_theme)
+            {
                 _tft.fillRect(100, 185, 60, 10, TFT_BLACK);
-            } else {
+            }
+            else
+            {
                 _tft.fillRect(100, 185, 60, 10, TFT_WHITE);
             }
 
@@ -183,13 +291,20 @@ private:
         }
     }
 
-    void _print_gauge() {
-        if (!_co2_sensor.isInitialized()) {
+    /**
+     * @name _print_gauge
+     * @details Print and update CO2 gauge widget
+     */
+    void _print_gauge()
+    {
+        if (!_co2_sensor.isInitialized())
+        {
             return;
         }
-    
+
         float value = static_cast<float>(_co2_sensor.getCO2());
-        if (value > _co2_scale->getHumanMax()){
+        if (value > _co2_scale->getHumanMax())
+        {
             value = _co2_scale->getHumanMax();
         }
 
@@ -200,43 +315,67 @@ private:
         _co2_meter.updateNeedle(value, 20);
     }
 
-    void _print_sensor_state() {
-        if (_force_redraw) {
+    /**
+     * @name _print_sensor_state
+     * @details Print sensor state (e.g. calibration) to display
+     */
+    void _print_sensor_state()
+    {
+        if (_force_redraw)
+        {
             _tft.setCursor(80, 165);
 
             _tft.setTextColor(TFT_CYAN);
-            if (_state.dark_theme) {
+            if (_state.dark_theme)
+            {
                 _tft.fillRect(80, 165, 80, 10, TFT_BLACK);
-            } else {
+            }
+            else
+            {
                 _tft.fillRect(80, 165, 80, 10, TFT_WHITE);
             }
 
-            if (_state.last_co2_sensor_state) {
+            if (_state.last_co2_sensor_state)
+            {
                 _tft.println(F("CALIBRATION"));
-            } else {
-                if (_state.dark_theme) {
+            }
+            else
+            {
+                if (_state.dark_theme)
+                {
                     _tft.fillRect(80, 165, 80, 10, TFT_BLACK);
-                } else {
+                }
+                else
+                {
                     _tft.fillRect(80, 165, 80, 10, TFT_WHITE);
                 }
             }
         }
     }
 
-    void _init_theme(bool fill) {
+    /**
+     * @name _init_theme
+     * @param fill - whether to fill the background
+     * @details Initialize display theme (dark/light)
+     */
+    void _init_theme(bool fill)
+    {
         _state.dark_theme = (*_db)[kk::use_dark_theme].toBool();
 
         _tft.setTextSize(1);
 
-        if (_state.dark_theme) {
-            if (fill) {
+        if (_state.dark_theme)
+        {
+            if (fill)
+            {
                 _tft.fillScreen(TFT_BLACK);
             }
             _tft.setTextColor(TFT_WHITE);
             return;
         }
 
-        if (fill) {
+        if (fill)
+        {
             _tft.fillScreen(TFT_WHITE);
         }
         _tft.setTextColor(TFT_BLACK);

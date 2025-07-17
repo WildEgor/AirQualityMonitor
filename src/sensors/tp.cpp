@@ -9,7 +9,8 @@ TPSensor::TPSensor(uint32_t ms)
     
     if (!_enable_test && !_init()) {
         LOG_ERROR("init failed! please check your wiring.");
-        // this->addLoop(); // HINT: uncomment if bme180 support
+        // Uncomment the following lines if BME180 support is needed
+        // this->addLoop();
         // exec();
         return;
     }
@@ -52,11 +53,11 @@ float TPSensor::getTemperatureMax() {
 }
 
 float TPSensor::getPressureMin() { 
-    return 30000.0f;  // 300 hPa in Pa
+    return 30000.0f;  // Minimum pressure: 300 hPa in Pa
 }
 
 float TPSensor::getPressureMax() { 
-    return 110000.0f; // 1100 hPa in Pa
+    return 110000.0f; // Maximum pressure: 1100 hPa in Pa
 }
 
 bool TPSensor::_init() {

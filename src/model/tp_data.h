@@ -1,6 +1,7 @@
 #pragma once
 
-struct TPData {
+struct TPData
+{
     float temp;
     float pressure;
 };

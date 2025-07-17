@@ -1,52 +1,115 @@
 #pragma once
 #include <Arduino.h>
-
 #include <WiFiConnector.h>
+
 #include "db/settings_db.h"
 #include "configs/config.h"
 
-// WiFiAdapter abstract class for wifi connectors
-class WiFiAdapter {
+#define LOG_COMPONENT "WiFiConn"
+#include "services/logger.h"
+
+/**
+ * @class WiFiAdapter
+ * @brief Abstract class for WiFi connectors
+ */
+class WiFiAdapter
+{
 public:
-    WiFiAdapter(const String& APname = "AQM_AP", const String& APpass = "", uint16_t timeout = 60, bool closeAP = false) {}
+    /**
+     * @brief Constructor
+     * @param APname Access point name
+     * @param APpass Access point password
+     * @param timeout Connection timeout in seconds
+     * @param closeAP Close AP after connection
+     */
+    WiFiAdapter(const String &APname = "AQM_AP",
+                const String &APpass = "",
+                uint16_t timeout = 60,
+                bool closeAP = false) {}
     virtual ~WiFiAdapter() {}
 
-    // try connect to network
-    virtual void connect(const String& ssid, const String& pass = "") = 0;
-    // check and return state
+    /**
+     * @brief Try to (re)connect to WiFi network
+     * @param ssid WiFi name
+     * @param pass WiFi password
+     */
+    virtual void connect(const String &ssid, const String &pass = "") = 0;
+    /**
+     * @brief Check if in connecting mode
+     * @return true if connecting
+     */
     virtual bool connecting() = 0;
-    // check and return state
+    /**
+     * @brief Check if connected to network
+     * @return true if connected
+     */
     virtual bool connected() = 0;
-    // call in loop
+    /**
+     * @brief Handle (re)connect logic
+     * @return true if successful
+     */
     virtual bool exec() = 0;
-    // return ip (softAP or local)
+    /**
+     * @brief Return softAP or local IP
+     * @return Device IP as string
+     */
     virtual String ip() = 0;
+
 private:
-    bool _is_initialized = false;
-}; 
+    bool _is_initialized = false; ///< Initialization flag
+};
 
-// WiFiConn wifi connection
-class WiFiConn : public LoopTickerBase {
+/**
+ * @class WiFiConn
+ * @brief Implements WiFi connection logic
+ */
+class WiFiConn : public LoopTickerBase
+{
 public:
-    WiFiConn(SettingsDB& settingsDb, WiFiAdapter& wifiAdapter);
+    /**
+     * @brief Constructor
+     * @param settingsDb Reference to settings database
+     * @param wifiAdapter Reference to WiFi adapter
+     */
+    WiFiConn(SettingsDB &settingsDb, WiFiAdapter &wifiAdapter);
 
-    // connect to network
+    /**
+     * @brief Connect to network
+     */
     void connect();
-    // return state
+
+    /**
+     * @brief Return connection status
+     * @return true if connected
+     */
     bool connected();
-    bool isInitialized() {
+    /**
+     * @brief Check if class is initialized
+     * @return true if initialized
+     */
+    bool isInitialized()
+    {
         return _is_initialized;
     };
-    // call in loop
+    /**
+     * @brief Handle connection loop
+     */
     void exec() override;
-    // return ip (softAP or local)
+    /**
+     * @brief Return softAP or local IP
+     * @return Device IP as string
+     */
     String ip();
 
 private:
-    // call WiFiAdapter
-    void _connect(const String& ssid, const String& pass);
+    /**
+     * @brief Internal connect logic calling WiFiAdapter
+     * @param ssid WiFi SSID
+     * @param pass WiFi password
+     */
+    void _connect(const String &ssid, const String &pass);
 
-    GyverDBFile* _db;
-    WiFiAdapter* _wifi_adapter;
-    bool _is_initialized = false;
+    GyverDBFile *_db;           ///< Pointer to database
+    WiFiAdapter *_wifi_adapter; ///< Pointer to WiFi adapter
+    bool _is_initialized = false; ///< Initialization flag
 };

@@ -6,41 +6,43 @@ sets::Logger webLogger(255);
 bool cfm_fw = false;
 
 WebPanel::WebPanel(
-    SettingsDB& settingsDb, 
-    WiFiConn& wifiConn
-) 
-    : LoopTickerBase(), 
-    _sett(String(APP_NAME) + " v" + String(APP_VERSION), &settingsDb.db()),
-    _db(&settingsDb.db()), 
-    _wifi_conn(&wifiConn), 
-    _is_initialized(false) {
-        _init();
-    }
+    SettingsDB &settingsDb,
+    WiFiConn &wifiConn)
+    : LoopTickerBase(),
+      _sett(String(APP_NAME) + " v" + String(APP_VERSION), &settingsDb.db()),
+      _db(&settingsDb.db()),
+      _wifi_conn(&wifiConn),
+      _is_initialized(false)
+{
+    _init();
+}
 
 WebPanel::WebPanel(
-    SettingsDB& settingsDb, 
-    WiFiConn& wifiConn, 
-    OTA& ota,
-    MQTTConn& mqttConn, 
-    RGBController& rgbController,
-    Display& display,
-    CO2Sensor& co2sensor
-) 
-    : LoopTickerBase(), 
-    _sett(String(APP_NAME) + " v" + ota.version(), &settingsDb.db()),
-    _db(&settingsDb.db()), 
-    _wifi_conn(&wifiConn),
-    _ota(&ota), 
-    _mqtt_conn(&mqttConn), 
-    _rgb_controller(&rgbController), 
-    _display(&display),
-    _co2_sensor(&co2sensor),
-    _is_initialized(false) {
-        _init();
-    }
+    SettingsDB &settingsDb,
+    WiFiConn &wifiConn,
+    OTA &ota,
+    MQTTConn &mqttConn,
+    RGBController &rgbController,
+    Display &display,
+    CO2Sensor &co2sensor)
+    : LoopTickerBase(),
+      _sett(String(APP_NAME) + " v" + ota.version(), &settingsDb.db()),
+      _db(&settingsDb.db()),
+      _wifi_conn(&wifiConn),
+      _ota(&ota),
+      _mqtt_conn(&mqttConn),
+      _rgb_controller(&rgbController),
+      _display(&display),
+      _co2_sensor(&co2sensor),
+      _is_initialized(false)
+{
+    _init();
+}
 
-void WebPanel::exec() {
-    if (!_is_initialized) {
+void WebPanel::exec()
+{
+    if (!_is_initialized)
+    {
         LOG_ERROR("call setup first!");
         return;
     }
@@ -48,7 +50,8 @@ void WebPanel::exec() {
     _sett.tick();
 }
 
-void WebPanel::_init() {
+void WebPanel::_init()
+{
     LOG_INFO("init...");
 
     Logger::getInstance().initWebLogger(webLogger);
@@ -59,17 +62,14 @@ void WebPanel::_init() {
     _sett.config.theme = sets::Colors::Green;
     _sett.begin(false);
 
-    _sett.onUpdate([this](sets::Updater& u) {
-        this->_update(u);
-    });
+    _sett.onUpdate([this](sets::Updater &u)
+                   { this->_update(u); });
 
-    _sett.onBuild([this](sets::Builder& b) {
-        this->_build(b);
-    });
+    _sett.onBuild([this](sets::Builder &b)
+                  { this->_build(b); });
 
-    _sett.onFocusChange([this]() {
-        LOG_DEBUG("browser connected!");
-    });
+    _sett.onFocusChange([this]()
+                        { LOG_DEBUG("browser connected!"); });
 
     LOG_INFO("init ok!");
 
@@ -77,19 +77,22 @@ void WebPanel::_init() {
     _is_initialized = true;
 }
 
-void WebPanel::_update(sets::Updater& u) {
+void WebPanel::_update(sets::Updater &u)
+{
     u.update(H(log), webLogger);
-    if (_ota && _ota->hasUpdate()) u.update("update"_h, "New updates available. Try update firmware?");
+    if (_ota && _ota->hasUpdate())
+        u.update("update"_h, "New updates available. Try update firmware?");
 }
 
-void WebPanel::_build(sets::Builder& b) {
-    SUB_BUILD_BEGIN   
+void WebPanel::_build(sets::Builder &b)
+{
+    SUB_BUILD_BEGIN
     sets::Menu m(b, "WiFi");
     b.Input(kk::wifi_ssid, "SSID");
     b.Pass(kk::wifi_pass, "Password");
     b.Button(SH("wifi_save"), "Save");
-    SUB_BUILD_END   
-    
+    SUB_BUILD_END
+
     SUB_BUILD_BEGIN
     sets::Menu m(b, "MQTT");
     b.Switch(kk::mqtt_enabled, "Enabled");
@@ -99,8 +102,8 @@ void WebPanel::_build(sets::Builder& b) {
     b.Pass(kk::mqtt_pass, "Password");
     b.Input(kk::mqtt_device_id, "Device ID");
     b.Button(SH("mqtt_save"), "Save");
-    SUB_BUILD_END    
-    
+    SUB_BUILD_END
+
     SUB_BUILD_BEGIN
     sets::Menu m(b, "CO2");
     b.Number(kk::co2_alarm_lvl, "Alarm value", nullptr, 0, 8000);
@@ -108,13 +111,14 @@ void WebPanel::_build(sets::Builder& b) {
     b.Button(SH("co2_save"), "Save");
 
     sets::Group g(b, "Calibration");
-    if (b.beginButtons()) {
+    if (b.beginButtons())
+    {
         b.Button(SH("co2_calibrate_run"), "Run", sets::Colors::Green);
         b.Button(SH("co2_calibrate_stop"), "Stop", sets::Colors::Red);
         b.endButtons();
     }
-    SUB_BUILD_END  
-    
+    SUB_BUILD_END
+
     SUB_BUILD_BEGIN
     sets::Menu m(b, "System");
     b.Switch(kk::rgb_enabled, "RGB Enabled");
@@ -122,77 +126,87 @@ void WebPanel::_build(sets::Builder& b) {
     b.Select(kk::log_lvl, "Log", log_levels);
     b.Button(SH("common_save"), "Save");
     b.Log(H(log), webLogger);
-    if (b.Button(SH("update_fw"), "Update firmware") || b.Confirm("update"_h)) {
-        if (_ota) {
+    if (b.Button(SH("update_fw"), "Update firmware") || b.Confirm("update"_h))
+    {
+        if (_ota)
+        {
             LOG_INFO("ota update start");
             _ota->update(true);
         }
     }
-    SUB_BUILD_END   
-    
+    SUB_BUILD_END
+
     SUB_BUILD_BEGIN
-    if (b.build.isAction()) {
-        switch (b.build.id) {
-            case SH("wifi_save"):
-                LOG_DEBUG("wifi_save pressed");
+    if (b.build.isAction())
+    {
+        switch (b.build.id)
+        {
+        case SH("wifi_save"):
+            LOG_DEBUG("wifi_save pressed");
 
-                if (_db && _db->update() && _wifi_conn) {
-                    _wifi_conn->connect();
-                    return;
+            if (_db && _db->update() && _wifi_conn)
+            {
+                _wifi_conn->connect();
+                return;
+            }
+
+            break;
+
+        case SH("mqtt_save"):
+            LOG_DEBUG("mqtt_save pressed");
+
+            if (_db && _db->update() && _mqtt_conn)
+            {
+                _mqtt_conn->setDeviceID((*_db)[kk::mqtt_device_id].toString());
+                _mqtt_conn->connect();
+                return;
+            }
+
+            break;
+
+        case SH("co2_save"):
+            LOG_DEBUG("co2_save pressed");
+
+            if (_db && _db->update())
+            {
+                return;
+            }
+
+            break;
+
+        case SH("co2_calibrate_run"):
+            LOG_DEBUG("co2_calibrate_run pressed");
+
+            _co2_sensor->startCalibration();
+            break;
+
+        case SH("co2_calibrate_stop"):
+            LOG_DEBUG("co2_calibrate_stop pressed");
+
+            _co2_sensor->forceStopCalibration();
+            break;
+
+        case SH("common_save"):
+            LOG_DEBUG("common_save pressed");
+
+            if (_db && _db->update())
+            {
+                SET_LOG_LEVEL((*_db)[kk::log_lvl].toString());
+
+                if (_rgb_controller)
+                {
+                    _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
                 }
 
-                break;
-                
-            case SH("mqtt_save"):
-                LOG_DEBUG("mqtt_save pressed");
-                
-                if (_db && _db->update() && _mqtt_conn) {
-                    _mqtt_conn->setDeviceID((*_db)[kk::mqtt_device_id].toString());
-                    _mqtt_conn->connect();
-                    return;
+                if (_display)
+                {
+                    _display->setTheme((*_db)[kk::use_dark_theme].toBool());
                 }
 
-                break;
-            
-            case SH("co2_save"):
-                LOG_DEBUG("co2_save pressed");
+                return;
+            }
 
-                if (_db && _db->update()) {
-                    return;
-                }
-
-                break;
-            
-            case SH("co2_calibrate_run"):
-                LOG_DEBUG("co2_calibrate_run pressed");
-                
-                _co2_sensor->startCalibration();
-                break;
-
-            case SH("co2_calibrate_stop"):
-                LOG_DEBUG("co2_calibrate_stop pressed");
-
-                _co2_sensor->forceStopCalibration();
-                break;
-
-            case SH("common_save"):
-                LOG_DEBUG("common_save pressed");
-                
-                if (_db && _db->update()) {
-                    SET_LOG_LEVEL((*_db)[kk::log_lvl].toString());
-
-                    if (_rgb_controller) {
-                        _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
-                    }
-
-                    if (_display) {
-                        _display->setTheme((*_db)[kk::use_dark_theme].toBool());
-                    }
-                
-                    return;
-                }
-
-                break;
+            break;
         }
     }
     SUB_BUILD_END

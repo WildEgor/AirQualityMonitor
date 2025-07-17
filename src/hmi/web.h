@@ -15,8 +15,23 @@
 #define LOG_COMPONENT "WebPannel"
 #include "services/logger.h"
 
+/**
+ * @name WebPanel
+ * @details Class for managing the web interface panel, settings, and integration with other modules
+ */
 class WebPanel : public LoopTickerBase {
 public:
+    /**
+     * @name WebPanel
+     * @param settingsDb - reference to settings database
+     * @param wifiConn - reference to WiFi connection
+     * @param ota - reference to OTA update service
+     * @param mqttConn - reference to MQTT connection
+     * @param rgbCtrl - reference to RGB controller
+     * @param hmi - reference to display/HMI
+     * @param co2sensor - reference to CO2 sensor
+     * @details Full-featured constructor for WebPanel
+     */
     WebPanel(SettingsDB& settingsDb, 
         WiFiConn& wifiConn, 
         OTA& ota,
@@ -25,25 +40,49 @@ public:
         Display& hmi,
         CO2Sensor& co2sensor
     );
+    /**
+     * @name WebPanel
+     * @param settingsDb - reference to settings database
+     * @param wifiConn - reference to WiFi connection
+     * @details Minimal constructor for WebPanel (WiFi only)
+     */
     WebPanel(SettingsDB& settingsDb, 
         WiFiConn& wifiConn
     );
 
+    /**
+     * @name exec
+     * @details Main loop for web panel logic
+     */
     void exec() override;
 
 private:
+    /**
+     * @name _init
+     * @details Internal initialization of web panel and dependencies
+     */
     void _init();
+    /**
+     * @name _update
+     * @param u - settings updater
+     * @details Update settings from web interface
+     */
     void _update(sets::Updater& u);
+    /**
+     * @name _build
+     * @param b - settings builder
+     * @details Build web interface structure and settings
+     */
     void _build(sets::Builder& b);
 
-    SettingsGyver _sett;
-    GyverDBFile* _db;
-    WiFiConn* _wifi_conn;
-    OTA* _ota;
-    MQTTConn* _mqtt_conn;
-    RGBController* _rgb_controller;
-    Display* _display;
-    CO2Sensor* _co2_sensor;
+    SettingsGyver _sett;              ///< Settings manager instance
+    GyverDBFile* _db;                 ///< Pointer to database file
+    WiFiConn* _wifi_conn;             ///< Pointer to WiFi connection
+    OTA* _ota;                        ///< Pointer to OTA update service
+    MQTTConn* _mqtt_conn;             ///< Pointer to MQTT connection
+    RGBController* _rgb_controller;   ///< Pointer to RGB controller
+    Display* _display;                ///< Pointer to display/HMI
+    CO2Sensor* _co2_sensor;           ///< Pointer to CO2 sensor
 
-    bool _is_initialized;
+    bool _is_initialized;             ///< Initialization flag
 };

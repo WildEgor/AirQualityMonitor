@@ -1,12 +1,19 @@
-#define LOG_COMPONENT "SettingsDB"
-#include "services/logger.h"
 #include "configs/config.h"
 #include "settings_db.h"
 
+/**
+ * @var co2_scale_types
+ * @brief Список типов цветовых шкал CO2: DEFAULT — 4 зоны, EASY — 3 зоны
+ */
 String co2_scale_types = "DEFAULT;EASY";
+/**
+ * @var log_levels
+ * @brief Список уровней логирования для пользовательского интерфейса
+ */
 String log_levels = "DEBUG;INFO;WARN;ERROR";
 
-SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
+SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
+{
     LOG_INFO("init...");
     bool fsInitialized = true;
 
@@ -16,16 +23,24 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
     fsInitialized = LittleFS.begin();
 #endif
 
-    if (!fsInitialized) {
+    if (!fsInitialized)
+    {
         LOG_ERROR("init littlefs failed!");
         return;
     }
 
     _db.begin();
+
+    /**
+     * @note Сброс базы данных к заводским настройкам, если определён RESET_DB
+     */
 #ifdef RESET_DB
     _db.reset();
 #endif
 
+    /**
+     * @note Инициализация разделов настроек: APP, WIFI, MQTT, CO2
+     */
     // ============================== APP ==============================
     _db.init(kk::rgb_enabled, RGB_ENABLED);
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
@@ -47,6 +62,9 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
     _db.init(kk::co2_scale_type, "DEFAULT");
     _db.init(kk::co2_alarm_lvl, RGB_DEFAULT_ALERT_TRHLD);
 
+    /**
+     * @note Вывод содержимого базы данных в сериал лог
+     */
     _db.dump(Serial);
 
     LOG_INFO("init ok!");
@@ -54,10 +72,12 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
     this->addLoop();
 }
 
-void SettingsDB::exec() {
+void SettingsDB::exec()
+{
     _db.tick();
 }
 
-GyverDBFile& SettingsDB::db() {
+GyverDBFile &SettingsDB::db()
+{
     return _db;
 }

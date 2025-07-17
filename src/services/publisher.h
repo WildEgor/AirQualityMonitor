@@ -4,39 +4,81 @@
 
 #include "connections/mqtt_conn.h"
 
-class MQTTPublisher : public LoopTimerBase {
+/**
+ * @name MQTTPublisher
+ * @details Class for periodic publishing of values to an MQTT topic
+ */
+class MQTTPublisher : public LoopTimerBase
+{
 public:
+    /**
+     * @brief Callback to get the value for publishing
+     */
     using ValueCallback = std::function<float()>;
 
-    MQTTPublisher(uint32_t ms, MQTTConn& mqtt, const String& topic = "")
-        : LoopTimerBase(ms), _mqtt(mqtt), _enabled(true), _topic(topic) {
-            this->addLoop();
-        }
+    /**
+     * @brief Constructor
+     * @param ms Publish interval in milliseconds
+     * @param mqtt Reference to MQTTConn object
+     * @param topic MQTT topic for publishing (default is empty)
+     */
+    MQTTPublisher(uint32_t ms, MQTTConn &mqtt, const String &topic = "")
+        : LoopTimerBase(ms), _mqtt(mqtt), _enabled(true), _topic(topic)
+    {
+        this->addLoop();
+    }
 
-    void exec() override {
-        if (!_enabled || !_mqtt.connected() || !_cb) return;
+    /**
+     * @brief Main publish loop
+     */
+    void exec() override
+    {
+        if (!_enabled || !_mqtt.connected() || !_cb)
+            return;
         publish();
     }
 
-    void setTopic(const String& topic) {
-        if (!topic.isEmpty()) _topic = topic;
+    /**
+     * @brief Set MQTT topic
+     * @param topic New topic
+     */
+    void setTopic(const String &topic)
+    {
+        if (!topic.isEmpty())
+            _topic = topic;
     }
 
-    void setValueCb(ValueCallback cb) {
+    /**
+     * @brief Set callback to get the value
+     * @param cb Callback function
+     */
+    void setValueCb(ValueCallback cb)
+    {
         _cb = cb;
     }
 
+    /**
+     * @brief Enable publishing
+     */
     void enable() { _enabled = true; }
+    /**
+     * @brief Disable publishing
+     */
     void disable() { _enabled = false; }
 
 private:
-    MQTTConn& _mqtt;
-    bool _enabled;
-    String _topic;
-    ValueCallback _cb;
+    MQTTConn &_mqtt;   ///< Reference to MQTT connection
+    bool _enabled;     ///< Publishing enabled flag
+    String _topic;     ///< MQTT topic
+    ValueCallback _cb; ///< Callback to get the value
 
-    void publish() {
-        if (_topic.isEmpty()) {
+    /**
+     * @brief Publish value to MQTT
+     */
+    void publish()
+    {
+        if (_topic.isEmpty())
+        {
             return;
         }
 
