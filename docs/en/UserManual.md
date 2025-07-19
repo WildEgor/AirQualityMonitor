@@ -17,18 +17,19 @@
 </p>
 
 ## Introduction  
-Air Quality Monitor (AQM) is an IoT (Internet of Things) device designed to measure indoor CO₂ levels and transmit real-time data visually via an RGB LED and remotely to Yandex via MQTT.  
+Air Quality Monitor (AQM) is an IoT (Internet of Things) device designed to measure indoor CO₂/TVOC levels also temperature/pressure/humidity and transmit real-time data visually via an RGB LED and remotely to Yandex (integrated using wqtt.ru) via MQTT.  
 
 ## Device Overview  
 ### Components  
 1. **Front Panel**:  
    - 1.28" IPS Round Display  
 2. **Rear Panel**:  
-   - Micro-USB Port (for power and firmware updates)  
+   - USB Type-C Port (for power and firmware updates)  
 3. **Internal Components**:  
-   - CO₂ Sensor (CCS811)  
-   - Microcontroller (ESP32-based)  
-   - RGB Indicator  
+   - CO₂ Sensor (CCS811)
+   - Temperature/Pressure/Humidity Sensor (BME280)  
+   - Microcontroller (ESP32 Live Mini)  
+   - RGB Indicator (WS2812B)  
 
 ## Getting Started  
 ### Installation  
@@ -36,10 +37,12 @@ Air Quality Monitor (AQM) is an IoT (Internet of Things) device designed to meas
 2. Ensure no obstructions block ventilation holes.  
 
 ### First Power-On  
-1. Connect the Micro-USB cable to a 5V/1A power source and the device.  
+1. Connect usb cable to a 5V/1A power source and the device.  
 2. The screen will display sequentially:  
-    - Step 1: Wi-Fi Status (see [Connecting to Wi-Fi](#connecting-to-wi-fi))  
-    - Step 2: CO₂ Initialization
+    - Step 1: CO₂ meter
+    - Step 2: Admin panel address
+    - Step 3: Wi-Fi Status (see [Connecting to Wi-Fi](#connecting-to-wi-fi))  
+    - Step 4: MQTT Status (see [MQTT Configuration](#mqtt-configuration))
       
 <p style="text-align:center">
   <img src="../images/first_start.jpg" width="250">
@@ -55,17 +58,11 @@ Air Quality Monitor (AQM) is an IoT (Internet of Things) device designed to meas
 </p> 
 
 2. Open a web browser and navigate to the address shown on the display (usually `http://192.168.4.1`; actual address may vary).
-
-<p style="text-align:center">
-  <img src="../images/web_ui_main_menu_local.jpg" width="250">
-  <h5 style="text-align:center"></h5>
-</p> 
-
 3. Select the **WIFI** menu item, enter your Wi-Fi network credentials (name and password), and click **Save**.  
 **Note**: After saving, the device will reboot and attempt to connect. Connection status updates will appear within seconds.
 
 <p style="text-align:center">
-  <img src="../images/web_ui_wifi_menu.jpg" width="250">
+  <img src="../images/web_ui_wifi_menu.png" width="250">
   <h5 style="text-align:center"></h5>
 </p>
 
@@ -76,9 +73,9 @@ Air Quality Monitor (AQM) is an IoT (Internet of Things) device designed to meas
 | **CO₂ Meter**             | Visual gradient with color zones: green, yellow, orange, red               |
 | **Current CO₂ Value**     | Current eCO₂ value (e.g., "850.0"). Min/max display values: 400.0 / 1500.0 |
 | **Web Panel Link**        | URL to the web panel (e.g., `http://192.168.1.100`)                       |
-| **Network Status**        | Internet connection status (green = connected, red = disconnected)        |
+| **Network Status**        | Internet and broker connection statuses (green = connected, red = disconnected)        |
 | **Calibration Status**    | Teal "CALIBRATION" text during calibration                                |
-| **Firmware Version**      | Current firmware version (e.g., "v1.0.0")                                |
+| **Firmware Version**      | Current firmware version with notification (e.g., "v1.0.0")                                |
 
 ### Web Panel  
 Accessible at `http://[device-address]`, includes:  
@@ -86,39 +83,41 @@ Accessible at `http://[device-address]`, includes:
    - SSID and password settings.
 
 <p style="text-align:center">
-  <img src="../images/web_ui_wifi_menu.jpg" width="250">
+  <img src="../images/web_ui_wifi_menu.png" width="250">
   <h5 style="text-align:center"></h5>
 </p>  
 
 2. **MQTT**:  
     - **Enable**: Toggle message publishing.  
-    - **Host**: Server IP/URL.  
+    - **Server**: Server IP/URL.  
     - **Port**: Server port.  
     - **Username/Password**: MQTT credentials.  
     - **Device ID**: Unique server identifier and topic prefix.  
 
 <p style="text-align:center">
-  <img src="../images/web_ui_mqtt_menu.jpg" width="250">
+  <img src="../images/web_ui_mqtt_menu.png" width="250">
   <h5 style="text-align:center"></h5>
 </p>  
 
 3. **CO₂**:  
    - **Alarm value**: Set warning thresholds.  
    - **Scale type**: Choose DEFAULT (4-color) or EASY (3-color) gradient.  
-   - **Calibration**: Start/stop calibration buttons.  
+   - **Calibration**: Run/stop calibration buttons.  
 
 <p style="text-align:center">
-  <img src="../images/web_ui_co2_menu.jpg" width="250">
+  <img src="../images/web_ui_co2_menu.png" width="250">
   <h5 style="text-align:center"></h5>
 </p>  
 
-4. **System**:  
+4. **System**: 
+   - **RGB Enabled**: Toggle RGB led. 
    - **Use dark theme**: Toggle light/dark mode.  
-   - **Log**: Set logging level.  
-   - **Firmware update**: Upload and install new firmware. 
+   - **Log**: Set logging level.
+   - **Rotate display**: Change display orientation.  
+   - **Update firmware**: Upload and install new firmware. 
 
 <p style="text-align:center">
-  <img src="../images/web_ui_system_menu.jpg" width="250">
+  <img src="../images/web_ui_system_menu.png" width="250">
   <h5 style="text-align:center"></h5>
 </p>  
 
@@ -128,7 +127,7 @@ Accessible at `http://[device-address]`, includes:
 - Set a unique device ID to avoid topic conflicts. 
 
 <p style="text-align:center">
-  <img src="../images/web_ui_mqtt_menu.jpg" width="250">
+  <img src="../images/web_ui_mqtt_menu.png" width="250">
   <h5 style="text-align:center">MQTT broker settings</h5>
 </p>  
 
@@ -147,7 +146,7 @@ Accessible at `http://[device-address]`, includes:
 5. Enter a **Device name** (e.g., "AQM") and **Room name**.  
 6. Under **Advanced Settings**, select **Sensors > Add > Float**.  
 7. Choose **Type > Carbon Dioxide** and set **Topic** to `common/aqm/co2`.  
-8. Repeat step 6 for TVOC, setting the topic to `common/aqm/tvoc`.  
+8. Repeat step 6 for TVOC, temperature and pressure setting the topic to `common/aqm/tvoc`, `common/aqm/temp` and `common/aqm/pressure`.  
 **Note**: The prefix `common/aqm` corresponds to the **Device ID** specified in the MQTT settings.  
 
 <p style="text-align:center">
@@ -167,13 +166,47 @@ Accessible at `http://[device-address]`, includes:
 </p>  
 
 ### Yandex Smart Home Integration  
-1. Open the **Yandex Smart Home** app.  
-2. Go to **Smart Home Devices**.  
+1. Open the **Yandex Smart Home** app.
+
+<p style="text-align:center">
+  <img src="../images/ysh_empty.jpg" width="250">
+  <h5 style="text-align:center">Yandex Smart Home without device</h5>
+</p> 
+
+2. Go to **Smart Home Devices**.
+
+<p style="text-align:center">
+  <img src="../images/ysh_add_device.jpg" width="250">
+  <h5 style="text-align:center">Find wqtt.ru</h5>
+</p> 
+
 3. Search for **WQTT.RU** and click **Link to Yandex**.  
+
+<p style="text-align:center">
+  <img src="../images/ysh_wqtt.jpg" width="250">
+  <h5 style="text-align:center">wqtt.ru</h5>
+</p> 
+
 4. Log in with your [wqtt.ru](https://wqtt.ru) account credentials.  
 5. Click **Refresh Device List**; your **AQM** should appear.  
 6. Assign a unique Cyrillic name (e.g., "Датчик воздуха").  
+
+<p style="text-align:center">
+  <img src="../images/ysh_add_aqm.jpg" width="250">
+  <h5 style="text-align:center">Add AQM device and rename it</h5>
+</p> 
+
 7. Reboot the device. Data will sync within minutes. Configure scenarios like CO₂ level alerts.  
+
+<p style="text-align:center">
+  <img src="../images/ysh_aqm_data.jpg" width="250">
+  <h5 style="text-align:center">AQM in Yandex Smart Home</h5>
+</p> 
+
+<p style="text-align:center">
+  <img src="../images/ysh_aqm_plot.jpg" width="250">
+  <h5 style="text-align:center">AQM plot data</h5>
+</p>
 
 ### MQTT Testing (Without Sensor)  
 A sample Go script in `scripts/mqtt_tester` can publish random values to the topic.  
@@ -182,7 +215,7 @@ A sample Go script in `scripts/mqtt_tester` can publish random values to the top
 - Toggle theme under **System > Use dark theme**.  
 
 <p style="text-align:center">
-  <img src="../images/web_ui_system_menu.jpg" width="250">
+  <img src="../images/web_ui_system_menu.png" width="250">
   <h5 style="text-align:center">Theme toggle</h5>
 </p>  
 
@@ -204,9 +237,9 @@ A sample Go script in `scripts/mqtt_tester` can publish random values to the top
 ### Firmware Update  
 - Navigate to **System > Update firmware**.  
 - Wait for the device to reboot. The new firmware version will appear in the web panel header.  
-- Alternatively, download the firmware (in `bin` folder) and upload `firmware.bin` via **OTA** menu.  
+- Alternatively, download the firmware (from `releases` in `/bin` folder) and upload `firmware.bin` via **OTA** menu (looks like a cloud).  
 
 <p style="text-align:center">
-  <img src="../images/web_ui_maintenance.jpg" width="250">
+  <img src="../images/web_ui_maintenance.png" width="250">
   <h5 style="text-align:center">Maintenance menu (accessible via top-right icon)</h5>
 </p>  
