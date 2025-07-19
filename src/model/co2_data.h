@@ -6,7 +6,6 @@
  */
 struct CO2Data
 {
-    bool mock;                 ///< Flag for mock/test mode
     uint16_t current_baseline; ///< Current sensor baseline
     float co2;                 ///< CO2 value in ppm
     float tvoc;                ///< TVOC value in ppb

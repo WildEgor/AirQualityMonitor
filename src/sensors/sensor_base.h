@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <Looper.h>
 
+#include "configs/config.h"
+
 class SensorBase : public LoopTimerBase
 {
 public:
@@ -10,7 +12,11 @@ public:
     virtual void setup() = 0;
     virtual void exec() override = 0;
     bool isInitialized() { return _is_initialized; }
-    void enableTest() { _enable_test = true; }
+    void enableTest()
+    {
+        updateInterval(SEC_3);
+        _enable_test = true;
+    }
 
     virtual void updateInterval(uint32_t new_ms)
     {

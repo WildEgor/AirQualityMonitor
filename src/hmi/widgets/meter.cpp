@@ -204,7 +204,7 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
   }
 
   ntft->drawString(mlabel, x + 5 + 230 - 40, y + 119 - 20, 2); // Units at bottom right
-  ntft->drawCentreString(mlabel, x + 120, y + 70, 4);          // Comment out to avoid font 4
+  // ntft->drawCentreString(mlabel, x + 120, y + 70, 4);          // Comment out to avoid font 4
   // ntft->drawRect(x + 5, y + 3, 230, 119, TFT_WHITE);           // Draw bezel line
 
   updateNeedle(0, 0);
@@ -296,7 +296,7 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
     }
 
     // Re-plot text under needle
-    ntft->drawCentreString(mlabel, mx + 120, my + 70, 4); // // Comment out to avoid font 4
+    // ntft->drawCentreString(mlabel, mx + 120, my + 70, 4); // // Comment out to avoid font 4
 
     // Store new needle end coords for next erase
     ltx = tx;

@@ -1,6 +1,6 @@
 #include "web.h"
 
-sets::Logger webLogger(255);
+sets::Logger webLogger(1024);
 bool cfm_fw = false;
 
 WebPanel::WebPanel(
@@ -53,24 +53,18 @@ void WebPanel::exec()
 void WebPanel::_init()
 {
     LOG_INFO("init...");
-
     Logger::getInstance().initWebLogger(webLogger);
-
     _sett.config.requestTout = SEC_10;
     _sett.config.pingTout = SEC_30;
     _sett.config.updateTout = 0;
     _sett.config.theme = sets::Colors::Green;
     _sett.begin(false);
-
     _sett.onUpdate([this](sets::Updater &u)
                    { this->_update(u); });
-
     _sett.onBuild([this](sets::Builder &b)
                   { this->_build(b); });
-
     _sett.onFocusChange([this]()
                         { LOG_DEBUG("browser connected!"); });
-
     LOG_INFO("init ok!");
 
     _is_initialized = true;
@@ -106,6 +100,8 @@ void WebPanel::_build(sets::Builder &b)
     SUB_BUILD_END
 #endif
 
+    sets::Group g(b, "Settings");
+
     SUB_BUILD_BEGIN
     sets::Menu m(b, "WiFi");
     b.Input(kk::wifi_ssid, "SSID");
@@ -127,25 +123,47 @@ void WebPanel::_build(sets::Builder &b)
     SUB_BUILD_BEGIN
     sets::Menu m(b, "CO2");
     b.Number(kk::co2_alarm_lvl, "Alarm value", nullptr, 0, 8000);
-    b.Select(kk::co2_scale_type, "Scale type", co2_scale_types);
-    b.Button(SH("co2_save"), "Save");
+    if (b.Select(kk::co2_scale_type, "Scale type", co2_scale_types))
+    {
+        _display->forceRender();
+    }
 
     sets::Group g(b, "Calibration");
     if (b.beginButtons())
     {
-        b.Button(SH("co2_calibrate_run"), "Run", sets::Colors::Green);
-        b.Button(SH("co2_calibrate_stop"), "Stop", sets::Colors::Red);
+        if (b.Button(SH("co2_calibrate_run"), "Run", sets::Colors::Green))
+        {
+            LOG_DEBUG("co2_calibrate_run pressed");
+            _co2_sensor->startCalibration();
+        }
+        if (b.Button(SH("co2_calibrate_stop"), "Stop", sets::Colors::Red))
+        {
+            LOG_DEBUG("co2_calibrate_stop pressed");
+            _co2_sensor->forceStopCalibration();
+        }
         b.endButtons();
     }
     SUB_BUILD_END
 
     SUB_BUILD_BEGIN
     sets::Menu m(b, "System");
-    b.Switch(kk::rgb_enabled, "RGB Enabled");
-    b.Switch(kk::use_dark_theme, "Use dark theme");
-    b.Select(kk::rotate_display, "Rotate display", display_rotate_values);
-    b.Select(kk::log_lvl, "Log", log_levels);
-    b.Button(SH("common_save"), "Save");
+    if (b.Switch(kk::rgb_enabled, "RGB Enabled"))
+    {
+        _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
+    }
+    if (b.Switch(kk::use_dark_theme, "Use dark theme"))
+    {
+        _display->setTheme((*_db)[kk::use_dark_theme].toBool());
+    }
+    if (b.Select(kk::log_lvl, "Log", log_levels))
+    {
+        SET_LOG_LEVEL((*_db)[kk::log_lvl].toString());
+    }
+    if (b.Button(SH("rotate_display"), "Rotate display"))
+    {
+        if (_display)
+            _display->moveRotation();
+    }
     b.Log(H(log), webLogger);
     if (b.Button(SH("update_fw"), "Update firmware") || b.Confirm("update"_h))
     {
@@ -158,12 +176,12 @@ void WebPanel::_build(sets::Builder &b)
     SUB_BUILD_END
 
     SUB_BUILD_BEGIN
-    b.HTML("", R"(<a href="https://github.com/WildEgor/AirQualityMonitor/blob/master/docs/en/UserManual.md">User Manual</a>)");
+    b.Link("User Manual", USER_MANUAL_URL);
     SUB_BUILD_END
 
     SUB_BUILD_BEGIN
     if (b.build.isAction())
-    {
+    {   
         switch (b.build.id)
         {
         case SH("wifi_save"):
@@ -188,54 +206,7 @@ void WebPanel::_build(sets::Builder &b)
             }
 
             break;
-
-        case SH("co2_save"):
-            LOG_DEBUG("co2_save pressed");
-
-            if (_db && _db->update())
-            {
-                if (_display)
-                {
-                    _display->forceRender();
-                }
-                return;
-            }
-
-            break;
-
-        case SH("co2_calibrate_run"):
-            LOG_DEBUG("co2_calibrate_run pressed");
-
-            _co2_sensor->startCalibration();
-            break;
-
-        case SH("co2_calibrate_stop"):
-            LOG_DEBUG("co2_calibrate_stop pressed");
-
-            _co2_sensor->forceStopCalibration();
-            break;
-
-        case SH("common_save"):
-            LOG_DEBUG("common_save pressed");
-
-            if (_db && _db->update())
-            {
-                SET_LOG_LEVEL((*_db)[kk::log_lvl].toString());
-
-                if (_rgb_controller)
-                {
-                    _rgb_controller->toggle((*_db)[kk::rgb_enabled].toBool());
-                }
-
-                if (_display)
-                {
-                    _display->setTheme((*_db)[kk::use_dark_theme].toBool());
-                    _display->setRotation((*_db)[kk::rotate_display].toString());
-                }
-
-                return;
-            }
-
+        default:
             break;
         }
     }

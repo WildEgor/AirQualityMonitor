@@ -3,7 +3,6 @@
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _state(CO2Sensor_INIT)
 {
     LOG_INFO("init...");
-    _data.mock = true;
     _data.co2 = 0.0;
     _data.tvoc = 0.0;
     _data.current_baseline = 0x00;
@@ -36,7 +35,6 @@ void CO2Sensor::exec()
     if (_state != CO2Sensor_CALIBRATING)
     {
         _state = CO2Sensor_RUNNING;
-
         _check_data();
     }
 }
@@ -94,19 +92,7 @@ void CO2Sensor::_check_data()
 {
     if (_enable_test)
     {
-        if (_data.mock)
-        {
-            _data.mock = false;
-            _data.co2 = 1300.10;
-        }
-        else
-        {
-            _data.mock = true;
-            _data.co2 = 800.10;
-        }
-
-        _data.tvoc = 3000.1;
-
+        _mock_data();
         _print_data();
         return;
     }
@@ -166,6 +152,13 @@ void CO2Sensor::_check_data()
     }
 }
 
+void CO2Sensor::_mock_data()
+{
+    _data.tvoc = 3000.1;
+    _data.co2 += 100.0;
+    if (_data.co2 >= 1500.0) _data.co2 = 0.0;
+}
+
 void CO2Sensor::_print_data()
 {
     LOG_DEBUG("CO2: " + String(_data.co2) + " ppm, TVOC: " + String(_data.tvoc) + " ppb");
@@ -188,7 +181,7 @@ void CO2Scale::init(GyverDBFile *db)
 
 void CO2Scale::getScale(uint16_t &rs, uint16_t &re, uint16_t &os, uint16_t &oe, uint16_t &ys, uint16_t &ye, uint16_t &gs, uint16_t &ge)
 {
-    if ((*_db)[kk::co2_scale_type].toString() == "DEFAULT")
+    if ((*_db)[kk::co2_scale_type].toString() == "1")
     {
         rs = 75;
         re = 100;
@@ -219,10 +212,10 @@ void CO2Scale::getColor(uint16_t value, uint8_t &r, uint8_t &g, uint8_t &b)
     const ColorThreshold *scale;
     size_t size;
 
-    if ((*_db)[kk::co2_scale_type].toString() == "DEFAULT")
+    if ((*_db)[kk::co2_scale_type].toString() == "1")
     {
         scale = _default_scale;
-        size = 5;
+        size = 4;
     }
     else
     {
@@ -265,13 +258,12 @@ bool CO2Scale::needAlarm(uint16_t value)
 
 void CO2Scale::_initScales()
 {
-    _default_scale[0] = {600, 0, 255, 0}; // green
-    _default_scale[1] = {800, 0, 255, 128}; // light green
-    _default_scale[2] = {1000, 255, 255, 0}; // yellow
-    _default_scale[3] = {1500, 255, 128, 0}; // orange
-    _default_scale[4] = {8000, 255, 0, 0}; // red
+    _default_scale[0] = {390, 0, 255, 0}; // green
+    _default_scale[1] = {790, 255, 255, 0}; // yellow
+    _default_scale[2] = {1150, 255, 128, 0}; // orange
+    _default_scale[3] = {1500, 255, 0, 0}; // red
 
-    _easy_scale[0] = {600, 0, 255, 0}; // green
-    _easy_scale[1] = {1500, 255, 255, 0}; // yellow
-    _easy_scale[2] = {8000, 255, 0, 0}; // red
+    _easy_scale[0] = {590, 0, 255, 0}; // green
+    _easy_scale[1] = {1090, 255, 255, 0}; // yellow
+    _easy_scale[2] = {1500, 255, 0, 0}; // red
 }

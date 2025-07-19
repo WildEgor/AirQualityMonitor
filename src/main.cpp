@@ -68,6 +68,9 @@ void setup()
   tph->enableTest();
 #endif
 
+/**
+ * @note Disable sending to MQTT to prevent broke data
+ */
 #ifndef ENABLE_TEST
   /**
    * @note Configure CO2 value publishing to topic [device_id]/co2
@@ -108,12 +111,19 @@ void setup()
   /**
    * @note Display initialization
    */
-  Display *display = new Display(SEC_1, *sdb, *co2, *tph, *wifi, *ota);
+  Display *display = new Display(
+    SEC_1, 
+    *sdb, 
+    *co2, 
+    *tph, 
+    *wifi,
+    *mqtt, 
+    *ota);
 
   /**
    * @note RGB controller initialization for CO2 level visualization
    */
-  RGBController *rgb = new RGBController(SEC_1, *sdb);
+  RGBController *rgb = new RGBController(MS_500, *sdb);
   rgb->setUpdaterCb([co2]() -> float
                     { return co2->getCO2(); });
 

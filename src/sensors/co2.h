@@ -170,6 +170,11 @@ private:
      * @details Print current data to log
      */
     void _print_data();
+        /**
+     * @name _mock_data
+     * @details Mock data for scale and alarm testing
+     */
+    void _mock_data();
 };
 
 /**

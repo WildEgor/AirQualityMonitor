@@ -15,12 +15,13 @@
 // app
 
 // maint
-#define DB_RESET // Factory reset database
+// #define DB_RESET // Factory reset database
 #define DB_NAME "/settings.db"
 #define PROJECT_PATH "WildEgor/AirQualityMonitor/master/project.json"
+#define USER_MANUAL_URL "https://github.com/WildEgor/AirQualityMonitor/blob/master/docs/en/UserManual.md"
 
 // feature flags
-#define WEB_PANEL_DASHBOARD
+// #define WEB_PANEL_DASHBOARD
 // maint
 
 // System constants (do not change)
@@ -30,6 +31,7 @@
 #define MS_100 100
 #define MS_500 500
 #define SEC_1 1000
+#define SEC_3 3000
 #define SEC_5 5000
 #define SEC_10 10000
 #define SEC_30 30000
@@ -61,6 +63,11 @@
 // rgb settings
 
 // hmi
+#define TFT_WIDTH 240
+#define TFT_HEIGHT 240
+#define TFT_ROTATION_0 2 // start position
+#define TFT_ROTATION_360 0
+
 /**
  * NOTE: Make changes here
  * To change pins: .pio/libdeps/mhetesp32devkit/TFT_eSPI/User_Setups/Setup200_GC9A01.h
@@ -68,26 +75,18 @@
  */
 #define GC9A01_DRIVER
 
-#define TFT_WIDTH 240
-#define TFT_HEIGHT 240
-#define TFT_ROTATION_0 2 // 360
-#define TFT_ROTATION_90 3
-#define TFT_ROTATION_180 0
-#define TFT_ROTATION_240 1
-
-// // esp_32_d1_mini
-// #define TFT_MOSI 23 // On some display driver boards, it might be labeled as "SDA" etc.
-// #define TFT_SCLK 18
-// #define TFT_CS 5   // Chip select control pin
-// #define TFT_DC 16  // Data/Command control pin
-// #define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
-
+// esp_32_live_mini
+#define TFT_MOSI 23 // On some display driver boards, it might be labeled as "SDA" etc.
+#define TFT_SCLK 18
+#define TFT_CS 5   // Chip select control pin
+#define TFT_DC 16  // Data/Command control pin
+#define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
 // esp_32_s2_mini
-#define TFT_MOSI 9
-#define TFT_SCLK 11
-#define TFT_CS   5
-#define TFT_DC   7
-#define TFT_RST  3
+// #define TFT_MOSI 9
+// #define TFT_SCLK 11
+// #define TFT_CS   5
+// #define TFT_DC   7
+// #define TFT_RST  3
 
 #define SPI_FREQUENCY 27000000
 #define SPI_READ_FREQUENCY 5000000

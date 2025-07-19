@@ -3,19 +3,14 @@
 
 /**
  * @var co2_scale_types
- * @brief Colors CO2: DEFAULT — 4 ranges, EASY — 3 ranges
+ * @brief Colors CO2: 3 or 4 color ranges
  */
-String co2_scale_types = "DEFAULT;EASY";
+String co2_scale_types = "3 color;4 color";
 /**
  * @var log_levels
  * @brief Log levels
  */
 String log_levels = "DEBUG;INFO;WARN;ERROR";
-/**
- * @var display_rotate_values
- * @brief Display rotation
- */
-String display_rotate_values = "0;90;180;240";
 
 SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
 {
@@ -49,8 +44,8 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
     // ============================== APP ==============================
     _db.init(kk::rgb_enabled, RGB_ENABLED);
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
-    _db.init(kk::rotate_display, "0");
     _db.init(kk::log_lvl, APP_LOG_LEVEL);
+    _db.init(kk::rotation_display, TFT_ROTATION_0);
 
     // ============================== WIFI ==============================
     _db.init(kk::wifi_ssid, WIFI_SSID);
@@ -65,7 +60,7 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
     _db.init(kk::mqtt_device_id, MQTT_DEFAULT_DEVICE_ID);
 
     // ============================== CO2 ==============================
-    _db.init(kk::co2_scale_type, "DEFAULT");
+    _db.init(kk::co2_scale_type, "4 color");
     _db.init(kk::co2_alarm_lvl, RGB_DEFAULT_ALERT_TRHLD);
 
     /**
