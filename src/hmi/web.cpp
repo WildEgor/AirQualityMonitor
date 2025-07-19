@@ -123,6 +123,7 @@ void WebPanel::_build(sets::Builder &b)
     sets::Menu m(b, "System");
     b.Switch(kk::rgb_enabled, "RGB Enabled");
     b.Switch(kk::use_dark_theme, "Use dark theme");
+    b.Select(kk::rotate_display, "Rotate display", display_rotate_values);
     b.Select(kk::log_lvl, "Log", log_levels);
     b.Button(SH("common_save"), "Save");
     b.Log(H(log), webLogger);
@@ -169,6 +170,10 @@ void WebPanel::_build(sets::Builder &b)
 
             if (_db && _db->update())
             {
+                if (_display)
+                {
+                    _display->forceRender();
+                }
                 return;
             }
 
@@ -201,6 +206,7 @@ void WebPanel::_build(sets::Builder &b)
                 if (_display)
                 {
                     _display->setTheme((*_db)[kk::use_dark_theme].toBool());
+                    _display->setRotation((*_db)[kk::rotate_display].toString());
                 }
 
                 return;

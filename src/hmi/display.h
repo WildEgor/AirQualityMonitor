@@ -1,12 +1,13 @@
 #pragma once
 #include <Looper.h>
+#include "SPI.h"
 #include <TFT_eSPI.h>
 
 #include "model/display_data.h"
 #include "widgets/meter.h"
 #include "configs/config.h"
 #include "sensors/co2.h"
-#include "sensors/tp.h"
+#include "sensors/tph.h"
 #include "services/ota.h"
 
 #define LOG_COMPONENT "Display"
@@ -24,16 +25,22 @@ public:
      * @param ms - update interval in milliseconds
      * @param settingsDb - reference to settings database
      * @param co2_sensor - reference to CO2 sensor
-     * @param tp_sensor - reference to temperature/pressure sensor
+     * @param tph_sensor - reference to temperature/pressure sensor
      * @param wifiConn - reference to WiFi connection
      * @param ota - reference to OTA update service
      * @details Display class constructor, initializes display and widgets
      */
-    Display(uint32_t ms, SettingsDB &settingsDb, CO2Sensor &co2_sensor, TPSensor &tp_sensor, WiFiConn &wifiConn, OTA &ota)
+    Display(
+        uint32_t ms,
+        SettingsDB &settingsDb,
+        CO2Sensor &co2_sensor,
+        TPHSensor &tph_sensor,
+        WiFiConn &wifiConn,
+        OTA &ota)
         : LoopTimerBase(ms),
           _db(&settingsDb.db()),
           _co2_sensor(co2_sensor),
-          _tp_sensor(tp_sensor),
+          _tph_sensor(tph_sensor),
           _co2_meter(nullptr),
           _co2_scale(&CO2Scale::getInstance()),
           _wifi(&wifiConn),
@@ -51,17 +58,17 @@ public:
         LOG_INFO("init tft...");
 
         _tft.init();
-        _tft.setRotation(0);
+        _tft.setRotation(TFT_ROTATION_0);
         _init_theme(true);
         LOG_INFO("init tft ok!");
 
         LOG_INFO("init widgets...");
         _co2_meter = MeterWidget(&_tft);
-        uint16_t rs, re, os, oe, ys, ye, gs, ge;
         _co2_scale->init(_db);
+        uint16_t rs, re, os, oe, ys, ye, gs, ge;
         _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.setTheme(_state.dark_theme);
         _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
+        _co2_meter.setTheme(_state.dark_theme);
         _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", "");
         LOG_INFO("init widgets ok!");
 
@@ -90,10 +97,76 @@ public:
             _state.dark_theme = dark;
             _init_theme(true);
             _co2_meter.setTheme(dark);
+            uint16_t rs, re, os, oe, ys, ye, gs, ge;
+            _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
+            _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
             _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", "");
             _force_redraw = true;
             _render();
         }
+    }
+
+    /**
+     * @name setRotation
+     * @param degree - rotation dir
+     * @details Change display rotation
+     */
+    void setRotation(String degree)
+    {
+        LOG_DEBUG("set rotation: " + degree);
+
+        int rotation = atoi(degree.c_str());
+
+        switch (rotation)
+        {
+        case 0:
+            _tft.setRotation(TFT_ROTATION_0);
+            break;
+        case 1:
+            _tft.setRotation(TFT_ROTATION_90);
+            break;
+        case 2:
+            _tft.setRotation(TFT_ROTATION_180);
+            break;
+        case 3:
+            _tft.setRotation(TFT_ROTATION_240);
+            break;
+        default:
+            _tft.setRotation(TFT_ROTATION_0);
+            break;
+        }
+
+        if (_state.dark_theme)
+        {
+            _tft.fillScreen(TFT_BLACK);
+        }
+        else
+        {
+            _tft.fillScreen(TFT_WHITE);
+        }
+        
+        uint16_t rs, re, os, oe, ys, ye, gs, ge;
+        _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
+        _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
+        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", "");
+        
+        _force_redraw = true;
+        _render();
+    }
+
+    /**
+     * @name forceRender
+     * @details Re-render display data
+     */
+    void forceRender()
+    {
+        uint16_t rs, re, os, oe, ys, ye, gs, ge;
+        _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
+        _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
+        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "co2", "", "", "", "", "");
+        
+        _force_redraw = true;
+        _render();
     }
 
 private:
@@ -123,10 +196,10 @@ private:
      */
     CO2Scale *_co2_scale;
     /**
-     * @name _tp_sensor
+     * @name _tph_sensor
      * @details Reference to temperature/pressure sensor
      */
-    TPSensor &_tp_sensor;
+    TPHSensor &_tph_sensor;
     /**
      * @name _wifi
      * @details Pointer to WiFi connection
@@ -205,6 +278,27 @@ private:
         if (abs(current_co2 - _state.last_co2_value) > 5.0)
         {
             _state.last_co2_value = current_co2;
+            return true;
+        }
+
+        float current_temp = _tph_sensor.getTemperature();
+        if (abs(current_temp - _state.last_temp_value) > 1.0)
+        {
+            _state.last_temp_value = current_temp;
+            return true;
+        }
+
+        float current_pressure = _tph_sensor.getPressure();
+        if (abs(current_pressure - _state.last_pressure_value) > 1.0)
+        {
+            _state.last_pressure_value = current_pressure;
+            return true;
+        }
+
+        float current_humidity = _tph_sensor.getHumidity();
+        if (abs(current_humidity - _state.last_humidity_value) > 5.0)
+        {
+            _state.last_humidity_value = current_humidity;
             return true;
         }
 

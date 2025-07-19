@@ -15,6 +15,8 @@ MQTTConn::MQTTConn(SettingsDB &settingsDb, WiFiConn &wifiConn) : LoopTickerBase(
 
     LOG_INFO("init...");
 
+    _tout = (60 * 1000ul);
+
     _device_id = (*_db)[kk::mqtt_device_id].toString();
 
     _connectToMQTT(
@@ -54,7 +56,7 @@ void MQTTConn::connect()
     if (!_wifi->connected())
         return;
 
-    if (!connected())
+    if (!connected() && (millis() - _tmr) >= _tout)
     {
         LOG_INFO("connect to server...");
 
@@ -116,6 +118,8 @@ bool MQTTConn::isInitialized() const
  */
 void MQTTConn::_connectToMQTT(const String &mqtt_server, uint16_t mqtt_port, const String &mqtt_user, const String &mqtt_password)
 {
+    _tmr = millis();
+
     if (!_wifi->connected())
         return;
 
@@ -157,20 +161,14 @@ void MQTTConn::_connectToMQTT(const String &mqtt_server, uint16_t mqtt_port, con
     LOG_DEBUG("mqtt_server: " + mqtt_server);
     LOG_DEBUG("mqtt_port: " + String(mqtt_port));
 
-    const int max_retries = 3;
-    for (int retry_count = 0; retry_count < max_retries; retry_count++)
+    LOG_DEBUG("attempting connection client...");
+
+    if (_pub_client.connect(client_id.c_str(), mqtt_user.c_str(), mqtt_password.c_str()))
     {
-        LOG_DEBUG("attempting connection client...");
-
-        if (_pub_client.connect(client_id.c_str(), mqtt_user.c_str(), mqtt_password.c_str()))
-        {
-            LOG_INFO("connected");
-            return;
-        }
-
+        LOG_INFO("connected");
+        return;
+    } else {
         LOG_ERROR("failed, rc=" + String(_pub_client.state()) + " try again...");
-        delay(1000);
+        return;
     }
-
-    LOG_ERROR("failed to connect to server after maximum retries");
 }

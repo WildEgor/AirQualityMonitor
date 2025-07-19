@@ -3,14 +3,19 @@
 
 /**
  * @var co2_scale_types
- * @brief Список типов цветовых шкал CO2: DEFAULT — 4 зоны, EASY — 3 зоны
+ * @brief Colors CO2: DEFAULT — 4 ranges, EASY — 3 ranges
  */
 String co2_scale_types = "DEFAULT;EASY";
 /**
  * @var log_levels
- * @brief Список уровней логирования для пользовательского интерфейса
+ * @brief Log levels
  */
 String log_levels = "DEBUG;INFO;WARN;ERROR";
+/**
+ * @var display_rotate_values
+ * @brief Display rotation
+ */
+String display_rotate_values = "0;90;180;240";
 
 SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
 {
@@ -44,6 +49,7 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
     // ============================== APP ==============================
     _db.init(kk::rgb_enabled, RGB_ENABLED);
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
+    _db.init(kk::rotate_display, "0");
     _db.init(kk::log_lvl, APP_LOG_LEVEL);
 
     // ============================== WIFI ==============================

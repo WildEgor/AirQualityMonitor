@@ -80,5 +80,6 @@ private:
     GyverDBFile *_db = nullptr; ///< Pointer to database
     WiFiConn *_wifi = nullptr;  ///< Pointer to WiFi connection
     String _device_id = "";    ///< Device ID
+    uint32_t _tmr = 0, _tout;
     bool _is_initialized = false; ///< Initialization flag
 };

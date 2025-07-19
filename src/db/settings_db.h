@@ -26,6 +26,7 @@ enum kk : size_t
     co2_alarm_lvl,    ///< CO2 alarm level
     rgb_enabled,      ///< RGB enabled flag
     use_dark_theme,   ///< Use dark theme flag
+    rotate_display,   ///< Rotate display flag
     log_lvl           ///< Log level
 };
 
@@ -39,6 +40,11 @@ extern String co2_scale_types;
  * @brief List of available log levels for UI
  */
 extern String log_levels;
+/**
+ * @var display_rotate_values
+ * @brief Display rotation
+ */
+extern String display_rotate_values;
 
 /**
  * @class SettingsDB

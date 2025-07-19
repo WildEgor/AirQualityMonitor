@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
-// #include "configs/secrets.h" // HINT: for development only
-#include "configs/secrets.example.h"
+#include "configs/secrets.h" // HINT: for development only
+// #include "configs/secrets.example.h"
 
 #define STRINGIZER(arg) #arg
 #define STR_VALUE(arg) STRINGIZER(arg)
@@ -9,20 +9,20 @@
 // app
 #define APP_NAME "AirQualityMonitor"
 #define APP_VERSION STR_VALUE(BUILD_VERSION) // Change version via project.json!
-#define APP_PLATFORM esp_32_d1_mini          // "esp_32_d1_mini" "esp_32_s2_mini" "esp8266_d1_mini"
-#define APP_LOG_LEVEL "INFO"                 // DEBUG, ERROR, WARN, INFO
+#define APP_LOG_LEVEL "DEBUG"                 // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // Enable mock sensor reading
-#define APP_DARK_THEME true // Select color theme
+#define APP_DARK_THEME false // Select color theme
 // app
 
 // maint
-// #define DB_RESET // Factory reset database
+#define DB_RESET // Factory reset database
 #define DB_NAME "/settings.db"
 #define PROJECT_PATH "WildEgor/AirQualityMonitor/master/project.json"
 // maint
 
 // System constants (do not change)
 #define CCS811_ADDR 0x5A
+#define BME280_ADDR 0x76 // 0x77 or 0x76
 #define SERIAL_SPEED 115200
 #define MS_100 100
 #define MS_500 500
@@ -33,7 +33,7 @@
 // system
 
 // MQTT service for interaction with Yandex (see wqtt.ru)
-#define MQTT_ENABLED true
+#define MQTT_ENABLED false
 #define MQTT_SERVER "m8.wqtt.ru"
 #define MQTT_PORT 20336
 #define MQTT_DEFAULT_DEVICE_ID "common/aqm" // Used as topic prefix for uniqueness
@@ -41,6 +41,7 @@
 #define MQTT_DEFAULT_TVOC_TOPIC "tvoc"
 #define MQTT_DEFAULT_TEMP_TOPIC "temp"
 #define MQTT_DEFAULT_PRESSURE_TOPIC "pressure"
+#define MQTT_DEFAULT_HUMIDITY_TOPIC "humidity"
 // mqtt
 
 // WiFi settings (see also secrets.example.h)
@@ -66,29 +67,27 @@
 
 #define TFT_WIDTH 240
 #define TFT_HEIGHT 240
+#define TFT_ROTATION_0 2 // 360
+#define TFT_ROTATION_90 3
+#define TFT_ROTATION_180 0
+#define TFT_ROTATION_240 1
 
-#if APP_PLATFORM == esp_32_d1_mini
-#define TFT_MOSI 23 // On some display driver boards, it might be labeled as "SDA" etc.
-#define TFT_SCLK 18
-#define TFT_CS 5   // Chip select control pin
-#define TFT_DC 16  // Data/Command control pin
-#define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
+// // esp_32_d1_mini
+// #define TFT_MOSI 23 // On some display driver boards, it might be labeled as "SDA" etc.
+// #define TFT_SCLK 18
+// #define TFT_CS 5   // Chip select control pin
+// #define TFT_DC 16  // Data/Command control pin
+// #define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
+
+// esp_32_s2_mini
+#define TFT_MOSI 9
+#define TFT_SCLK 11
+#define TFT_CS   5
+#define TFT_DC   7
+#define TFT_RST  3
+
 #define SPI_FREQUENCY 27000000
 #define SPI_READ_FREQUENCY 5000000
-#endif
-
-#if APP_PLATFORM == esp_32_s2_mini
-#define TFT_MOSI 35 // 11
-#define TFT_SCLK 37 // 7, 36
-#define TFT_CS 33
-#define TFT_DC 34
-#define TFT_RST 36
-#define SPI_FREQUENCY 40000000
-#define SPI_READ_FREQUENCY 5000000
-#endif
-
-#if APP_PLATFORM == esp8266_d1_mini
-#endif
 
 #define LOAD_GLCD  // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH
 #define LOAD_FONT2 // Font 2. Small 16 pixel high font, needs ~3534 bytes in FLASH, 96 characters

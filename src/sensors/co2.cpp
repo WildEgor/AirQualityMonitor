@@ -231,6 +231,7 @@ void CO2Scale::getColor(uint16_t value, uint8_t &r, uint8_t &g, uint8_t &b)
         size = 3;
     }
 
+    // try find by color in scale
     for (size_t i = 0; i < size; ++i)
     {
         if (value <= scale[i].threshold)
@@ -242,6 +243,7 @@ void CO2Scale::getColor(uint16_t value, uint8_t &r, uint8_t &g, uint8_t &b)
         }
     }
 
+    // if not in scale choose second default color
     r = scale[size - 1].r;
     g = scale[size - 1].g;
     b = scale[size - 1].b;
@@ -264,13 +266,13 @@ bool CO2Scale::needAlarm(uint16_t value)
 
 void CO2Scale::_initScales()
 {
-    _default_scale[0] = {600, 0, 255, 0};
-    _default_scale[1] = {800, 0, 255, 128};
-    _default_scale[2] = {1000, 255, 255, 0};
-    _default_scale[3] = {1500, 255, 128, 0};
-    _default_scale[4] = {8000, 255, 0, 0};
+    _default_scale[0] = {600, 0, 255, 0}; // green
+    _default_scale[1] = {800, 0, 255, 128}; // light green
+    _default_scale[2] = {1000, 255, 255, 0}; // yellow
+    _default_scale[3] = {1500, 255, 128, 0}; // orange
+    _default_scale[4] = {8000, 255, 0, 0}; // red
 
-    _easy_scale[0] = {600, 0, 255, 0};
-    _easy_scale[1] = {1500, 255, 255, 0};
-    _easy_scale[2] = {8000, 255, 0, 0};
+    _easy_scale[0] = {600, 0, 255, 0}; // green
+    _easy_scale[1] = {1500, 255, 255, 0}; // yellow
+    _easy_scale[2] = {8000, 255, 0, 0}; // red
 }

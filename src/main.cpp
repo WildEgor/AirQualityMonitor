@@ -9,7 +9,7 @@
 #include "connections/wifi_connector_adapter.cpp"
 #include "sensors/sensor_base.h"
 #include "sensors/co2.h"
-#include "sensors/tp.h"
+#include "sensors/tph.h"
 #include "hmi/display.h"
 #include "hmi/web.h"
 #include "controllers/rgb.h"
@@ -58,14 +58,14 @@ void setup()
    * @note Sensors initialization
    */
   CO2Sensor *co2 = new CO2Sensor(SEC_30);
-  TPSensor *tp = new TPSensor(SEC_30);
+  TPHSensor *tph = new TPHSensor(SEC_30);
 
   /**
    * @note Enable test mode for sensors (data emulation)
    */
 #ifdef ENABLE_TEST
   co2->enableTest();
-  tp->enableTest();
+  tph->enableTest();
 #endif
 
 #ifndef ENABLE_TEST
@@ -87,21 +87,28 @@ void setup()
    * @note Configure temperature publishing to topic [device_id]/temp
    */
   MQTTPublisher *tempp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TEMP_TOPIC);
-  tempp->setValueCb([tp]() -> float
-                    { return tp->getTemperature(); });
+  tempp->setValueCb([tph]() -> float
+                    { return tph->getTemperature(); });
 
   /**
    * @note Configure pressure publishing to topic [device_id]/pressure
    */
   MQTTPublisher *pp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_PRESSURE_TOPIC);
-  pp->setValueCb([tp]() -> float
-                 { return tp->getPressure(); });
+  pp->setValueCb([tph]() -> float
+                 { return tph->getPressure(); });
+
+  /**
+   * @note Configure humidity publishing to topic [device_id]/humidity
+   */
+  MQTTPublisher *hp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_HUMIDITY_TOPIC);
+  hp->setValueCb([tph]() -> float
+                 { return tph->getHumidity(); });
 #endif
 
   /**
    * @note Display initialization
    */
-  Display *display = new Display(SEC_1, *sdb, *co2, *tp, *wifi, *ota);
+  Display *display = new Display(SEC_1, *sdb, *co2, *tph, *wifi, *ota);
 
   /**
    * @note RGB controller initialization for CO2 level visualization

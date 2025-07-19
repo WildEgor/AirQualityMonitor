@@ -5,18 +5,17 @@
 
 #include "sensor_base.h"
 #include "connections/mqtt_conn.h"
-#include "model/tp_data.h"
+#include "model/tph_data.h"
 #include "db/settings_db.h"
+#include "configs/config.h"
 
-#define LOG_COMPONENT "TPSensor"
+#define LOG_COMPONENT "TPHSensor"
 #include "services/logger.h"
 
-#define BMP280_ADDR 0x76 // Default I2C address (0x77 alternative)
-
-class TPSensor : public SensorBase
+class TPHSensor : public SensorBase
 {
 public:
-    TPSensor(uint32_t ms);
+    TPHSensor(uint32_t ms);
 
     void setup() override;
     void exec() override;
@@ -26,11 +25,14 @@ public:
     float getPressureMin();
     float getPressureMax();
     float getPressure();
+    float getHumidityMin();
+    float getHumidityMax();
+    float getHumidity();
     const char *getType() const override;
 
 private:
     GyverBME280 _sensor;
-    TPData _data;
+    TPHData _data;
 
     bool _init();
     void _check_data();
