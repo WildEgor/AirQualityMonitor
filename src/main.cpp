@@ -120,7 +120,15 @@ void setup()
   /**
    * @note Web interface initialization
    */
-  WebPanel *wp = new WebPanel(*sdb, *wifi, *ota, *mqtt, *rgb, *display, *co2);
+  WebPanel *wp = new WebPanel(
+      *sdb,
+      *wifi,
+      *ota,
+      *mqtt,
+      *rgb,
+      *display,
+      *co2,
+      *tph);
 
   LOG_INFO("init ok!");
 }

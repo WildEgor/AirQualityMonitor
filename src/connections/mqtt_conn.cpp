@@ -10,9 +10,6 @@ PubSubClient _pub_client(_espClient);
  */
 MQTTConn::MQTTConn(SettingsDB &settingsDb, WiFiConn &wifiConn) : LoopTickerBase(), _db(&settingsDb.db()), _wifi(&wifiConn)
 {
-    if (!isEnabled())
-        return;
-
     LOG_INFO("init...");
 
     _tout = (60 * 1000ul);
@@ -27,22 +24,17 @@ MQTTConn::MQTTConn(SettingsDB &settingsDb, WiFiConn &wifiConn) : LoopTickerBase(
 
     LOG_INFO("init ok!");
 
-    this->addLoop();
     _is_initialized = true;
+    this->addLoop();
 }
 
 void MQTTConn::exec()
 {
-    if (!isEnabled())
+    if (!isEnabled() || !_wifi->connected())
         return;
-
-    if (!_wifi->connected())
-    {
-        return;
-    }
 
     bool pub_connected = _pub_client.loop();
-    if (!pub_connected)
+    if (!pub_connected && (millis() - _tmr) >= _tout)
     {
         connect();
     }
@@ -50,13 +42,10 @@ void MQTTConn::exec()
 
 void MQTTConn::connect()
 {
-    if (!isEnabled())
+    if (!isEnabled() || !_wifi->connected())
         return;
 
-    if (!_wifi->connected())
-        return;
-
-    if (!connected() && (millis() - _tmr) >= _tout)
+    if (!connected())
     {
         LOG_INFO("connect to server...");
 
@@ -70,14 +59,18 @@ void MQTTConn::connect()
 
 void MQTTConn::publish(const String &topic, const String &payload)
 {
-    if (!isEnabled())
+    if (!isEnabled() || !_wifi->connected())
         return;
-    if (!_wifi->connected())
-        return;
+
+    String topicPrefix = "";
+    if (!_device_id.isEmpty())
+    {
+        topicPrefix = _device_id + "/";
+    }
 
     LOG_DEBUG("pub to topic: " + _device_id + "/" + topic + " value: " + payload);
 
-    String t = _device_id + "/" + topic;
+    String t = topicPrefix + topic;
 
     bool ok = _pub_client.publish(t.c_str(), payload.c_str(), false);
     if (!ok)
@@ -120,7 +113,7 @@ void MQTTConn::_connectToMQTT(const String &mqtt_server, uint16_t mqtt_port, con
 {
     _tmr = millis();
 
-    if (!_wifi->connected())
+    if (!isEnabled() || !_wifi->connected())
         return;
 
     if (mqtt_server.isEmpty())
@@ -167,7 +160,9 @@ void MQTTConn::_connectToMQTT(const String &mqtt_server, uint16_t mqtt_port, con
     {
         LOG_INFO("connected");
         return;
-    } else {
+    }
+    else
+    {
         LOG_ERROR("failed, rc=" + String(_pub_client.state()) + " try again...");
         return;
     }

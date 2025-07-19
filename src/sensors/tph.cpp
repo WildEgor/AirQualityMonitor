@@ -43,7 +43,7 @@ float TPHSensor::getHumidity() {
 }
 
 const char* TPHSensor::getType() const { 
-    return "tp_sensor"; 
+    return "tph_sensor"; 
 }
 
 float TPHSensor::getTemperatureMin() { 
@@ -76,7 +76,8 @@ bool TPHSensor::_init() {
         return false;
     }
 
-    _sensor.oneMeasurement();
+    _sensor.setFilter(FILTER_COEF_4);
+    
     return true;
 }
 
