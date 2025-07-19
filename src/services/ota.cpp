@@ -1,6 +1,6 @@
 #include "ota.h"
 
-OTA::OTA() : LoopTickerBase()
+OTA::OTA(WiFiConn &wifiConn) : LoopTickerBase(), _wifi_conn(&wifiConn)
 {
     LOG_INFO("init...");
 
@@ -14,6 +14,8 @@ OTA::OTA() : LoopTickerBase()
 
 bool OTA::hasUpdate()
 { 
+    if (!_wifi_conn->connected()) return false;
+
     String _remote_ver = "";
     _ota.checkUpdate(&_remote_ver, &_notes);
     return !String(APP_VERSION).equals(_remote_ver);
@@ -21,6 +23,8 @@ bool OTA::hasUpdate()
 
 bool OTA::update(bool now)
 {
+    if (!_wifi_conn->connected()) return false;
+    
     if (_ota.checkUpdate(&_ver, &_notes))
     {
         LOG_INFO("update to " + _ver);
