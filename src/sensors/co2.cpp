@@ -19,9 +19,8 @@ CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _state(CO2Sensor_INIT)
     _state = CO2Sensor_RUNNING;
 
     LOG_INFO("init ok!");
-    this->addLoop();
-
     exec();
+    this->addLoop();
 }
 
 void CO2Sensor::setup() {}

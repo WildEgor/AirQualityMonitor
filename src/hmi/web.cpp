@@ -1,6 +1,4 @@
 #include "web.h"
-#include "services/publisher.h"
-#include "configs/config.h"
 
 sets::Logger webLogger(255);
 bool cfm_fw = false;
@@ -24,7 +22,8 @@ WebPanel::WebPanel(
     MQTTConn &mqttConn,
     RGBController &rgbController,
     Display &display,
-    CO2Sensor &co2sensor)
+    CO2Sensor &co2sensor,
+    TPHSensor &tphSeonsor)
     : LoopTickerBase(),
       _sett(String(APP_NAME) + " v" + ota.version(), &settingsDb.db()),
       _db(&settingsDb.db()),
@@ -34,6 +33,7 @@ WebPanel::WebPanel(
       _rgb_controller(&rgbController),
       _display(&display),
       _co2_sensor(&co2sensor),
+      _tph_sensor(&tphSeonsor),
       _is_initialized(false)
 {
     _init();
@@ -73,19 +73,39 @@ void WebPanel::_init()
 
     LOG_INFO("init ok!");
 
-    this->addLoop();
     _is_initialized = true;
+    this->addLoop();
 }
 
 void WebPanel::_update(sets::Updater &u)
 {
+#ifdef WEB_PANEL_DASHBOARD
+    u.update(SH("eco2_gauge"), _co2_sensor->getCO2());
+    u.update("tvoc_gauge"_h, _co2_sensor->getTVOC());
+    u.update("temp_gauge"_h, _tph_sensor->getTemperature());
+    u.update("pressure_gauge"_h, _tph_sensor->getPressure());
+    u.update("humidity_gauge"_h, _tph_sensor->getHumidity());
+#endif
+
     u.update(H(log), webLogger);
+
     if (_ota && _ota->hasUpdate())
         u.update("update"_h, "New updates available. Try update firmware?");
 }
 
 void WebPanel::_build(sets::Builder &b)
 {
+#ifdef WEB_PANEL_DASHBOARD
+    SUB_BUILD_BEGIN
+    sets::Group g(b, "Dashboard");
+    b.LinearGauge(SH("eco2_gauge"), "eCO2", _co2_sensor->getCO2Min(), _co2_sensor->getCO2Max(), "ppm", 0.0f);
+    b.LinearGauge("tvoc_gauge"_h, "TVOC", _co2_sensor->getTVOCMin(), _co2_sensor->getTVOCMax(), "ppb", 0.0f);
+    b.LinearGauge("temp_gauge"_h, "Temp", _tph_sensor->getTemperatureMin(), _tph_sensor->getTemperatureMax(), "°C", 0.0f);
+    b.LinearGauge("pressure_gauge"_h, "Pressure", _tph_sensor->getPressureMin(), _tph_sensor->getPressureMax(), "hPa", 0.0f);
+    b.LinearGauge("humidity_gauge"_h, "Humidity", _tph_sensor->getHumidityMin(), _tph_sensor->getHumidityMax(), "%", 0.0f);
+    SUB_BUILD_END
+#endif
+
     SUB_BUILD_BEGIN
     sets::Menu m(b, "WiFi");
     b.Input(kk::wifi_ssid, "SSID");
@@ -135,6 +155,10 @@ void WebPanel::_build(sets::Builder &b)
             _ota->update(true);
         }
     }
+    SUB_BUILD_END
+
+    SUB_BUILD_BEGIN
+    b.HTML("", R"(<a href="https://github.com/WildEgor/AirQualityMonitor/blob/master/docs/en/UserManual.md">User Manual</a>)");
     SUB_BUILD_END
 
     SUB_BUILD_BEGIN
