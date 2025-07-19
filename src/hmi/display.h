@@ -122,7 +122,8 @@ public:
     void moveRotation()
     {
         _tft_rotate += 1;
-        if (_tft_rotate > 3) _tft_rotate = TFT_ROTATION_360;
+        if (_tft_rotate > 3)
+            _tft_rotate = TFT_ROTATION_360;
 
         (*_db)[kk::rotation_display] = _tft_rotate;
 
@@ -359,11 +360,25 @@ private:
             _tft.setCursor(145, 185);
             if (_state.dark_theme)
             {
-                _tft.drawSmoothCircle(145, 185, 2, TFT_GREENYELLOW, TFT_BLACK);
+                if (_state.has_updates)
+                {
+                    _tft.drawSmoothCircle(145, 185, 2, TFT_GREENYELLOW, TFT_BLACK);
+                }
+                else
+                {
+                    _tft.drawSmoothCircle(145, 185, 2, TFT_BLACK, TFT_BLACK);
+                }
             }
             else
             {
-                _tft.drawSmoothCircle(145, 185, 2, TFT_GREEN, TFT_WHITE);
+                if (_state.has_updates)
+                {
+                    _tft.drawSmoothCircle(145, 185, 2, TFT_GREEN, TFT_WHITE);
+                }
+                else
+                {
+                    _tft.drawSmoothCircle(145, 185, 2, TFT_WHITE, TFT_WHITE);
+                }
             }
         }
     }

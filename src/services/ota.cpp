@@ -13,8 +13,10 @@ OTA::OTA() : LoopTickerBase()
 };
 
 bool OTA::hasUpdate()
-{
-    return _ota.hasUpdate();
+{ 
+    String _remote_ver = "";
+    _ota.checkUpdate(&_remote_ver, &_notes);
+    return !String(APP_VERSION).equals(_remote_ver);
 }
 
 bool OTA::update(bool now)
