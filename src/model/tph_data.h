@@ -1,6 +1,8 @@
 #pragma once
 
-struct TPData {
+struct TPHData
+{
     float temp;
     float pressure;
+    float humidity;
 };

@@ -5,12 +5,12 @@
 // #########################################################################
 // Meter constructor
 // #########################################################################
-MeterWidget::MeterWidget(TFT_eSPI* tft)
+MeterWidget::MeterWidget(TFT_eSPI *tft)
 {
   ltx = 0;              // Saved x coord of bottom of needle
   osx = 120, osy = 120; // Saved x & y coords
-  old_analog =  -999;   // Value last displayed
-  old_value = -999;   // Value last displayed
+  old_analog = -999;    // Value last displayed
+  old_value = -999;     // Value last displayed
 
   mx = 0;
   my = 0;
@@ -21,10 +21,10 @@ MeterWidget::MeterWidget(TFT_eSPI* tft)
   memset(mlabel, 0, sizeof(mlabel));
 
   // Defaults
-  strncpy(ms0,   "0", 4);
-  strncpy(ms1,  "25", 4);
-  strncpy(ms2,  "50", 4);
-  strncpy(ms3,  "75", 4);
+  strncpy(ms0, "0", 4);
+  strncpy(ms1, "25", 4);
+  strncpy(ms2, "50", 4);
+  strncpy(ms3, "75", 4);
   strncpy(ms4, "100", 4);
 
   redStart = 0;
@@ -52,7 +52,7 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
   // Save offsets for needle plotting
   mx = x;
   my = y;
-  factor = 100.0/(endScale - startScale);
+  factor = 100.0 / (endScale - startScale);
   scaleStart = startScale;
 
   strncpy(mlabel, units, sizeof(mlabel) - 1);
@@ -65,16 +65,20 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
   strncpy(ms4, s4, 4);
 
   // Meter outline
-  if (dark_theme) {
+  if (dark_theme)
+  {
     ntft->fillRect(x + 5, y + 3, 230, 119, TFT_BLACK);
-    ntft->setTextColor(TFT_WHITE);  // Text colour
-  } else {
+    ntft->setTextColor(TFT_WHITE); // Text colour
+  }
+  else
+  {
     ntft->fillRect(x + 5, y + 3, 230, 119, TFT_WHITE);
-    ntft->setTextColor(TFT_BLACK);  // Text colour
+    ntft->setTextColor(TFT_BLACK); // Text colour
   }
 
   // Draw ticks every 5 degrees from -50 to +50 degrees (100 deg. FSD swing)
-  for (int i = -50; i < 51; i += 5) {
+  for (int i = -50; i < 51; i += 5)
+  {
     // Long scale tick length
     int tl = 15;
 
@@ -95,39 +99,48 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
     int y3 = y + sy2 * 100 + 140;
 
     // Red zone limits
-    if (redEnd > redStart) {
-      if (i >= redStart && i < redEnd) {
+    if (redEnd > redStart)
+    {
+      if (i >= redStart && i < redEnd)
+      {
         ntft->fillTriangle(x0, y0, x1, y1, x2, y2, TFT_RED);
         ntft->fillTriangle(x1, y1, x2, y2, x3, y3, TFT_RED);
       }
     }
 
     // Orange zone limits
-    if (orangeEnd > orangeStart) {
-      if (i >= orangeStart && i < orangeEnd) {
+    if (orangeEnd > orangeStart)
+    {
+      if (i >= orangeStart && i < orangeEnd)
+      {
         ntft->fillTriangle(x0, y0, x1, y1, x2, y2, TFT_ORANGE);
         ntft->fillTriangle(x1, y1, x2, y2, x3, y3, TFT_ORANGE);
       }
     }
 
     // Yellow zone limits
-    if (yellowEnd > yellowStart) {
-      if (i >= yellowStart && i < yellowEnd) {
+    if (yellowEnd > yellowStart)
+    {
+      if (i >= yellowStart && i < yellowEnd)
+      {
         ntft->fillTriangle(x0, y0, x1, y1, x2, y2, TFT_YELLOW);
         ntft->fillTriangle(x1, y1, x2, y2, x3, y3, TFT_YELLOW);
       }
     }
 
     // Green zone limits
-    if (greenEnd > greenStart) {
-      if (i >= greenStart && i < greenEnd) {
+    if (greenEnd > greenStart)
+    {
+      if (i >= greenStart && i < greenEnd)
+      {
         ntft->fillTriangle(x0, y0, x1, y1, x2, y2, TFT_GREEN);
         ntft->fillTriangle(x1, y1, x2, y2, x3, y3, TFT_GREEN);
       }
     }
 
     // Short scale tick length
-    if (i % 25 != 0) tl = 8;
+    if (i % 25 != 0)
+      tl = 8;
 
     // Recalculate coords in case tick length changed
     x0 = x + sx * (100 + tl) + 120;
@@ -136,23 +149,38 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
     y1 = y + sy * 100 + 140;
 
     // Draw tick
-    if (dark_theme) {
+    if (dark_theme)
+    {
       ntft->drawLine(x0, y0, x1, y1, TFT_WHITE);
-    } else {
+    }
+    else
+    {
       ntft->drawLine(x0, y0, x1, y1, TFT_BLACK);
     }
 
     // Check if labels should be drawn, with position tweaks
-    if (i % 25 == 0) {
+    if (i % 25 == 0)
+    {
       // Calculate label positions
       x0 = x + sx * (100 + tl + 10) + 120;
       y0 = y + sy * (100 + tl + 10) + 140;
-      switch (i / 25) {
-        case -2: ntft->drawCentreString(ms0, x0, y0 - 12, 2); break;
-        case -1: ntft->drawCentreString(ms1, x0, y0 - 9, 2); break;
-        case  0: ntft->drawCentreString(ms2, x0, y0 - 6, 2); break;
-        case  1: ntft->drawCentreString(ms3, x0, y0 - 9, 2); break;
-        case  2: ntft->drawCentreString(ms4, x0, y0 - 12, 2); break;
+      switch (i / 25)
+      {
+      case -2:
+        ntft->drawCentreString(ms0, x0, y0 - 12, 2);
+        break;
+      case -1:
+        ntft->drawCentreString(ms1, x0, y0 - 9, 2);
+        break;
+      case 0:
+        ntft->drawCentreString(ms2, x0, y0 - 6, 2);
+        break;
+      case 1:
+        ntft->drawCentreString(ms3, x0, y0 - 9, 2);
+        break;
+      case 2:
+        ntft->drawCentreString(ms4, x0, y0 - 12, 2);
+        break;
       }
     }
 
@@ -162,22 +190,26 @@ void MeterWidget::analogMeter(uint16_t x, uint16_t y, float startScale, float en
     x0 = x + sx * 100 + 120;
     y0 = y + sy * 100 + 140;
     // Draw scale arc, don't draw the last part
-    if (i < 50) {
-      if (dark_theme) {
+    if (i < 50)
+    {
+      if (dark_theme)
+      {
         ntft->drawLine(x0, y0, x1, y1, TFT_WHITE);
-      } else {
+      }
+      else
+      {
         ntft->drawLine(x0, y0, x1, y1, TFT_BLACK);
       }
     }
   }
 
   ntft->drawString(mlabel, x + 5 + 230 - 40, y + 119 - 20, 2); // Units at bottom right
-  ntft->drawCentreString(mlabel, x + 120, y + 70, 4);          // Comment out to avoid font 4
+  // ntft->drawCentreString(mlabel, x + 120, y + 70, 4);          // Comment out to avoid font 4
   // ntft->drawRect(x + 5, y + 3, 230, 119, TFT_WHITE);           // Draw bezel line
-  
+
   updateNeedle(0, 0);
 }
-    
+
 // #########################################################################
 // Update needle position
 // This function is blocking while needle moves, time depends on ms_delay
@@ -192,12 +224,16 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
   char buf[8];
   dtostrf(val, 6, 1, buf);
 
-  char* p = buf;
-  while (*p == ' ') p++;
+  char *p = buf;
+  while (*p == ' ')
+    p++;
 
-  if (dark_theme) {
+  if (dark_theme)
+  {
     ntft->setTextColor(TFT_WHITE, TFT_BLACK);
-  } else {
+  }
+  else
+  {
     ntft->setTextColor(TFT_BLACK, TFT_WHITE);
   }
 
@@ -209,22 +245,31 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
   ntft->fillRect(mx + 50 - clearWidth, my + 119 - 20, clearWidth, clearHeight, bgColor);
   ntft->drawRightString(p, mx + 50, my + 119 - 20, 2);
 
-  if (value < -10) value = -10; // Limit value to emulate needle end stops
-  if (value > 110) value = 110;
+  if (value < -10)
+    value = -10; // Limit value to emulate needle end stops
+  if (value > 110)
+    value = 110;
 
   int value_diff = abs(value - old_analog);
-  if (value_diff <= 5) {
+  if (value_diff <= 5)
+  {
     ms_delay = 0; // Instant update for small changes
-  } else if (value_diff <= 15) {
+  }
+  else if (value_diff <= 15)
+  {
     ms_delay = ms_delay / 2; // Faster animation for medium changes
   }
 
   // Move the needle until new value reached
-  while (value != old_analog) {
-    if (old_analog < value) old_analog++;
-    else old_analog--;
+  while (value != old_analog)
+  {
+    if (old_analog < value)
+      old_analog++;
+    else
+      old_analog--;
 
-    if (ms_delay == 0) old_analog = value; // Update immediately if delay is 0
+    if (ms_delay == 0)
+      old_analog = value; // Update immediately if delay is 0
 
     float sdeg = map(old_analog, -10, 110, -150, -30); // Map value to angle
     // Calculate tip of needle coords
@@ -235,12 +280,15 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
     float tx = tan((sdeg + 90) * 0.0174532925);
 
     // Erase old needle image
-    if (dark_theme) {
+    if (dark_theme)
+    {
       ntft->drawLine(mx + 120 + 20 * ltx - 1, my + 140 - 20, mx + osx - 1, my + osy, TFT_BLACK);
       ntft->drawLine(mx + 120 + 20 * ltx, my + 140 - 20, mx + osx, my + osy, TFT_BLACK);
       ntft->drawLine(mx + 120 + 20 * ltx + 1, my + 140 - 20, mx + osx + 1, my + osy, TFT_BLACK);
       ntft->setTextColor(TFT_WHITE);
-    } else {
+    }
+    else
+    {
       ntft->drawLine(mx + 120 + 20 * ltx - 1, my + 140 - 20, mx + osx - 1, my + osy, TFT_WHITE);
       ntft->drawLine(mx + 120 + 20 * ltx, my + 140 - 20, mx + osx, my + osy, TFT_WHITE);
       ntft->drawLine(mx + 120 + 20 * ltx + 1, my + 140 - 20, mx + osx + 1, my + osy, TFT_WHITE);
@@ -248,7 +296,7 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
     }
 
     // Re-plot text under needle
-    ntft->drawCentreString(mlabel, mx + 120, my + 70, 4); // // Comment out to avoid font 4
+    // ntft->drawCentreString(mlabel, mx + 120, my + 70, 4); // // Comment out to avoid font 4
 
     // Store new needle end coords for next erase
     ltx = tx;
@@ -262,10 +310,12 @@ void MeterWidget::updateNeedle(float val, uint32_t ms_delay)
     ntft->drawLine(mx + 120 + 20 * ltx + 1, my + 140 - 20, mx + osx + 1, my + osy, TFT_RED);
 
     // Slow needle down slightly as it approaches new position
-    if (abs(old_analog - value) < 10) ms_delay += ms_delay / 5;
+    if (abs(old_analog - value) < 10)
+      ms_delay += ms_delay / 5;
 
     // Wait before next update (only if delay > 0)
-    if (ms_delay > 0) {
+    if (ms_delay > 0)
+    {
       delay(ms_delay);
     }
   }
@@ -290,7 +340,8 @@ void MeterWidget::setZones(uint16_t rs, uint16_t re, uint16_t os, uint16_t oe, u
 // #########################################################################
 // Set widget theme
 // #########################################################################
-void MeterWidget::setTheme(bool dark) {
+void MeterWidget::setTheme(bool dark)
+{
   dark_theme = dark;
   updateNeedle(old_value, 0);
 }

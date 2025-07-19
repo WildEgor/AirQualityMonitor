@@ -4,81 +4,149 @@
 #include "db/settings_db.h"
 #include "model/co2_data.h"
 #include "configs/config.h"
-#include "configs/settings.h"
 #include "connections/mqtt_conn.h"
 #include "connections/wifi_conn.h"
 #include "connections/wifi_connector_adapter.cpp"
 #include "sensors/sensor_base.h"
 #include "sensors/co2.h"
-#include "sensors/tp.h"
-#include "hmi/hmi.h"
+#include "sensors/tph.h"
+#include "hmi/display.h"
+#include "hmi/web.h"
 #include "controllers/rgb.h"
 #include "services/logger.h"
 #include "services/publisher.h"
 #include "services/ota.h"
 
-void setup() {
-  Serial.begin(115200);
-  
+/**
+ * @brief Initialization of all main components: logging, database, WiFi and MQTT connections, data publishing, display, RGB, and web interface
+ */
+void setup()
+{
+  /**
+   * @note Logging initialization
+   */
+  Serial.begin(SERIAL_SPEED);
   SET_LOG_LEVEL(APP_LOG_LEVEL);
   LOG_INFO("init...");
 
-  SettingsDB* sdb = new SettingsDB();
+  /**
+   * @note Database initialization
+   */
+  SettingsDB *sdb = new SettingsDB();
 
-  WiFiAdapter* wifia = new WiFiConnectorAdapter(
-    WIFI_AP_NAME, 
-    WIFI_AP_PASS, 
-    WIFI_CONN_RETRY_TIMEOUT, 
-    false
-  );
-  WiFiConn* wifi = new WiFiConn(*sdb, *wifia);
+  /**
+   * @note WiFi connection initialization
+   */
+  WiFiAdapter *wifia = new WiFiConnectorAdapter(
+      WIFI_AP_NAME,
+      WIFI_AP_PASS,
+      WIFI_CONN_RETRY_TIMEOUT,
+      false);
+  WiFiConn *wifi = new WiFiConn(*sdb, *wifia);
 
-  OTA* ota = new OTA();
+  /**
+   * @note OTA firmware update initialization
+   */
+  OTA *ota = new OTA();
 
-  MQTTConn* mqtt = new MQTTConn(*sdb, *wifi);
+  /**
+   * @note MQTT connection initialization
+   */
+  MQTTConn *mqtt = new MQTTConn(*sdb, *wifi);
 
-  CO2Sensor* co2 = new CO2Sensor(SEC_30);
-  TPSensor* tp = new TPSensor(SEC_30);
+  /**
+   * @note Sensors initialization
+   */
+  CO2Sensor *co2 = new CO2Sensor(SEC_30);
+  TPHSensor *tph = new TPHSensor(SEC_30);
 
+  /**
+   * @note Enable test mode for sensors (data emulation)
+   */
 #ifdef ENABLE_TEST
   co2->enableTest();
-  tp->enableTest();
+  tph->enableTest();
 #endif
 
+/**
+ * @note Disable sending to MQTT to prevent broke data
+ */
 #ifndef ENABLE_TEST
-  MQTTPublisher* co2p = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_CO2_TOPIC);
-  co2p->setValueCb([co2]() -> float {
-    return co2->getCO2();
-  });
+  /**
+   * @note Configure CO2 value publishing to topic [device_id]/co2
+   */
+  MQTTPublisher *co2p = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_CO2_TOPIC);
+  co2p->setValueCb([co2]() -> float
+                   { return co2->getCO2(); });
 
-  MQTTPublisher* tvocp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TVOC_TOPIC);
-  tvocp->setValueCb([co2]() -> float {
-    return co2->getTVOC();
-  });
+  /**
+   * @note Configure TVOC value publishing to topic [device_id]/tvoc
+   */
+  MQTTPublisher *tvocp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TVOC_TOPIC);
+  tvocp->setValueCb([co2]() -> float
+                    { return co2->getTVOC(); });
 
-  MQTTPublisher* tempp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TEMP_TOPIC);
-  tempp->setValueCb([tp]() -> float {
-    return tp->getTemperature();
-  });
+  /**
+   * @note Configure temperature publishing to topic [device_id]/temp
+   */
+  MQTTPublisher *tempp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TEMP_TOPIC);
+  tempp->setValueCb([tph]() -> float
+                    { return tph->getTemperature(); });
 
-  MQTTPublisher* pp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_PRESSURE_TOPIC);
-  pp->setValueCb([tp]() -> float {
-    return tp->getPressure();
-  });
+  /**
+   * @note Configure pressure publishing to topic [device_id]/pressure
+   */
+  MQTTPublisher *pp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_PRESSURE_TOPIC);
+  pp->setValueCb([tph]() -> float
+                 { return tph->getPressure(); });
+
+  /**
+   * @note Configure humidity publishing to topic [device_id]/humidity
+   */
+  MQTTPublisher *hp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_HUMIDITY_TOPIC);
+  hp->setValueCb([tph]() -> float
+                 { return tph->getHumidity(); });
 #endif
 
-  HMI* hmi = new HMI(SEC_1, *sdb, *co2, *tp, *wifi, *ota);
+  /**
+   * @note Display initialization
+   */
+  Display *display = new Display(
+    SEC_1, 
+    *sdb, 
+    *co2, 
+    *tph, 
+    *wifi,
+    *mqtt, 
+    *ota);
 
-  RGBController* rgb = new RGBController(SEC_1, *sdb);
-  rgb->setUpdaterCb([co2]() -> float {
-    return co2->getCO2();
-  });
+  /**
+   * @note RGB controller initialization for CO2 level visualization
+   */
+  RGBController *rgb = new RGBController(MS_500, *sdb);
+  rgb->setUpdaterCb([co2]() -> float
+                    { return co2->getCO2(); });
 
-  Settings* sett = new Settings(*sdb, *wifi, *ota, *mqtt, *rgb, *hmi, *co2);
+  /**
+   * @note Web interface initialization
+   */
+  WebPanel *wp = new WebPanel(
+      *sdb,
+      *wifi,
+      *ota,
+      *mqtt,
+      *rgb,
+      *display,
+      *co2,
+      *tph);
 
   LOG_INFO("init ok!");
 }
 
-void loop() {
+/**
+ * @brief Main loop. Handles all tickers and timers.
+ */
+void loop()
+{
   Looper.loop();
 }

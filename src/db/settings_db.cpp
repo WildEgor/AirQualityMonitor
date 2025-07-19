@@ -1,12 +1,19 @@
-#define LOG_COMPONENT "SettingsDB"
-#include "services/logger.h"
 #include "configs/config.h"
 #include "settings_db.h"
 
-String co2_scale_types = "DEFAULT;EASY";
+/**
+ * @var co2_scale_types
+ * @brief Colors CO2: 3 or 4 color ranges
+ */
+String co2_scale_types = "3 color;4 color";
+/**
+ * @var log_levels
+ * @brief Log levels
+ */
 String log_levels = "DEBUG;INFO;WARN;ERROR";
 
-SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
+SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
+{
     LOG_INFO("init...");
     bool fsInitialized = true;
 
@@ -16,20 +23,29 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
     fsInitialized = LittleFS.begin();
 #endif
 
-    if (!fsInitialized) {
+    if (!fsInitialized)
+    {
         LOG_ERROR("init littlefs failed!");
         return;
     }
 
     _db.begin();
+
+    /**
+     * @note Сброс базы данных к заводским настройкам, если определён RESET_DB
+     */
 #ifdef RESET_DB
     _db.reset();
 #endif
 
+    /**
+     * @note Инициализация разделов настроек: APP, WIFI, MQTT, CO2
+     */
     // ============================== APP ==============================
     _db.init(kk::rgb_enabled, RGB_ENABLED);
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
     _db.init(kk::log_lvl, APP_LOG_LEVEL);
+    _db.init(kk::rotation_display, TFT_ROTATION_0);
 
     // ============================== WIFI ==============================
     _db.init(kk::wifi_ssid, WIFI_SSID);
@@ -44,22 +60,25 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME) {
     _db.init(kk::mqtt_device_id, MQTT_DEFAULT_DEVICE_ID);
 
     // ============================== CO2 ==============================
-    _db.init(kk::co2_scale_type, "DEFAULT");
+    _db.init(kk::co2_scale_type, "4 color");
     _db.init(kk::co2_alarm_lvl, RGB_DEFAULT_ALERT_TRHLD);
 
-#ifdef ENABLE_TEST
+    /**
+     * @note Вывод содержимого базы данных в сериал лог
+     */
     _db.dump(Serial);
-#endif
 
     LOG_INFO("init ok!");
 
     this->addLoop();
 }
 
-void SettingsDB::exec() {
+void SettingsDB::exec()
+{
     _db.tick();
 }
 
-GyverDBFile& SettingsDB::db() {
+GyverDBFile &SettingsDB::db()
+{
     return _db;
 }
