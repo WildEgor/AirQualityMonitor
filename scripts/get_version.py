@@ -21,4 +21,6 @@ env.Append(CPPDEFINES=[
   f'BUILD_VERSION={firmware_version}'
 ])
 
-env.Replace(PROGNAME=f'{env["PIOENV"]}_{firmware_version.replace(".", "_")}')
+progname = f'{env["PIOENV"]}_{firmware_version.replace(".", "_")}'
+print(f'Using progname {progname} for the build')
+env.Replace(PROGNAME=progname)
