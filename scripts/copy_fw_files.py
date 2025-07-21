@@ -42,5 +42,7 @@ def createZIP(original_folder_path, zip_file_path):
                 # Add the file to the ZIP file
                 zipf.write(os.path.join(root, file), new_path)
 
-env.AddPostAction("$BUILD_DIR/${PROGNAME}.hex", copy_fw_files)
-env.AddPostAction("$BUILD_DIR/${PROGNAME}.bin", copy_fw_files)
+
+pio = env["PIOENV"]
+env.AddPostAction("$BUILD_DIR/${pio}/${PROGNAME}.hex", copy_fw_files)
+env.AddPostAction("$BUILD_DIR/${pio}/${PROGNAME}.bin", copy_fw_files)

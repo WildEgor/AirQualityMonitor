@@ -47,7 +47,7 @@ void setup()
   /**
    * @note OTA firmware update initialization
    */
-  OTA *ota = new OTA();
+  OTA *ota = new OTA(*wifi);
 
   /**
    * @note MQTT connection initialization

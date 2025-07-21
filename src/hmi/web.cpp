@@ -103,7 +103,7 @@ void WebPanel::_build(sets::Builder &b)
     sets::Group g(b, "Settings");
 
     SUB_BUILD_BEGIN
-    sets::Menu m(b, "WiFi");
+    sets::Menu m(b, "Wi-Fi");
     b.Input(kk::wifi_ssid, "SSID");
     b.Pass(kk::wifi_pass, "Password");
     b.Button(SH("wifi_save"), "Save");

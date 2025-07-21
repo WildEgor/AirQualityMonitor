@@ -122,7 +122,8 @@ public:
     void moveRotation()
     {
         _tft_rotate += 1;
-        if (_tft_rotate > 3) _tft_rotate = TFT_ROTATION_360;
+        if (_tft_rotate > 3)
+            _tft_rotate = TFT_ROTATION_360;
 
         (*_db)[kk::rotation_display] = _tft_rotate;
 
@@ -339,31 +340,42 @@ private:
      */
     void _print_fw_version()
     {
-        if (_force_redraw)
+        // show current fw version
+        _tft.setCursor(100, 185);
+        if (_state.dark_theme)
         {
-            // show current fw version
-            _tft.setCursor(100, 185);
-            if (_state.dark_theme)
-            {
-                _tft.fillRect(100, 185, 60, 10, TFT_BLACK);
-            }
-            else
-            {
-                _tft.fillRect(100, 185, 60, 10, TFT_WHITE);
-            }
-            _tft.setTextColor(TFT_LIGHTGREY);
-            _tft.print(F("v "));
-            _tft.println(_state.last_fw_ver);
+            _tft.fillRect(100, 185, 60, 10, TFT_BLACK);
+        }
+        else
+        {
+            _tft.fillRect(100, 185, 60, 10, TFT_WHITE);
+        }
+        _tft.setTextColor(TFT_LIGHTGREY);
+        _tft.print(F("v "));
+        _tft.println(_state.last_fw_ver);
 
-            // show little green round dot as updates notification
-            _tft.setCursor(145, 185);
-            if (_state.dark_theme)
+        // show little green round dot as updates notification
+        _tft.setCursor(145, 185);
+        if (_state.dark_theme)
+        {
+            if (_state.has_updates)
             {
                 _tft.drawSmoothCircle(145, 185, 2, TFT_GREENYELLOW, TFT_BLACK);
             }
             else
             {
+                _tft.drawSmoothCircle(145, 185, 2, TFT_BLACK, TFT_BLACK);
+            }
+        }
+        else
+        {
+            if (_state.has_updates)
+            {
                 _tft.drawSmoothCircle(145, 185, 2, TFT_GREEN, TFT_WHITE);
+            }
+            else
+            {
+                _tft.drawSmoothCircle(145, 185, 2, TFT_WHITE, TFT_WHITE);
             }
         }
     }
@@ -374,29 +386,26 @@ private:
      */
     void _print_mqtt_info()
     {
-        if (_force_redraw)
+        _tft.setCursor(130, 145);
+        if (_state.dark_theme)
         {
-            _tft.setCursor(130, 145);
-            if (_state.dark_theme)
-            {
-                _tft.fillRect(130, 145, 60, 10, TFT_BLACK);
-            }
-            else
-            {
-                _tft.fillRect(130, 145, 60, 10, TFT_WHITE);
-            }
+            _tft.fillRect(130, 145, 60, 10, TFT_BLACK);
+        }
+        else
+        {
+            _tft.fillRect(130, 145, 60, 10, TFT_WHITE);
+        }
 
-            if (!_state.last_mqtt_state)
-            {
-                _tft.setTextColor(TFT_RED);
-                _tft.println(F("MQTT"));
-                LOG_ERROR("mqtt not connected");
-            }
-            else
-            {
-                _tft.setTextColor(TFT_GREEN);
-                _tft.println(F("MQTT"));
-            }
+        if (!_state.last_mqtt_state)
+        {
+            _tft.setTextColor(TFT_RED);
+            _tft.println(F("MQTT"));
+            LOG_ERROR("mqtt not connected");
+        }
+        else
+        {
+            _tft.setTextColor(TFT_GREEN);
+            _tft.println(F("MQTT"));
         }
     }
 
@@ -406,47 +415,44 @@ private:
      */
     void _print_wifi_info()
     {
-        if (_force_redraw)
+        _init_theme(false);
+
+        _tft.setCursor(20, 130);
+        if (_state.dark_theme)
         {
-            _init_theme(false);
+            _tft.fillRect(20, 130, 200, 10, TFT_BLACK);
+        }
+        else
+        {
+            _tft.fillRect(20, 130, 200, 10, TFT_WHITE);
+        }
 
-            _tft.setCursor(20, 130);
-            if (_state.dark_theme)
-            {
-                _tft.fillRect(20, 130, 200, 10, TFT_BLACK);
-            }
-            else
-            {
-                _tft.fillRect(20, 130, 200, 10, TFT_WHITE);
-            }
+        LOG_DEBUG("admin panel: http://" + _wifi->ip());
 
-            LOG_DEBUG("admin panel: http://" + _wifi->ip());
+        _tft.setTextColor(TFT_LIGHTGREY);
+        _tft.print(F("admin panel: http://"));
+        _tft.println(_wifi->ip());
 
-            _tft.setTextColor(TFT_LIGHTGREY);
-            _tft.print(F("admin panel: http://"));
-            _tft.println(_wifi->ip());
+        _tft.setCursor(90, 145);
+        if (_state.dark_theme)
+        {
+            _tft.fillRect(90, 145, 60, 10, TFT_BLACK);
+        }
+        else
+        {
+            _tft.fillRect(90, 145, 60, 10, TFT_WHITE);
+        }
 
-            _tft.setCursor(90, 145);
-            if (_state.dark_theme)
-            {
-                _tft.fillRect(90, 145, 60, 10, TFT_BLACK);
-            }
-            else
-            {
-                _tft.fillRect(90, 145, 60, 10, TFT_WHITE);
-            }
-
-            if (!_state.last_wifi_state)
-            {
-                _tft.setTextColor(TFT_RED);
-                _tft.println(F("WIFI"));
-                LOG_ERROR("wifi not connected");
-            }
-            else
-            {
-                _tft.setTextColor(TFT_GREEN);
-                _tft.println(F("WIFI"));
-            }
+        if (!_state.last_wifi_state)
+        {
+            _tft.setTextColor(TFT_RED);
+            _tft.println(F("Wi-Fi"));
+            LOG_ERROR("wifi not connected");
+        }
+        else
+        {
+            _tft.setTextColor(TFT_GREEN);
+            _tft.println(F("Wi-Fi"));
         }
     }
 
@@ -478,11 +484,25 @@ private:
      */
     void _print_sensor_state()
     {
-        if (_force_redraw)
-        {
-            _init_theme(false);
+        _init_theme(false);
 
-            _tft.setCursor(90, 165);
+        _tft.setCursor(90, 165);
+        if (_state.dark_theme)
+        {
+            _tft.fillRect(90, 165, 80, 10, TFT_BLACK);
+        }
+        else
+        {
+            _tft.fillRect(90, 165, 80, 10, TFT_WHITE);
+        }
+
+        _tft.setTextColor(TFT_CYAN);
+        if (_state.last_co2_sensor_state)
+        {
+            _tft.println(F("CALIBRATION"));
+        }
+        else
+        {
             if (_state.dark_theme)
             {
                 _tft.fillRect(90, 165, 80, 10, TFT_BLACK);
@@ -490,23 +510,6 @@ private:
             else
             {
                 _tft.fillRect(90, 165, 80, 10, TFT_WHITE);
-            }
-
-            _tft.setTextColor(TFT_CYAN);
-            if (_state.last_co2_sensor_state)
-            {
-                _tft.println(F("CALIBRATION"));
-            }
-            else
-            {
-                if (_state.dark_theme)
-                {
-                    _tft.fillRect(90, 165, 80, 10, TFT_BLACK);
-                }
-                else
-                {
-                    _tft.fillRect(90, 165, 80, 10, TFT_WHITE);
-                }
             }
         }
     }

@@ -3,6 +3,7 @@
 #include <Looper.h>
 
 #include "configs/config.h"
+#include "connections/wifi_conn.h"
 
 #define LOG_COMPONENT "OTA"
 #include "services/logger.h"
@@ -14,7 +15,7 @@
 class OTA : public LoopTickerBase
 {
 public:
-    OTA();
+    OTA(WiFiConn &wifiConn);
 
     /**
      * @brief Execute OTA checks
@@ -39,6 +40,11 @@ public:
 
 private:
     AutoOTA _ota = AutoOTA(APP_VERSION, PROJECT_PATH);
+    /**
+     * @name _wifi_conn
+     * @details Pointer to WiFi connection
+     */
+    WiFiConn *_wifi_conn;
 
     bool _is_initialized = false;
     String _ver = "";
