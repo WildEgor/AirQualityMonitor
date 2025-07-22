@@ -1,7 +1,6 @@
 #include "web.h"
 
 sets::Logger webLogger(1024);
-bool cfm_fw = false;
 
 WebPanel::WebPanel(
     SettingsDB &settingsDb,
@@ -10,7 +9,8 @@ WebPanel::WebPanel(
       _sett(String(APP_NAME) + " v" + String(APP_VERSION), &settingsDb.db()),
       _db(&settingsDb.db()),
       _wifi_conn(&wifiConn),
-      _is_initialized(false)
+      _is_initialized(false),
+      _cfm_fr(false)
 {
     _init();
 }
@@ -26,6 +26,7 @@ WebPanel::WebPanel(
     TPHSensor &tphSeonsor)
     : LoopTickerBase(),
       _sett(String(APP_NAME) + " v" + ota.version(), &settingsDb.db()),
+      _settingsDb(&settingsDb),
       _db(&settingsDb.db()),
       _wifi_conn(&wifiConn),
       _ota(&ota),
@@ -34,7 +35,8 @@ WebPanel::WebPanel(
       _display(&display),
       _co2_sensor(&co2sensor),
       _tph_sensor(&tphSeonsor),
-      _is_initialized(false)
+      _is_initialized(false),
+      _cfm_fr(false)
 {
     _init();
 }
@@ -80,6 +82,13 @@ void WebPanel::_update(sets::Updater &u)
     u.update("pressure_gauge"_h, _tph_sensor->getPressure());
     u.update("humidity_gauge"_h, _tph_sensor->getHumidity());
 #endif
+
+    if (_cfm_fr)
+    {
+        LOG_DEBUG("confirm factory reset?");
+        u.update(kk::cfm_fr, "Confirm factory reset?");
+        _cfm_fr = false;
+    }
 
     u.update(H(log), webLogger);
 
@@ -173,6 +182,24 @@ void WebPanel::_build(sets::Builder &b)
             _ota->update(true);
         }
     }
+
+    bool res;
+    if (b.Confirm(kk::cfm_fr, "Confirm", &res)) {
+        LOG_DEBUG("confirm factory reset? " + b.build.value.toString());
+
+        if (_settingsDb && b.build.value.toBool())
+        {
+            _settingsDb->factory_reset();
+        }
+    }
+
+    if (b.Button("Factory reset"))
+    {
+        _cfm_fr = true;
+
+        // TODO: fix confirm
+        _settingsDb->factory_reset();
+    }
     SUB_BUILD_END
 
     SUB_BUILD_BEGIN
@@ -181,7 +208,7 @@ void WebPanel::_build(sets::Builder &b)
 
     SUB_BUILD_BEGIN
     if (b.build.isAction())
-    {   
+    {
         switch (b.build.id)
         {
         case SH("wifi_save"):

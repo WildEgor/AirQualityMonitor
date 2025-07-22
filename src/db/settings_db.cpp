@@ -32,20 +32,22 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
     _db.begin();
 
     /**
-     * @note Сброс базы данных к заводским настройкам, если определён RESET_DB
+     * @note Reset database
      */
-#ifdef RESET_DB
+#ifdef DB_RESET
     _db.reset();
+    _db.update();
 #endif
 
     /**
-     * @note Инициализация разделов настроек: APP, WIFI, MQTT, CO2
+     * @note Init settings: APP, WIFI, MQTT, CO2
      */
     // ============================== APP ==============================
     _db.init(kk::rgb_enabled, RGB_ENABLED);
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
     _db.init(kk::log_lvl, APP_LOG_LEVEL);
     _db.init(kk::rotation_display, TFT_ROTATION_0);
+    _db.init(kk::cfm_fr, false);
 
     // ============================== WIFI ==============================
     _db.init(kk::wifi_ssid, WIFI_SSID);
@@ -60,17 +62,41 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
     _db.init(kk::mqtt_device_id, MQTT_DEFAULT_DEVICE_ID);
 
     // ============================== CO2 ==============================
-    _db.init(kk::co2_scale_type, "4 color");
-    _db.init(kk::co2_alarm_lvl, RGB_DEFAULT_ALERT_TRHLD);
+    _db.init(kk::co2_scale_type, APP_CO2_DEFAULT_SCALE_TYPE);
+    _db.init(kk::co2_alarm_lvl, APP_CO2_DEFAULT_ALERT_TRHLD);
 
     /**
-     * @note Вывод содержимого базы данных в сериал лог
+     * @note Show db dump
      */
     _db.dump(Serial);
 
     LOG_INFO("init ok!");
 
     this->addLoop();
+}
+
+void SettingsDB::factory_reset()
+{
+    _db.reset();
+
+    _db[kk::cfm_fr] = false;
+    _db[kk::rgb_enabled] = false;
+    _db[kk::use_dark_theme] = false;
+    _db[kk::log_lvl] = APP_DEFAULT_LOG_LEVEL;
+    _db[kk::rotation_display] = TFT_ROTATION_0;
+    _db[kk::wifi_ssid] = EMPTY_SECRET;
+    _db[kk::wifi_pass] = EMPTY_SECRET;
+    _db[kk::mqtt_enabled] = false;
+    _db[kk::mqtt_server] = EMPTY_SECRET;
+    _db[kk::mqtt_username] = EMPTY_SECRET;
+    _db[kk::mqtt_pass] = EMPTY_SECRET;
+    _db[kk::mqtt_device_id] = MQTT_DEFAULT_DEVICE_ID;
+    _db[kk::co2_scale_type] = APP_CO2_DEFAULT_SCALE_TYPE;
+    _db[kk::co2_alarm_lvl] = APP_CO2_DEFAULT_ALERT_TRHLD;
+
+    _db.update();
+
+    ESP.restart();
 }
 
 void SettingsDB::exec()

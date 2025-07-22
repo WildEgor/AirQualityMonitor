@@ -27,7 +27,8 @@ enum kk : size_t
     rgb_enabled,      ///< RGB enabled flag
     use_dark_theme,   ///< Use dark theme flag
     rotation_display, ///< Rotation display
-    log_lvl           ///< Log level
+    log_lvl,           ///< Log level
+    cfm_fr             ///< Configrm factory reset
 };
 
 /**
@@ -57,6 +58,11 @@ public:
      * @brief Initialize database dependencies
      */
     void setup();
+
+    /**
+     * @brief Reset db values to factory values and reboot device
+     */
+    void factory_reset();
 
     /**
      * @brief Handle database updates
