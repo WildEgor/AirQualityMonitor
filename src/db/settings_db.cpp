@@ -36,7 +36,6 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
      */
 #ifdef DB_RESET
     _db.reset();
-    _db.update();
 #endif
 
     /**
@@ -69,6 +68,8 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
      * @note Show db dump
      */
     _db.dump(Serial);
+
+    _db.update();
 
     LOG_INFO("init ok!");
 
