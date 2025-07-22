@@ -8,6 +8,7 @@
 // app
 #define APP_NAME "AirQualityMonitor"
 #define APP_VERSION STR_VALUE(BUILD_VERSION) // Change version via project.json!
+#define APP_PLATFORM STR_VALUE(BUILD_PLATFORM)
 #define APP_DEFAULT_LOG_LEVEL "ERROR"
 #define APP_LOG_LEVEL "DEBUG"                 // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // Enable mock sensor reading
@@ -78,15 +79,17 @@
  * To change pins: .pio/libdeps/mhetesp32devkit/TFT_eSPI/User_Setups/Setup200_GC9A01.h
  * Uncomment the correct driver: .pio/libdeps/mhetesp32devkit/TFT_eSPI/User_Setup_Select.h
  */
+#define USER_SETUP_INFO "User_Setup"
 #define GC9A01_DRIVER
 
-// esp_32_live_mini
+// mhetesp32devkit
 #define TFT_MOSI 23 // On some display driver boards, it might be labeled as "SDA" etc.
 #define TFT_SCLK 18
 #define TFT_CS 5   // Chip select control pin
 #define TFT_DC 16  // Data/Command control pin
 #define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
-// esp_32_s2_mini
+
+// lolin_s2_mini 
 // #define TFT_MOSI 9
 // #define TFT_SCLK 11
 // #define TFT_CS   5

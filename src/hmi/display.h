@@ -83,7 +83,6 @@ public:
         _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
         LOG_INFO("init widgets ok!");
 
-        _render();
         this->addLoop();
     }
 
@@ -257,9 +256,9 @@ private:
         }
 
         LOG_DEBUG("render started...");
+        _print_gauge();
         _print_wifi_info();
         _print_mqtt_info();
-        _print_gauge();
         _print_sensor_state();
         _print_fw_version();
         LOG_DEBUG("rendered ok!");
@@ -308,26 +307,27 @@ private:
             return true;
         }
 
-        float current_temp = _tph_sensor.getTemperature();
-        if (abs(current_temp - _state.last_temp_value) > 1.0)
-        {
-            _state.last_temp_value = current_temp;
-            return true;
-        }
-
-        float current_pressure = _tph_sensor.getPressure();
-        if (abs(current_pressure - _state.last_pressure_value) > 1.0)
-        {
-            _state.last_pressure_value = current_pressure;
-            return true;
-        }
-
-        float current_humidity = _tph_sensor.getHumidity();
-        if (abs(current_humidity - _state.last_humidity_value) > 5.0)
-        {
-            _state.last_humidity_value = current_humidity;
-            return true;
-        }
+        /**
+         * @note Disabled because not affect on display
+         */
+        // float current_temp = _tph_sensor.getTemperature();
+        // if (abs(current_temp - _state.last_temp_value) > 1.0)
+        // {
+        //     _state.last_temp_value = current_temp;
+        //     return true;
+        // }
+        // float current_pressure = _tph_sensor.getPressure();
+        // if (abs(current_pressure - _state.last_pressure_value) > 1.0)
+        // {
+        //     _state.last_pressure_value = current_pressure;
+        //     return true;
+        // }
+        // float current_humidity = _tph_sensor.getHumidity();
+        // if (abs(current_humidity - _state.last_humidity_value) > 5.0)
+        // {
+        //     _state.last_humidity_value = current_humidity;
+        //     return true;
+        // }
 
         String current_fw_ver = _ota->version();
         if (current_fw_ver != _state.last_fw_ver)
@@ -346,7 +346,6 @@ private:
         if ((millis() - _state.last_render_time) > SEC_5)
         {
             _state.last_render_time = millis();
-            _force_redraw = true;
             return true;
         }
 
