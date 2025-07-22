@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-// #include "configs/secrets.h" // HINT: for development only
 #include "configs/secrets.example.h"
 
 #define STRINGIZER(arg) #arg
@@ -9,13 +8,19 @@
 // app
 #define APP_NAME "AirQualityMonitor"
 #define APP_VERSION STR_VALUE(BUILD_VERSION) // Change version via project.json!
+#define APP_DEFAULT_LOG_LEVEL "ERROR"
 #define APP_LOG_LEVEL "DEBUG"                 // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // Enable mock sensor reading
 #define APP_DARK_THEME false // Select color theme
+#define APP_CO2_DEFAULT_ALERT_TRHLD 1200 // CO2 threshold for red blinking
+#define APP_CO2_DEFAULT_SCALE_TYPE "4 color"
 // app
 
 // maint
 // #define DB_RESET // Factory reset database
+#ifdef DB_RESET
+#include "configs/secrets.h" // HINT: for development only
+#endif
 #define DB_NAME "/settings.db"
 #define PROJECT_PATH "WildEgor/AirQualityMonitor/master/project.json"
 #define USER_MANUAL_URL "https://github.com/WildEgor/AirQualityMonitor/blob/master/docs/en/UserManual.md"
@@ -35,6 +40,7 @@
 #define SEC_5 5000
 #define SEC_10 10000
 #define SEC_30 30000
+#define EMPTY_SECRET "*****"
 // system
 
 // MQTT service for interaction with Yandex (see wqtt.ru)
@@ -59,7 +65,6 @@
 #define RGB_ENABLED false
 #define RGB_PIN 19
 #define RGB_NUMPIXELS 4              // Number of LEDs in the strip. Min: 1, Max: 255
-#define RGB_DEFAULT_ALERT_TRHLD 1200 // CO2 threshold for red blinking
 // rgb settings
 
 // hmi

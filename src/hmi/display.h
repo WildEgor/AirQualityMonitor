@@ -15,6 +15,9 @@
 #define LOG_COMPONENT "Display"
 #include "services/logger.h"
 
+#define TFT_BASE_X_OFFSET 0
+#define TFT_BASE_Y_OFFSET 0
+
 /**
  * @name Display
  * @details Class for managing the TFT display, rendering widgets and sensor data
@@ -66,6 +69,7 @@ public:
         _tft.init();
         _tft.setRotation(_tft_rotate);
         _init_theme(true);
+        _init_rotation_offsets();
         LOG_INFO("init tft ok!");
 
         LOG_INFO("init widgets...");
@@ -76,7 +80,7 @@ public:
         _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
         _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
         _co2_meter.setTheme(_state.dark_theme);
-        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
+        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
         LOG_INFO("init widgets ok!");
 
         _render();
@@ -109,7 +113,7 @@ public:
         uint16_t rs, re, os, oe, ys, ye, gs, ge;
         _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
         _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
+        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
 
         _force_redraw = true;
         _render();
@@ -127,6 +131,10 @@ public:
 
         (*_db)[kk::rotation_display] = _tft_rotate;
 
+        LOG_DEBUG("rotation: " + String(_tft_rotate));
+
+        _init_rotation_offsets();
+
         _tft.setRotation(_tft_rotate);
 
         if (_state.dark_theme)
@@ -142,7 +150,7 @@ public:
         uint16_t rs, re, os, oe, ys, ye, gs, ge;
         _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
         _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
+        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
 
         _force_redraw = true;
         _render();
@@ -158,7 +166,7 @@ public:
         uint16_t rs, re, os, oe, ys, ye, gs, ge;
         _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
         _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.analogMeter(0, 0, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
+        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
 
         _force_redraw = true;
         _render();
@@ -225,6 +233,17 @@ private:
      * @details Set display orientation
      */
     int _tft_rotate = TFT_ROTATION_0;
+
+    /**
+     * @name _x_center_offset 
+     * @details Adjust center
+     */
+    uint16_t _x_center_offset = 0;
+    /**
+     * @name _y_center_offset 
+     * @details Adjust center
+     */
+    uint16_t _y_center_offset = 0;
 
     /**
      * @name _render
@@ -341,41 +360,46 @@ private:
     void _print_fw_version()
     {
         // show current fw version
-        _tft.setCursor(100, 185);
+        uint16_t x_fw = 100 + _x_center_offset;
+        uint16_t y_fw = 185 + _y_center_offset;
+
+        _tft.setCursor(x_fw, y_fw);
         if (_state.dark_theme)
         {
-            _tft.fillRect(100, 185, 60, 10, TFT_BLACK);
+            _tft.fillRect(x_fw, y_fw, 60, 10, TFT_BLACK);
         }
         else
         {
-            _tft.fillRect(100, 185, 60, 10, TFT_WHITE);
+            _tft.fillRect(x_fw, y_fw, 60, 10, TFT_WHITE);
         }
         _tft.setTextColor(TFT_LIGHTGREY);
         _tft.print(F("v "));
         _tft.println(_state.last_fw_ver);
 
         // show little green round dot as updates notification
-        _tft.setCursor(145, 185);
+        uint16_t x_fw_n = 145 + _x_center_offset;
+        uint16_t y_fw_n = 185 + _y_center_offset;
+        _tft.setCursor(x_fw_n, y_fw_n);
         if (_state.dark_theme)
         {
             if (_state.has_updates)
             {
-                _tft.drawSmoothCircle(145, 185, 2, TFT_GREENYELLOW, TFT_BLACK);
+                _tft.drawSmoothCircle(x_fw_n, y_fw_n, 2, TFT_GREENYELLOW, TFT_BLACK);
             }
             else
             {
-                _tft.drawSmoothCircle(145, 185, 2, TFT_BLACK, TFT_BLACK);
+                _tft.drawSmoothCircle(x_fw_n, y_fw_n, 2, TFT_BLACK, TFT_BLACK);
             }
         }
         else
         {
             if (_state.has_updates)
             {
-                _tft.drawSmoothCircle(145, 185, 2, TFT_GREEN, TFT_WHITE);
+                _tft.drawSmoothCircle(x_fw_n, y_fw_n, 2, TFT_GREEN, TFT_WHITE);
             }
             else
             {
-                _tft.drawSmoothCircle(145, 185, 2, TFT_WHITE, TFT_WHITE);
+                _tft.drawSmoothCircle(x_fw_n, y_fw_n, 2, TFT_WHITE, TFT_WHITE);
             }
         }
     }
@@ -386,14 +410,17 @@ private:
      */
     void _print_mqtt_info()
     {
-        _tft.setCursor(130, 145);
+        int16_t x_info = 130 + _x_center_offset;
+        int16_t y_info = 145 + _y_center_offset;
+
+        _tft.setCursor(x_info, y_info);
         if (_state.dark_theme)
         {
-            _tft.fillRect(130, 145, 60, 10, TFT_BLACK);
+            _tft.fillRect(x_info, y_info, 60, 10, TFT_BLACK);
         }
         else
         {
-            _tft.fillRect(130, 145, 60, 10, TFT_WHITE);
+            _tft.fillRect(x_info, y_info, 60, 10, TFT_WHITE);
         }
 
         if (!_state.last_mqtt_state)
@@ -415,16 +442,17 @@ private:
      */
     void _print_wifi_info()
     {
-        _init_theme(false);
+        int16_t x_link = 20 + _x_center_offset;
+        int16_t y_link = 130 + _y_center_offset;
 
-        _tft.setCursor(20, 130);
+        _tft.setCursor(x_link, y_link);
         if (_state.dark_theme)
         {
-            _tft.fillRect(20, 130, 200, 10, TFT_BLACK);
+            _tft.fillRect(x_link, y_link, 200, 10, TFT_BLACK);
         }
         else
         {
-            _tft.fillRect(20, 130, 200, 10, TFT_WHITE);
+            _tft.fillRect(x_link, y_link, 200, 10, TFT_WHITE);
         }
 
         LOG_DEBUG("admin panel: http://" + _wifi->ip());
@@ -433,14 +461,17 @@ private:
         _tft.print(F("admin panel: http://"));
         _tft.println(_wifi->ip());
 
-        _tft.setCursor(90, 145);
+        int16_t x_wifi = 90 + _x_center_offset;
+        int16_t y_wifi = 145 + _y_center_offset;
+
+        _tft.setCursor(x_wifi, y_wifi);
         if (_state.dark_theme)
         {
-            _tft.fillRect(90, 145, 60, 10, TFT_BLACK);
+            _tft.fillRect(x_wifi, y_wifi, 60, 10, TFT_BLACK);
         }
         else
         {
-            _tft.fillRect(90, 145, 60, 10, TFT_WHITE);
+            _tft.fillRect(x_wifi, y_wifi, 60, 10, TFT_WHITE);
         }
 
         if (!_state.last_wifi_state)
@@ -471,10 +502,8 @@ private:
             value = _co2_scale->getHumanMax();
         }
 
-        _init_theme(false);
-
         LOG_DEBUG("update gauge value: " + String(value));
-        _tft.setCursor(0, 0);
+        _tft.setCursor(_x_center_offset, _y_center_offset);
         _co2_meter.updateNeedle(value, 10);
     }
 
@@ -484,16 +513,17 @@ private:
      */
     void _print_sensor_state()
     {
-        _init_theme(false);
+        int16_t x_state = 90 + _x_center_offset;
+        int16_t y_state = 165 + _y_center_offset;
 
-        _tft.setCursor(90, 165);
+        _tft.setCursor(x_state, y_state);
         if (_state.dark_theme)
         {
-            _tft.fillRect(90, 165, 80, 10, TFT_BLACK);
+            _tft.fillRect(x_state, y_state, 80, 10, TFT_BLACK);
         }
         else
         {
-            _tft.fillRect(90, 165, 80, 10, TFT_WHITE);
+            _tft.fillRect(x_state, y_state, 80, 10, TFT_WHITE);
         }
 
         _tft.setTextColor(TFT_CYAN);
@@ -505,11 +535,11 @@ private:
         {
             if (_state.dark_theme)
             {
-                _tft.fillRect(90, 165, 80, 10, TFT_BLACK);
+                _tft.fillRect(x_state, y_state, 80, 10, TFT_BLACK);
             }
             else
             {
-                _tft.fillRect(90, 165, 80, 10, TFT_WHITE);
+                _tft.fillRect(x_state, y_state, 80, 10, TFT_WHITE);
             }
         }
     }
@@ -534,5 +564,34 @@ private:
         if (fill)
             _tft.fillScreen(TFT_WHITE);
         _tft.setTextColor(TFT_BLACK);
+    }
+
+    /**
+     * @name _init_rotation_offsets
+     * @details Init display rotation offsets
+     * @note TODO
+     */
+    void _init_rotation_offsets()
+    {
+        if (_tft_rotate == 0)
+        {
+            _x_center_offset = 0;
+            _y_center_offset = 0;
+        }
+        if (_tft_rotate == 1)
+        {
+            _x_center_offset = 0;
+            _y_center_offset = 0;
+        }
+        if (_tft_rotate == 2)
+        {
+            _x_center_offset = 0;
+            _y_center_offset = 0;
+        }
+        if (_tft_rotate == 3)
+        {
+            _x_center_offset = 0;
+            _y_center_offset = 0;
+        }
     }
 };

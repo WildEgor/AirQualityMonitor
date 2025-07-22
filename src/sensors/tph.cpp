@@ -6,6 +6,7 @@ TPHSensor::TPHSensor(uint32_t ms)
 
     _data.pressure = 0.0;
     _data.temp = 0.0;
+    _data.humidity = 0.0;
     
     if (!_enable_test && !_init()) {
         LOG_ERROR("init failed! please check your wiring.");

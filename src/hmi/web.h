@@ -78,7 +78,8 @@ private:
     void _build(sets::Builder& b);
 
     SettingsGyver _sett;              ///< Settings manager instance
-    GyverDBFile* _db;                 ///< Pointer to database file
+    GyverDBFile* _db;
+    SettingsDB* _settingsDb;                 ///< Pointer to database file
     WiFiConn* _wifi_conn;             ///< Pointer to WiFi connection
     OTA* _ota;                        ///< Pointer to OTA update service
     MQTTConn* _mqtt_conn;             ///< Pointer to MQTT connection
@@ -88,4 +89,5 @@ private:
     TPHSensor* _tph_sensor;           ///< Pointer to TPH sensor
 
     bool _is_initialized;             ///< Initialization flag
+    bool _cfm_fr;
 };
