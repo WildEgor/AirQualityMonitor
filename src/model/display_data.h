@@ -4,6 +4,7 @@
 struct DisplayState
 {
     unsigned long last_render_time = 0;
+    unsigned long intro_delay = 0;
     float last_co2_value = -1;
     float last_temp_value = -1;
     float last_pressure_value = -1;

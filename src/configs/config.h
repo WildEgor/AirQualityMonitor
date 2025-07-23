@@ -69,37 +69,32 @@
 #define RGB_NUMPIXELS 4              // Number of LEDs in the strip. Min: 1, Max: 255
 // rgb settings
 
-// hmi
-#define TFT_WIDTH 240
-#define TFT_HEIGHT 240
-#define TFT_ROTATION_0 2 // start position
-#define TFT_ROTATION_360 0
-
 /**
  * NOTE: Make changes here
  * To change pins: .pio/libdeps/mhetesp32devkit/TFT_eSPI/User_Setups/Setup200_GC9A01.h
  * Uncomment the correct driver: .pio/libdeps/mhetesp32devkit/TFT_eSPI/User_Setup_Select.h
  */
+// hmi
+#define TFT_WIDTH 240
+#define TFT_HEIGHT 240
+#define TFT_ROTATION_0 2 // start position
+#define TFT_ROTATION_360 0
 #define USER_SETUP_INFO "User_Setup"
 #define GC9A01_DRIVER
-
 // mhetesp32devkit
 #define TFT_MOSI 23 // On some display driver boards, it might be labeled as "SDA" etc.
 #define TFT_SCLK 18
 #define TFT_CS 5   // Chip select control pin
 #define TFT_DC 16  // Data/Command control pin
 #define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
-
 // lolin_s2_mini 
 // #define TFT_MOSI 9
 // #define TFT_SCLK 11
 // #define TFT_CS   5
 // #define TFT_DC   7
 // #define TFT_RST  3
-
 #define SPI_FREQUENCY 27000000
 #define SPI_READ_FREQUENCY 5000000
-
 #define LOAD_GLCD  // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH
 #define LOAD_FONT2 // Font 2. Small 16 pixel high font, needs ~3534 bytes in FLASH, 96 characters
 #define LOAD_FONT4 // Font 4. Medium 26 pixel high font, needs ~5848 bytes in FLASH, 96 characters
