@@ -3,7 +3,7 @@
 CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _state(CO2Sensor_INIT)
 {
     LOG_INFO("init...");
-    _data.co2 = 0.0;
+    _data.co2 = 400.0f;
     _data.tvoc = 0.0;
     _data.current_baseline = 0x00;
 
@@ -155,7 +155,7 @@ void CO2Sensor::_check_data()
 void CO2Sensor::_mock_data()
 {
     _data.tvoc = 3000.1;
-    _data.co2 += 100.0;
+    _data.co2 += 50.0;
     if (_data.co2 >= 1500.0) _data.co2 = 0.0;
 }
 
@@ -258,12 +258,12 @@ bool CO2Scale::needAlarm(uint16_t value)
 
 void CO2Scale::_initScales()
 {
-    _default_scale[0] = {390, 0, 255, 0}; // green
-    _default_scale[1] = {790, 255, 255, 0}; // yellow
-    _default_scale[2] = {1150, 255, 128, 0}; // orange
+    _default_scale[0] = {690, 0, 255, 0}; // green
+    _default_scale[1] = {990, 255, 255, 0}; // yellow
+    _default_scale[2] = {1290, 255, 128, 0}; // orange
     _default_scale[3] = {1500, 255, 0, 0}; // red
 
-    _easy_scale[0] = {590, 0, 255, 0}; // green
+    _easy_scale[0] = {790, 0, 255, 0}; // green
     _easy_scale[1] = {1090, 255, 255, 0}; // yellow
     _easy_scale[2] = {1500, 255, 0, 0}; // red
 }
