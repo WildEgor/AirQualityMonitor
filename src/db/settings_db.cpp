@@ -46,6 +46,7 @@ SettingsDB::SettingsDB() : LoopTickerBase(), _db(&LittleFS, DB_NAME)
     _db.init(kk::use_dark_theme, APP_DARK_THEME);
     _db.init(kk::log_lvl, APP_LOG_LEVEL);
     _db.init(kk::rotation_display, TFT_ROTATION_0);
+    _db.init(kk::temp_offset, TEMP_DEFAULT_OFFSET);
     _db.init(kk::cfm_fr, false);
 
     // ============================== WIFI ==============================
@@ -83,6 +84,7 @@ void SettingsDB::factory_reset()
     _db[kk::cfm_fr] = false;
     _db[kk::rgb_enabled] = false;
     _db[kk::use_dark_theme] = false;
+    _db[kk::temp_offset] = TEMP_DEFAULT_OFFSET;
     _db[kk::log_lvl] = APP_DEFAULT_LOG_LEVEL;
     _db[kk::rotation_display] = TFT_ROTATION_0;
     _db[kk::wifi_ssid] = EMPTY_SECRET;

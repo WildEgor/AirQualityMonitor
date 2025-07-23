@@ -15,7 +15,7 @@
 class TPHSensor : public SensorBase
 {
 public:
-    TPHSensor(uint32_t ms);
+    TPHSensor(SettingsDB &settingsDb, uint32_t ms);
 
     void setup() override;
     void exec() override;
@@ -31,6 +31,7 @@ public:
     const char *getType() const override;
 
 private:
+    GyverDBFile *_db;
     GyverBME280 _sensor;
     TPHData _data;
 

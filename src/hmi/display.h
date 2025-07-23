@@ -68,21 +68,17 @@ public:
 
         _tft.init();
         _tft.setRotation(_tft_rotate);
+        _tft.resetViewport();
         _init_theme(true);
         _init_rotation_offsets();
         LOG_INFO("init tft ok!");
 
         LOG_INFO("init widgets...");
         _co2_meter = MeterWidget(&_tft);
-
         _co2_scale->init(_db);
-        uint16_t rs, re, os, oe, ys, ye, gs, ge;
-        _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.setTheme(_state.dark_theme);
-        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
         LOG_INFO("init widgets ok!");
 
+        forceRender();
         this->addLoop();
     }
 
@@ -108,14 +104,7 @@ public:
         _state.dark_theme = dark;
         _init_theme(true);
 
-        _co2_meter.setTheme(dark);
-        uint16_t rs, re, os, oe, ys, ye, gs, ge;
-        _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
-
-        _force_redraw = true;
-        _render();
+        forceRender();
     }
 
     /**
@@ -130,8 +119,6 @@ public:
 
         (*_db)[kk::rotation_display] = _tft_rotate;
 
-        LOG_DEBUG("rotation: " + String(_tft_rotate));
-
         _init_rotation_offsets();
 
         _tft.setRotation(_tft_rotate);
@@ -145,14 +132,7 @@ public:
             _tft.fillScreen(TFT_WHITE);
         }
 
-        _co2_meter.setTheme(_state.dark_theme);
-        uint16_t rs, re, os, oe, ys, ye, gs, ge;
-        _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
-
-        _force_redraw = true;
-        _render();
+        forceRender();
     }
 
     /**
@@ -165,8 +145,7 @@ public:
         uint16_t rs, re, os, oe, ys, ye, gs, ge;
         _co2_scale->getScale(rs, re, os, oe, ys, ye, gs, ge);
         _co2_meter.setZones(rs, re, os, oe, ys, ye, gs, ge);
-        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
-
+        _co2_meter.analogMeter(_x_center_offset, _y_center_offset, _co2_scale->getMin(), _co2_scale->getHumanMax(), "CO2", "", "", "", "", "");
         _force_redraw = true;
         _render();
     }
@@ -234,12 +213,12 @@ private:
     int _tft_rotate = TFT_ROTATION_0;
 
     /**
-     * @name _x_center_offset 
+     * @name _x_center_offset
      * @details Adjust center
      */
     uint16_t _x_center_offset = 0;
     /**
-     * @name _y_center_offset 
+     * @name _y_center_offset
      * @details Adjust center
      */
     uint16_t _y_center_offset = 0;
@@ -361,8 +340,6 @@ private:
         // show current fw version
         uint16_t x_fw = 100 + _x_center_offset;
         uint16_t y_fw = 185 + _y_center_offset;
-
-        _tft.setCursor(x_fw, y_fw);
         if (_state.dark_theme)
         {
             _tft.fillRect(x_fw, y_fw, 60, 10, TFT_BLACK);
@@ -372,13 +349,11 @@ private:
             _tft.fillRect(x_fw, y_fw, 60, 10, TFT_WHITE);
         }
         _tft.setTextColor(TFT_LIGHTGREY);
-        _tft.print(F("v "));
-        _tft.println(_state.last_fw_ver);
+        _tft.drawString("v " + _state.last_fw_ver, x_fw, y_fw);
 
         // show little green round dot as updates notification
         uint16_t x_fw_n = 145 + _x_center_offset;
         uint16_t y_fw_n = 185 + _y_center_offset;
-        _tft.setCursor(x_fw_n, y_fw_n);
         if (_state.dark_theme)
         {
             if (_state.has_updates)
@@ -411,8 +386,6 @@ private:
     {
         int16_t x_info = 130 + _x_center_offset;
         int16_t y_info = 145 + _y_center_offset;
-
-        _tft.setCursor(x_info, y_info);
         if (_state.dark_theme)
         {
             _tft.fillRect(x_info, y_info, 60, 10, TFT_BLACK);
@@ -425,13 +398,13 @@ private:
         if (!_state.last_mqtt_state)
         {
             _tft.setTextColor(TFT_RED);
-            _tft.println(F("MQTT"));
+            _tft.drawString(F("MQTT"), x_info, y_info);
             LOG_ERROR("mqtt not connected");
         }
         else
         {
             _tft.setTextColor(TFT_GREEN);
-            _tft.println(F("MQTT"));
+            _tft.drawString(F("MQTT"), x_info, y_info);
         }
     }
 
@@ -443,8 +416,6 @@ private:
     {
         int16_t x_link = 20 + _x_center_offset;
         int16_t y_link = 130 + _y_center_offset;
-
-        _tft.setCursor(x_link, y_link);
         if (_state.dark_theme)
         {
             _tft.fillRect(x_link, y_link, 200, 10, TFT_BLACK);
@@ -454,16 +425,15 @@ private:
             _tft.fillRect(x_link, y_link, 200, 10, TFT_WHITE);
         }
 
-        LOG_DEBUG("admin panel: http://" + _wifi->ip());
+        String link = "admin panel: http://" + _wifi->ip();
+        LOG_DEBUG(link);
 
         _tft.setTextColor(TFT_LIGHTGREY);
-        _tft.print(F("admin panel: http://"));
-        _tft.println(_wifi->ip());
+        _tft.drawString(link, x_link, y_link);
 
         int16_t x_wifi = 90 + _x_center_offset;
         int16_t y_wifi = 145 + _y_center_offset;
 
-        _tft.setCursor(x_wifi, y_wifi);
         if (_state.dark_theme)
         {
             _tft.fillRect(x_wifi, y_wifi, 60, 10, TFT_BLACK);
@@ -476,13 +446,13 @@ private:
         if (!_state.last_wifi_state)
         {
             _tft.setTextColor(TFT_RED);
-            _tft.println(F("Wi-Fi"));
+            _tft.drawString(F("Wi-Fi"), x_wifi, y_wifi);
             LOG_ERROR("wifi not connected");
         }
         else
         {
             _tft.setTextColor(TFT_GREEN);
-            _tft.println(F("Wi-Fi"));
+            _tft.drawString(F("Wi-Fi"), x_wifi, y_wifi);
         }
     }
 
@@ -514,8 +484,6 @@ private:
     {
         int16_t x_state = 90 + _x_center_offset;
         int16_t y_state = 165 + _y_center_offset;
-
-        _tft.setCursor(x_state, y_state);
         if (_state.dark_theme)
         {
             _tft.fillRect(x_state, y_state, 80, 10, TFT_BLACK);
@@ -528,7 +496,7 @@ private:
         _tft.setTextColor(TFT_CYAN);
         if (_state.last_co2_sensor_state)
         {
-            _tft.println(F("CALIBRATION"));
+            _tft.drawString(F("CALIBRATION"), x_state, y_state);
         }
         else
         {

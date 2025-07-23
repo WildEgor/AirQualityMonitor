@@ -33,6 +33,7 @@
 // System constants (do not change)
 #define CCS811_ADDR 0x5A
 #define BME280_ADDR 0x76 // 0x77 or 0x76
+#define TEMP_DEFAULT_OFFSET 15
 #define SERIAL_SPEED 115200
 #define MS_100 100
 #define MS_500 500

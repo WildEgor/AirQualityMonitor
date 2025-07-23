@@ -58,7 +58,7 @@ void setup()
    * @note Sensors initialization
    */
   CO2Sensor *co2 = new CO2Sensor(SEC_30);
-  TPHSensor *tph = new TPHSensor(SEC_30);
+  TPHSensor *tph = new TPHSensor(*sdb, SEC_30);
 
   /**
    * @note Enable test mode for sensors (data emulation)
