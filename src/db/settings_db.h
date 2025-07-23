@@ -24,6 +24,7 @@ enum kk : size_t
     mqtt_device_id,   ///< MQTT device ID
     co2_scale_type,   ///< CO2 scale type
     co2_alarm_lvl,    ///< CO2 alarm level
+    temp_offset,      ///< Temp offset
     rgb_enabled,      ///< RGB enabled flag
     use_dark_theme,   ///< Use dark theme flag
     rotation_display, ///< Rotation display

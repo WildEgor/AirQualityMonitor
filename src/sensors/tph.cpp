@@ -1,7 +1,7 @@
 #include "tph.h"
 
-TPHSensor::TPHSensor(uint32_t ms) 
-    : SensorBase(ms) {
+TPHSensor::TPHSensor(SettingsDB &settingsDb, uint32_t ms) 
+    : _db(&settingsDb.db()), SensorBase(ms) {
     LOG_INFO("init...");
 
     _data.pressure = 0.0;
@@ -91,7 +91,7 @@ void TPHSensor::_check_data() {
         return;
     }
 
-    _data.temp = constrain(_sensor.readTemperature(), getTemperatureMin(), getTemperatureMax());
+    _data.temp = constrain(_sensor.readTemperature() - (*_db)[kk::temp_offset].toFloat(), getTemperatureMin(), getTemperatureMax());
     _data.pressure = constrain(_sensor.readPressure(), getPressureMin(), getPressureMax());
     _data.humidity = constrain(_sensor.readHumidity(), getHumidityMin(), getHumidityMax());
 

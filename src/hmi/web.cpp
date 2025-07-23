@@ -164,6 +164,7 @@ void WebPanel::_build(sets::Builder &b)
     {
         _display->setTheme((*_db)[kk::use_dark_theme].toBool());
     }
+    b.Number(kk::temp_offset, "Temp offset", nullptr, 0.0f, 50.0f);
     if (b.Select(kk::log_lvl, "Log", log_levels))
     {
         SET_LOG_LEVEL((*_db)[kk::log_lvl].toString());
