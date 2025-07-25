@@ -59,6 +59,9 @@ public:
         _state.dark_theme = (*_db)[kk::use_dark_theme].toBool();
         _force_redraw = true;
         _show_intro = false;
+#ifdef SHOW_INTRO
+        _show_intro = true;
+#endif
         _state.last_co2_value = -1;
         _state.last_wifi_state = false;
         _state.last_mqtt_state = false;

@@ -28,6 +28,7 @@
 
 // feature flags
 // #define WEB_PANEL_DASHBOARD
+// #define SHOW_INTRO
 // maint
 
 // System constants (do not change)
