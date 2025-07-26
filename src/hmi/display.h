@@ -5,7 +5,6 @@
 
 #include "model/display_data.h"
 #include "widgets/meter.h"
-#include "widgets/qr/qrcode.h"
 #include "configs/config.h"
 #include "sensors/co2.h"
 #include "sensors/tph.h"
@@ -58,7 +57,6 @@ public:
         _tft_rotate = (*_db)[kk::rotation_display].toInt();
         _state.dark_theme = (*_db)[kk::use_dark_theme].toBool();
         _force_redraw = true;
-        _show_intro = false;
         _state.last_co2_value = -1;
         _state.last_wifi_state = false;
         _state.last_mqtt_state = false;
@@ -78,7 +76,6 @@ public:
         LOG_INFO("init tft ok!");
 
         LOG_INFO("init widgets...");
-        _qr.init(100, 80, 100, 100);
         _co2_meter = MeterWidget(&_tft);
         _co2_scale->init(_db);
         LOG_INFO("init widgets ok!");
@@ -162,11 +159,6 @@ private:
      */
     TFT_eSPI _tft = TFT_eSPI();
     /**
-     * @name _qr
-     * @details QR code
-     */
-    QRcode _qr = (&_tft);
-    /**
      * @name _db
      * @details Pointer to settings database
      */
@@ -216,12 +208,6 @@ private:
      * @details Flag to force display redraw
      */
     bool _force_redraw = false;
-
-    /**
-     * @name _show_intro
-     * @details Show QR intro
-     */
-    bool _show_intro = false;
     /**
      * @name _tft_rotate
      * @details Set display orientation
@@ -251,38 +237,14 @@ private:
         }
 
         LOG_DEBUG("render started...");
-
-        if (_show_intro) {
-            _print_intro();
-        } else {
-            _print_gauge();
-            _print_wifi_info();
-            _print_mqtt_info();
-            _print_sensor_state();
-            _print_fw_version();
-        }
+        _print_gauge();
+        _print_wifi_info();
+        _print_mqtt_info();
+        _print_sensor_state();
+        _print_fw_version();
         LOG_DEBUG("rendered ok!");
 
         _force_redraw = false;
-    }
-
-    void _print_intro()
-    {
-        if (_state.dark_theme)
-        {
-            _qr.create(USER_MANUAL_URL, 1);
-        }
-        else
-        {
-            _qr.create(USER_MANUAL_URL, 0);
-        }
-
-        if ((millis() - _state.intro_delay) >= SEC_5)
-        {
-            _show_intro = false;
-            _state.intro_delay = millis();
-            _init_theme(true);
-        }
     }
 
     /**
