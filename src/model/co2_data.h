@@ -20,14 +20,3 @@ struct ColorThreshold
     uint16_t threshold; ///< Threshold value
     uint8_t r, g, b;    ///< RGB color components
 };
-
-/**
- * @enum CO2Sensor_State
- * @brief Enumeration for CO2 sensor states
- */
-typedef enum
-{
-    CO2Sensor_INIT,       ///< Initialization state
-    CO2Sensor_RUNNING,    ///< Normal operation state
-    CO2Sensor_CALIBRATING ///< Calibration state
-} CO2Sensor_State;

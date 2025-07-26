@@ -1,6 +1,6 @@
 #include "co2.h"
 
-CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _state(CO2Sensor_INIT)
+CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _state(Sensor_INIT)
 {
     LOG_INFO("init...");
     _data.co2 = 400.0f;
@@ -15,7 +15,7 @@ CO2Sensor::CO2Sensor(uint32_t ms) : SensorBase(ms), _state(CO2Sensor_INIT)
     }
 
     _is_initialized = true;
-    _state = CO2Sensor_RUNNING;
+    _state = Sensor_RUNNING;
 
     LOG_INFO("init ok!");
     exec();
@@ -32,9 +32,9 @@ void CO2Sensor::exec()
         return;
     }
 
-    if (_state != CO2Sensor_CALIBRATING)
+    if (_state != Sensor_CALIBRATING)
     {
-        _state = CO2Sensor_RUNNING;
+        _state = Sensor_RUNNING;
         _check_data();
     }
 }

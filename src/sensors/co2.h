@@ -6,6 +6,7 @@
 #include "sensor_base.h"
 #include "configs/config.h"
 #include "connections/mqtt_conn.h"
+#include "model/sensor_state.h"
 #include "model/co2_data.h"
 #include "db/settings_db.h"
 
@@ -78,7 +79,7 @@ public:
      */
     bool isCalibrating()
     {
-        return _state == CO2Sensor_CALIBRATING;
+        return _state == Sensor_CALIBRATING;
     }
 
     /**
@@ -94,7 +95,7 @@ public:
             _data.current_baseline = 0x00;
         }
 
-        _state = CO2Sensor_CALIBRATING;
+        _state = Sensor_CALIBRATING;
 
         if (_data.current_baseline == 0x00)
         {
@@ -110,7 +111,7 @@ public:
      */
     void forceStopCalibration()
     {
-        if (_state != CO2Sensor_CALIBRATING || _data.current_baseline == 0x01)
+        if (_state != Sensor_CALIBRATING || _data.current_baseline == 0x01)
         {
             return;
         }
@@ -134,7 +135,7 @@ public:
 
         delay(5000);
 
-        _state = CO2Sensor_RUNNING;
+        _state = Sensor_RUNNING;
     };
 
 private:
@@ -152,7 +153,7 @@ private:
      * @name _state
      * @details Current sensor state (initialization, running, calibration)
      */
-    CO2Sensor_State _state;
+    Sensor_State _state;
 
     /**
      * @name _init
