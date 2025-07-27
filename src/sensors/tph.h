@@ -17,7 +17,7 @@ class TPHSensor : public SensorBase
 public:
     TPHSensor(SettingsDB &settingsDb, uint32_t ms);
 
-    void setup() override;
+    bool begin() override;
     void exec() override;
     float getTemperatureMin();
     float getTemperatureMax();

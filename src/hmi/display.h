@@ -6,7 +6,8 @@
 #include "model/display_data.h"
 #include "widgets/meter.h"
 #include "configs/config.h"
-#include "sensors/co2.h"
+#include "sensors/co2_base.h"
+#include "sensors/co2_scale.h"
 #include "sensors/tph.h"
 #include "connections/wifi_conn.h"
 #include "connections/mqtt_conn.h"
@@ -39,7 +40,7 @@ public:
     Display(
         uint32_t ms,
         SettingsDB &settingsDb,
-        CO2Sensor &co2_sensor,
+        CO2SensorBase &co2_sensor,
         TPHSensor &tph_sensor,
         WiFiConn &wifiConn,
         MQTTConn &mqttConn,
@@ -172,7 +173,7 @@ private:
      * @name _co2_sensor
      * @details Reference to CO2 sensor
      */
-    CO2Sensor &_co2_sensor;
+    CO2SensorBase &_co2_sensor;
     /**
      * @name _co2_scale
      * @details Pointer to CO2 scale instance
@@ -464,7 +465,7 @@ private:
      */
     void _print_gauge()
     {
-        if (!_co2_sensor.isInitialized())
+        if (!_co2_sensor.begin())
             return;
 
         float value = static_cast<float>(_co2_sensor.getCO2());

@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @enum Sensor_State
  * @brief Enumeration for sensor states

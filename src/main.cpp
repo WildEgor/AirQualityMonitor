@@ -8,7 +8,9 @@
 #include "connections/wifi_conn.h"
 #include "connections/wifi_connector_adapter.cpp"
 #include "sensors/sensor_base.h"
-#include "sensors/co2.h"
+#include "sensors/co2_base.h"
+#include "sensors/ccs811.h"
+#include "sensors/ens160.h"
 #include "sensors/tph.h"
 #include "hmi/display.h"
 #include "hmi/web.h"
@@ -57,7 +59,26 @@ void setup()
   /**
    * @note Sensors initialization
    */
-  CO2Sensor *co2 = new CO2Sensor(SEC_30);
+  CO2SensorBase *co2 = nullptr;
+
+  CCS811_CO2Sensor *ccs811 = new CCS811_CO2Sensor(SEC_30);
+  ENS160_CO2Sensor *ens160 = new ENS160_CO2Sensor(SEC_30);
+
+  if (ccs811->begin())
+  {
+    co2 = ccs811;
+    LOG_INFO("CCS811 setup success");
+  }
+  else if (ens160->begin())
+  {
+    co2 = ens160;
+    LOG_INFO("ENS160 setup success");
+  }
+  else
+  {
+    LOG_ERROR("co2 sensor not working");
+  }
+
   TPHSensor *tph = new TPHSensor(*sdb, SEC_30);
 
   /**
@@ -112,13 +133,13 @@ void setup()
    * @note Display initialization
    */
   Display *display = new Display(
-    SEC_1, 
-    *sdb, 
-    *co2, 
-    *tph, 
-    *wifi,
-    *mqtt, 
-    *ota);
+      SEC_1,
+      *sdb,
+      *co2,
+      *tph,
+      *wifi,
+      *mqtt,
+      *ota);
 
   /**
    * @note RGB controller initialization for CO2 level visualization

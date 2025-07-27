@@ -10,9 +10,9 @@
 #define APP_VERSION STR_VALUE(BUILD_VERSION) // Change version via project.json!
 #define APP_PLATFORM STR_VALUE(BUILD_PLATFORM)
 #define APP_DEFAULT_LOG_LEVEL "ERROR"
-#define APP_LOG_LEVEL "DEBUG"                 // DEBUG, ERROR, WARN, INFO
+#define APP_LOG_LEVEL "DEBUG" // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // Enable mock sensor reading
-#define APP_DARK_THEME false // Select color theme
+#define APP_DARK_THEME false             // Select color theme
 #define APP_CO2_DEFAULT_ALERT_TRHLD 1200 // CO2 threshold for red blinking
 #define APP_CO2_DEFAULT_SCALE_TYPE "4 color"
 // app
@@ -32,6 +32,7 @@
 
 // System constants (do not change)
 #define CCS811_ADDR 0x5A
+#define ENS160_ADDR 0x51
 #define BME280_ADDR 0x76 // 0x77 or 0x76
 #define TEMP_DEFAULT_OFFSET 15
 #define SERIAL_SPEED 115200
@@ -66,7 +67,7 @@
 // RGB settings
 #define RGB_ENABLED false
 #define RGB_PIN 19
-#define RGB_NUMPIXELS 4              // Number of LEDs in the strip. Min: 1, Max: 255
+#define RGB_NUMPIXELS 4 // Number of LEDs in the strip. Min: 1, Max: 255
 // rgb settings
 
 /**
@@ -87,7 +88,7 @@
 #define TFT_CS 5   // Chip select control pin
 #define TFT_DC 16  // Data/Command control pin
 #define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
-// lolin_s2_mini 
+// lolin_s2_mini
 // #define TFT_MOSI 9
 // #define TFT_SCLK 11
 // #define TFT_CS   5

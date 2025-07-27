@@ -3,7 +3,7 @@
 
 #include "controller_base.h"
 #include "configs/config.h"
-#include "sensors/co2.h"
+#include "sensors/co2_scale.h"
 
 #define LOG_COMPONENT "RGBController"
 #include "services/logger.h"

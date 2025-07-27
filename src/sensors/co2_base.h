@@ -9,6 +9,8 @@ class CO2SensorBase
 public:
     CO2SensorBase() {};
 
+    virtual bool begin() = 0;
+
     virtual float getCO2Min() = 0;
     virtual float getCO2Max() = 0;
     virtual float getCO2() = 0;
@@ -40,4 +42,4 @@ protected:
      * @details Structure for storing current sensor data
      */
     CO2Data _data;
-}
+};
