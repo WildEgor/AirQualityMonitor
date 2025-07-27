@@ -1,7 +1,7 @@
-#include "tph.h"
+#include "bme280.h"
 
-TPHSensor::TPHSensor(SettingsDB &settingsDb, uint32_t ms)
-    : _db(&settingsDb.db()), SensorBase(ms)
+BME280_TPHSensor::BME280_TPHSensor(uint32_t ms, SettingsDB &settingsDb)
+    : TPHSensorBase(), SensorBase(ms), _db(&settingsDb.db())
 {
     LOG_INFO("init...");
 
@@ -22,13 +22,13 @@ TPHSensor::TPHSensor(SettingsDB &settingsDb, uint32_t ms)
     this->addLoop();
 }
 
-bool TPHSensor::begin()
+bool BME280_TPHSensor::begin()
 {
     _init();
     return _is_initialized;
 }
 
-void TPHSensor::exec()
+void BME280_TPHSensor::exec()
 {
     if (!_is_initialized)
     {
@@ -39,57 +39,57 @@ void TPHSensor::exec()
     _check_data();
 }
 
-float TPHSensor::getTemperature()
+float BME280_TPHSensor::getTemperature()
 {
     return _data.temp;
 }
 
-float TPHSensor::getPressure()
+float BME280_TPHSensor::getPressure()
 {
     return _data.pressure;
 }
 
-float TPHSensor::getHumidity()
+float BME280_TPHSensor::getHumidity()
 {
     return _data.humidity;
 }
 
-const char *TPHSensor::getType() const
+const char *BME280_TPHSensor::getType() const
 {
     return "tph_sensor";
 }
 
-float TPHSensor::getTemperatureMin()
+float BME280_TPHSensor::getTemperatureMin()
 {
     return -40.0f;
 }
 
-float TPHSensor::getTemperatureMax()
+float BME280_TPHSensor::getTemperatureMax()
 {
     return 85.0f;
 }
 
-float TPHSensor::getPressureMin()
+float BME280_TPHSensor::getPressureMin()
 {
     return 30000.0f; // Minimum pressure: 300 hPa in Pa
 }
 
-float TPHSensor::getPressureMax()
+float BME280_TPHSensor::getPressureMax()
 {
     return 110000.0f; // Maximum pressure: 1100 hPa in Pa
 }
 
-float TPHSensor::getHumidityMin()
+float BME280_TPHSensor::getHumidityMin()
 {
     return 0.0f; // Maximum pressure: 0 % in RH
 }
 
-float TPHSensor::getHumidityMax()
+float BME280_TPHSensor::getHumidityMax()
 {
     return 100.0f; // Maximum pressure: 100 % in RH
 }
 
-bool TPHSensor::_init()
+bool BME280_TPHSensor::_init()
 {
     if (!_sensor.begin(BME280_ADDR))
     {
@@ -104,7 +104,7 @@ bool TPHSensor::_init()
     return true;
 }
 
-void TPHSensor::_check_data()
+void BME280_TPHSensor::_check_data()
 {
     if (_enable_test)
     {
@@ -122,7 +122,7 @@ void TPHSensor::_check_data()
     _print_data();
 }
 
-void TPHSensor::_print_data()
+void BME280_TPHSensor::_print_data()
 {
     LOG_DEBUG(String("temp: ") + _data.temp + " °C, " +
               "pressure: " + (_data.pressure / 100.0f) + " hPa, " +

@@ -23,7 +23,7 @@ WebPanel::WebPanel(
     RGBController &rgbController,
     Display &display,
     CO2SensorBase &co2sensor,
-    TPHSensor &tphSeonsor)
+    TPHSensorBase &tphSeonsor)
     : LoopTickerBase(),
       _sett(String(APP_NAME) + " v" + ota.version(), &settingsDb.db()),
       _settingsDb(&settingsDb),

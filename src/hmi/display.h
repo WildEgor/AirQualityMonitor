@@ -8,7 +8,7 @@
 #include "configs/config.h"
 #include "sensors/co2_base.h"
 #include "sensors/co2_scale.h"
-#include "sensors/tph.h"
+#include "sensors/tph_base.h"
 #include "connections/wifi_conn.h"
 #include "connections/mqtt_conn.h"
 #include "services/ota.h"
@@ -41,7 +41,7 @@ public:
         uint32_t ms,
         SettingsDB &settingsDb,
         CO2SensorBase &co2_sensor,
-        TPHSensor &tph_sensor,
+        TPHSensorBase &tph_sensor,
         WiFiConn &wifiConn,
         MQTTConn &mqttConn,
         OTA &ota)
@@ -183,7 +183,7 @@ private:
      * @name _tph_sensor
      * @details Reference to temperature/pressure sensor
      */
-    TPHSensor &_tph_sensor;
+    TPHSensorBase &_tph_sensor;
     /**
      * @name _wifi
      * @details Pointer to WiFi connection

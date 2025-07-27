@@ -5,7 +5,7 @@
 #include "db/settings_db.h"
 #include "connections/mqtt_conn.h"
 #include "sensors/co2_base.h"
-#include "sensors/tph.h"
+#include "sensors/tph_base.h"
 #include "controllers/rgb.h"
 #include "connections/wifi_conn.h"
 #include "services/publisher.h"
@@ -41,7 +41,7 @@ public:
              RGBController &rgbCtrl,
              Display &hmi,
              CO2SensorBase &co2sensor,
-             TPHSensor &tphSensor);
+             TPHSensorBase &tphSensor);
     /**
      * @name WebPanel
      * @param settingsDb - reference to settings database
@@ -85,7 +85,7 @@ private:
     RGBController *_rgb_controller; ///< Pointer to RGB controller
     Display *_display;              ///< Pointer to display/HMI
     CO2SensorBase *_co2_sensor;     ///< Pointer to CO2 sensor
-    TPHSensor *_tph_sensor;         ///< Pointer to TPH sensor
+    TPHSensorBase *_tph_sensor;         ///< Pointer to TPH sensor
 
     bool _is_initialized; ///< Initialization flag
     bool _cfm_fr;
