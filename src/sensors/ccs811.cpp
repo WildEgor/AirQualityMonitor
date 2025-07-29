@@ -30,7 +30,7 @@ bool CCS811_CO2Sensor::begin()
         if (_init()) {
             return true;
         }
-        delay(500);
+        delay(100);
     }
     return _is_initialized;
 }
@@ -80,14 +80,13 @@ float CCS811_CO2Sensor::getTVOCMax()
 
 bool CCS811_CO2Sensor::_init()
 {
-    if (_enable_test)
+    if (_enable_test || _is_initialized)
     {
         return true;
     }
 
     LOG_DEBUG("init...");
 
-    Wire.begin();
     if (_sensor.beginWithStatus() != CCS811Core::CCS811_Stat_SUCCESS)
     {
         LOG_ERROR("init failed!");

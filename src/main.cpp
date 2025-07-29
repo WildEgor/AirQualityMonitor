@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include <Looper.h>
+#include <Wire.h>
 
 #include "db/settings_db.h"
 #include "model/co2_data.h"
@@ -61,6 +62,7 @@ void setup()
   /**
    * @note Sensors initialization
    */
+  Wire.begin();
   CO2SensorBase *co2 = new Dummy_CO2Sensor();
   TPHSensorBase *tph = new Dummy_TPHSensor();
   CCS811_CO2Sensor *ccs811 = new CCS811_CO2Sensor(SEC_30);

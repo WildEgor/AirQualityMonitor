@@ -29,7 +29,7 @@ bool BME280_TPHSensor::begin()
         if (_init()) {
             return true;
         }
-        delay(500);
+        delay(100);
     }
     return _is_initialized;
 }
@@ -97,6 +97,11 @@ float BME280_TPHSensor::getHumidityMax()
 
 bool BME280_TPHSensor::_init()
 {
+    if (_enable_test || _is_initialized)
+    {
+        return true;
+    }
+
     if (!_sensor.begin(BME280_ADDR))
     {
         LOG_ERROR("init failed! please check your wiring.");

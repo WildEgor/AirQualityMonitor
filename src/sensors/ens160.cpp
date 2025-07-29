@@ -29,7 +29,7 @@ bool ENS160_CO2Sensor::begin()
         if (_init()) {
             return true;
         }
-        delay(500);
+        delay(100);
     }
     return _is_initialized;
 }
@@ -79,14 +79,13 @@ float ENS160_CO2Sensor::getTVOCMax()
 
 bool ENS160_CO2Sensor::_init()
 {
-    if (_enable_test)
+    if (_enable_test || _is_initialized)
     {
         return true;
     }
 
     LOG_DEBUG("init...");
 
-    Wire.begin();
     if (!_sensor.begin(ENS160_ADDR))
     {
         LOG_ERROR("init failed!");
