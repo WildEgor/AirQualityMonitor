@@ -25,7 +25,13 @@ CCS811_CO2Sensor::CCS811_CO2Sensor(uint32_t ms) : CO2SensorBase(), SensorBase(ms
 
 bool CCS811_CO2Sensor::begin()
 {
-    _init();
+    const int max_retries = 3;
+    for (int attempt = 0; attempt < max_retries; ++attempt) {
+        if (_init()) {
+            return true;
+        }
+        delay(500);
+    }
     return _is_initialized;
 }
 
@@ -74,12 +80,12 @@ float CCS811_CO2Sensor::getTVOCMax()
 
 bool CCS811_CO2Sensor::_init()
 {
-    if (_enable_test || _is_initialized)
+    if (_enable_test)
     {
         return true;
     }
 
-    _sensor = CCS811(CCS811_ADDR);
+    LOG_DEBUG("init...");
 
     Wire.begin();
     if (_sensor.beginWithStatus() != CCS811Core::CCS811_Stat_SUCCESS)
@@ -92,6 +98,8 @@ bool CCS811_CO2Sensor::_init()
     _sensor.setDriveMode(2); // Set measurement interval: 1 - every 1s, 2 - every 10s, 3 - every 60s
 
     _is_initialized = true;
+
+    LOG_INFO("initialized!");
 
     return true;
 }
@@ -170,5 +178,5 @@ void CCS811_CO2Sensor::_mock_data()
 
 void CCS811_CO2Sensor::_print_data()
 {
-    LOG_DEBUG("CO2: " + String(_data.co2) + " ppm, TVOC: " + String(_data.tvoc) + " ppb");
+    LOG_DEBUG("CCS811 - CO2: " + String(_data.co2) + " ppm, TVOC: " + String(_data.tvoc) + " ppb");
 }

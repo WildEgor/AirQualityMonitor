@@ -24,7 +24,13 @@ BME280_TPHSensor::BME280_TPHSensor(uint32_t ms, SettingsDB &settingsDb)
 
 bool BME280_TPHSensor::begin()
 {
-    _init();
+    const int max_retries = 3;
+    for (int attempt = 0; attempt < max_retries; ++attempt) {
+        if (_init()) {
+            return true;
+        }
+        delay(500);
+    }
     return _is_initialized;
 }
 
@@ -94,6 +100,7 @@ bool BME280_TPHSensor::_init()
     if (!_sensor.begin(BME280_ADDR))
     {
         LOG_ERROR("init failed! please check your wiring.");
+        _is_initialized = false;
         return false;
     }
 

@@ -10,7 +10,7 @@
 #include "model/sensor_state.h"
 #include "model/co2_data.h"
 
-#define LOG_COMPONENT "CO2Sensor"
+#define LOG_COMPONENT "CCS811"
 #include "services/logger.h"
 
 /**
@@ -143,7 +143,7 @@ private:
      * @name _sensor
      * @details CCS811 driver instance
      */
-    CCS811 _sensor;
+    CCS811 _sensor = CCS811(CCS811_ADDR);
     /**
      * @name _data
      * @details Structure for storing current sensor data

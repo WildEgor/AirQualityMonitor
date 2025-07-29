@@ -24,7 +24,13 @@ ENS160_CO2Sensor::ENS160_CO2Sensor(uint32_t ms) : CO2SensorBase(), SensorBase(ms
 
 bool ENS160_CO2Sensor::begin()
 {
-    _init();
+    const int max_retries = 3;
+    for (int attempt = 0; attempt < max_retries; ++attempt) {
+        if (_init()) {
+            return true;
+        }
+        delay(500);
+    }
     return _is_initialized;
 }
 
@@ -78,10 +84,13 @@ bool ENS160_CO2Sensor::_init()
         return true;
     }
 
+    LOG_DEBUG("init...");
+
     Wire.begin();
     if (!_sensor.begin(ENS160_ADDR))
     {
         LOG_ERROR("init failed!");
+        _is_initialized = false;
         return false;
     }
 
@@ -89,6 +98,8 @@ bool ENS160_CO2Sensor::_init()
     _sensor.setOperatingMode(SFE_ENS160_STANDARD);
 
     _is_initialized = true;
+
+    LOG_INFO("initialized!");
 
     return true;
 }
@@ -141,5 +152,5 @@ void ENS160_CO2Sensor::_mock_data()
 
 void ENS160_CO2Sensor::_print_data()
 {
-    LOG_DEBUG("CO2: " + String(_data.co2) + " ppm, TVOC: " + String(_data.tvoc) + " ppb");
+    LOG_DEBUG("ENS160 - CO2: " + String(_data.co2) + " ppm, TVOC: " + String(_data.tvoc) + " ppb");
 }

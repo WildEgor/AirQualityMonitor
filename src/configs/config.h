@@ -9,7 +9,7 @@
 #define APP_NAME "AirQualityMonitor"
 #define APP_VERSION STR_VALUE(BUILD_VERSION) // Change version via project.json!
 #define APP_PLATFORM STR_VALUE(BUILD_PLATFORM)
-#define APP_DEFAULT_LOG_LEVEL "ERROR"
+#define APP_DEFAULT_LOG_LEVEL "DEBUG"
 #define APP_LOG_LEVEL "DEBUG" // DEBUG, ERROR, WARN, INFO
 // #define ENABLE_TEST // Enable mock sensor reading
 #define APP_DARK_THEME false             // Select color theme
@@ -32,8 +32,8 @@
 
 // System constants (do not change)
 #define CCS811_ADDR 0x5A
-#define ENS160_ADDR 0x51
-#define BME280_ADDR 0x76 // 0x77 or 0x76
+#define ENS160_ADDR 0x53 // 0x52
+#define BME280_ADDR 0x76 // 0x77
 #define TEMP_DEFAULT_OFFSET 15
 #define SERIAL_SPEED 115200
 #define MS_100 100
@@ -66,7 +66,6 @@
 
 // RGB settings
 #define RGB_ENABLED false
-#define RGB_PIN 19
 #define RGB_NUMPIXELS 4 // Number of LEDs in the strip. Min: 1, Max: 255
 // rgb settings
 
@@ -80,28 +79,4 @@
 #define TFT_HEIGHT 240
 #define TFT_ROTATION_0 2 // start position
 #define TFT_ROTATION_360 0
-#define USER_SETUP_INFO "User_Setup"
-#define GC9A01_DRIVER
-// mhetesp32devkit
-#define TFT_MOSI 23 // On some display driver boards, it might be labeled as "SDA" etc.
-#define TFT_SCLK 18
-#define TFT_CS 5   // Chip select control pin
-#define TFT_DC 16  // Data/Command control pin
-#define TFT_RST 17 // Reset pin (can be connected to Arduino RESET pin)
-// lolin_s2_mini
-// #define TFT_MOSI 9
-// #define TFT_SCLK 11
-// #define TFT_CS   5
-// #define TFT_DC   7
-// #define TFT_RST  3
-#define SPI_FREQUENCY 27000000
-#define SPI_READ_FREQUENCY 5000000
-#define LOAD_GLCD  // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH
-#define LOAD_FONT2 // Font 2. Small 16 pixel high font, needs ~3534 bytes in FLASH, 96 characters
-#define LOAD_FONT4 // Font 4. Medium 26 pixel high font, needs ~5848 bytes in FLASH, 96 characters
-#define LOAD_FONT6 // Font 6. Large 48 pixel font, needs ~2666 bytes in FLASH, only characters 1234567890:-.apm
-#define LOAD_FONT7 // Font 7. 7 segment 48 pixel font, needs ~2438 bytes in FLASH, only characters 1234567890:.
-#define LOAD_FONT8 // Font 8. Large 75 pixel font needs ~3256 bytes in FLASH, only characters 1234567890:-.
-#define LOAD_GFXFF // FreeFonts. Include access to the 48 Adafruit_GFX free fonts FF1 to FF48 and custom fonts
-#define SMOOTH_FONT
 // hmi

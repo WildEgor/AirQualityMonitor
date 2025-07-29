@@ -1,18 +1,17 @@
 #pragma once
 #include <Arduino.h>
-#include <SparkFun_ENS160.h>
 
 #include "co2_base.h"
 #include "sensor_base.h"
 #include "configs/config.h"
 
-#define LOG_COMPONENT "ENS160"
+#define LOG_COMPONENT "CO2Dummy"
 #include "services/logger.h"
 
-class ENS160_CO2Sensor : public CO2SensorBase, public SensorBase
+class Dummy_CO2Sensor : public CO2SensorBase, public SensorBase
 {
 public:
-    ENS160_CO2Sensor(uint32_t ms);
+    Dummy_CO2Sensor();
 
     float getCO2Min();
     float getCO2Max();
@@ -52,27 +51,10 @@ public:
     };
 
 private:
-    SparkFun_ENS160 _sensor = SparkFun_ENS160();
-
-    /**
-     * @name _init
-     * @details Internal sensor initialization
-     * @return bool - initialization success
-     */
+    CO2Data _data;
+    
     bool _init();
-    /**
-     * @name _check_data
-     * @details Check and update sensor data
-     */
     void _check_data();
-    /**
-     * @name _print_data
-     * @details Print current data to log
-     */
-    void _print_data();
-    /**
-     * @name _mock_data
-     * @details Mock data for scale and alarm testing
-     */
     void _mock_data();
+    void _print_data();
 };

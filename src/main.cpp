@@ -12,6 +12,8 @@
 #include "sensors/ccs811.h"
 #include "sensors/ens160.h"
 #include "sensors/bme280.h"
+#include "sensors/co2_dummy.h"
+#include "sensors/tph_dummy.h"
 #include "hmi/display.h"
 #include "hmi/web.h"
 #include "controllers/rgb.h"
@@ -59,21 +61,22 @@ void setup()
   /**
    * @note Sensors initialization
    */
-  CO2SensorBase *co2 = nullptr;
-  TPHSensorBase *tph = nullptr;
-
+  CO2SensorBase *co2 = new Dummy_CO2Sensor();
+  TPHSensorBase *tph = new Dummy_TPHSensor();
   CCS811_CO2Sensor *ccs811 = new CCS811_CO2Sensor(SEC_30);
   ENS160_CO2Sensor *ens160 = new ENS160_CO2Sensor(SEC_30);
 
-  if (ccs811->begin())
+  if (ens160->begin())
   {
-    co2 = ccs811;
-    LOG_INFO("CCS811 setup success");
-  }
-  else if (ens160->begin())
-  {
+    delete co2;
     co2 = ens160;
     LOG_INFO("ENS160 setup success");
+  }
+  else if (ccs811->begin())
+  {
+    delete co2;
+    co2 = ccs811;
+    LOG_INFO("CCS811 setup success");
   }
   else
   {
@@ -83,7 +86,10 @@ void setup()
   BME280_TPHSensor *bme280 = new BME280_TPHSensor(SEC_30, *sdb);
   if (bme280->begin())
   {
+    delete tph;
     tph = bme280;
+  } else {
+    LOG_ERROR("tph sensor not working");
   }
 
   /**
