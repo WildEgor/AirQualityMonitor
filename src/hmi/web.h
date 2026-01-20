@@ -4,8 +4,8 @@
 #include "configs/config.h"
 #include "db/settings_db.h"
 #include "connections/mqtt_conn.h"
-#include "sensors/co2.h"
-#include "sensors/tph.h"
+#include "sensors/co2_base.h"
+#include "sensors/tph_base.h"
 #include "controllers/rgb.h"
 #include "connections/wifi_conn.h"
 #include "services/publisher.h"
@@ -19,7 +19,8 @@
  * @name WebPanel
  * @details Class for managing the web interface panel, settings, and integration with other modules
  */
-class WebPanel : public LoopTickerBase {
+class WebPanel : public LoopTickerBase
+{
 public:
     /**
      * @name WebPanel
@@ -33,24 +34,22 @@ public:
      * @param tphSensor - reference to TPH sensor
      * @details Full-featured constructor for WebPanel
      */
-    WebPanel(SettingsDB& settingsDb, 
-        WiFiConn& wifiConn, 
-        OTA& ota,
-        MQTTConn& mqttConn, 
-        RGBController& rgbCtrl,
-        Display& hmi,
-        CO2Sensor& co2sensor,
-        TPHSensor& tphSensor
-    );
+    WebPanel(SettingsDB &settingsDb,
+             WiFiConn &wifiConn,
+             OTA &ota,
+             MQTTConn &mqttConn,
+             RGBController &rgbCtrl,
+             Display &hmi,
+             CO2SensorBase &co2sensor,
+             TPHSensorBase &tphSensor);
     /**
      * @name WebPanel
      * @param settingsDb - reference to settings database
      * @param wifiConn - reference to WiFi connection
      * @details Minimal constructor for WebPanel (WiFi only)
      */
-    WebPanel(SettingsDB& settingsDb, 
-        WiFiConn& wifiConn
-    );
+    WebPanel(SettingsDB &settingsDb,
+             WiFiConn &wifiConn);
 
     /**
      * @name exec
@@ -69,25 +68,25 @@ private:
      * @param u - settings updater
      * @details Update settings from web interface
      */
-    void _update(sets::Updater& u);
+    void _update(sets::Updater &u);
     /**
      * @name _build
      * @param b - settings builder
      * @details Build web interface structure and settings
      */
-    void _build(sets::Builder& b);
+    void _build(sets::Builder &b);
 
-    SettingsGyver _sett;              ///< Settings manager instance
-    GyverDBFile* _db;
-    SettingsDB* _settingsDb;                 ///< Pointer to database file
-    WiFiConn* _wifi_conn;             ///< Pointer to WiFi connection
-    OTA* _ota;                        ///< Pointer to OTA update service
-    MQTTConn* _mqtt_conn;             ///< Pointer to MQTT connection
-    RGBController* _rgb_controller;   ///< Pointer to RGB controller
-    Display* _display;                ///< Pointer to display/HMI
-    CO2Sensor* _co2_sensor;           ///< Pointer to CO2 sensor
-    TPHSensor* _tph_sensor;           ///< Pointer to TPH sensor
+    SettingsGyver _sett; ///< Settings manager instance
+    GyverDBFile *_db;
+    SettingsDB *_settingsDb;        ///< Pointer to database file
+    WiFiConn *_wifi_conn;           ///< Pointer to WiFi connection
+    OTA *_ota;                      ///< Pointer to OTA update service
+    MQTTConn *_mqtt_conn;           ///< Pointer to MQTT connection
+    RGBController *_rgb_controller; ///< Pointer to RGB controller
+    Display *_display;              ///< Pointer to display/HMI
+    CO2SensorBase *_co2_sensor;     ///< Pointer to CO2 sensor
+    TPHSensorBase *_tph_sensor;         ///< Pointer to TPH sensor
 
-    bool _is_initialized;             ///< Initialization flag
+    bool _is_initialized; ///< Initialization flag
     bool _cfm_fr;
 };

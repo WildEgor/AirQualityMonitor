@@ -3,21 +3,29 @@
 #include <Wire.h>
 #include <GyverBME280.h>
 
+#include "tph_base.h"
 #include "sensor_base.h"
-#include "connections/mqtt_conn.h"
 #include "model/tph_data.h"
 #include "db/settings_db.h"
 #include "configs/config.h"
 
-#define LOG_COMPONENT "TPHSensor"
+#define LOG_COMPONENT "BME280"
 #include "services/logger.h"
 
-class TPHSensor : public SensorBase
+class BME280_TPHSensor : public TPHSensorBase, public SensorBase
 {
 public:
-    TPHSensor(SettingsDB &settingsDb, uint32_t ms);
+    BME280_TPHSensor(uint32_t ms, SettingsDB &settingsDb);
 
-    void setup() override;
+    /**
+     * @name setup
+     * @details Initialize CCS811 dependencies
+     */
+    bool begin() override;
+    /**
+     * @name exec
+     * @details Main polling and data processing loop for the sensor
+     */
     void exec() override;
     float getTemperatureMin();
     float getTemperatureMax();
@@ -28,6 +36,10 @@ public:
     float getHumidityMin();
     float getHumidityMax();
     float getHumidity();
+    /**
+     * @name getType
+     * @return const char* - sensor type
+     */
     const char *getType() const override;
 
 private:
