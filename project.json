@@ -12,6 +12,15 @@
             "offset": 0
           }
         ]
+      },
+      {
+        "chipFamily": "ESP32-S2",
+        "parts": [
+          {
+            "path": "https://raw.githubusercontent.com/WildEgor/AirQualityMonitor/master/bin/firmware_lolin_s2_mini.bin",
+            "offset": 0
+          }
+        ]
       }
     ]
   }

@@ -22,8 +22,8 @@ WebPanel::WebPanel(
     MQTTConn &mqttConn,
     RGBController &rgbController,
     Display &display,
-    CO2Sensor &co2sensor,
-    TPHSensor &tphSeonsor)
+    CO2SensorBase &co2sensor,
+    TPHSensorBase &tphSeonsor)
     : LoopTickerBase(),
       _sett(String(APP_NAME) + " v" + ota.version(), &settingsDb.db()),
       _settingsDb(&settingsDb),
@@ -185,7 +185,8 @@ void WebPanel::_build(sets::Builder &b)
     }
 
     bool res;
-    if (b.Confirm(kk::cfm_fr, "Confirm", &res)) {
+    if (b.Confirm(kk::cfm_fr, "Confirm", &res))
+    {
         LOG_DEBUG("confirm factory reset? " + b.build.value.toString());
 
         if (_settingsDb && b.build.value.toBool())

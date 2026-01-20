@@ -9,9 +9,9 @@ class SensorBase : public LoopTimerBase
 public:
     SensorBase(uint32_t ms) : LoopTimerBase(ms), _enable_test(false), _is_initialized(false) {}
 
-    virtual void setup() = 0;
+    virtual bool begin() = 0;
     virtual void exec() override = 0;
-    bool isInitialized() { return _is_initialized; }
+
     void enableTest()
     {
         updateInterval(SEC_3);
