@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
-#include <SparkFun_ENS160.h>
+#include <Wire.h>
+#include <ScioSense_ENS16x.h>
 
 #include "co2_base.h"
 #include "sensor_base.h"
@@ -52,7 +53,7 @@ public:
     };
 
 private:
-    SparkFun_ENS160 _sensor = SparkFun_ENS160();
+    ENS160 _sensor = ENS160();
 
     /**
      * @name _init

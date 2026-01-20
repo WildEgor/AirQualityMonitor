@@ -32,7 +32,7 @@
 
 // System constants (do not change)
 #define CCS811_ADDR 0x5A
-#define ENS160_ADDR 0x53 // 0x52
+#define ENS160_ADDR 0x53 // 0x52 or 0x53
 #define BME280_ADDR 0x76 // 0x77
 #define TEMP_DEFAULT_OFFSET 15
 #define SERIAL_SPEED 115200

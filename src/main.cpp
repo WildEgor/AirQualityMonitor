@@ -82,7 +82,7 @@ void setup()
   }
   else
   {
-    LOG_ERROR("co2 sensor not working");
+    LOG_ERROR("co2 sensor not working! Try restart board...");
   }
 
   BME280_TPHSensor *bme280 = new BME280_TPHSensor(SEC_30, *sdb);

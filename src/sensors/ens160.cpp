@@ -25,11 +25,14 @@ ENS160_CO2Sensor::ENS160_CO2Sensor(uint32_t ms) : CO2SensorBase(), SensorBase(ms
 bool ENS160_CO2Sensor::begin()
 {
     const int max_retries = 3;
-    for (int attempt = 0; attempt < max_retries; ++attempt) {
-        if (_init()) {
+    for (int attempt = 0; attempt < max_retries; ++attempt)
+    {
+        if (_init())
+        {
             return true;
         }
-        delay(100);
+        LOG_DEBUG("try retry init...");
+        delay(500);
     }
     return _is_initialized;
 }
@@ -86,15 +89,16 @@ bool ENS160_CO2Sensor::_init()
 
     LOG_DEBUG("init...");
 
-    if (!_sensor.begin(ENS160_ADDR))
+    _sensor.begin(&Wire, ENS160_ADDR);
+
+    if (!_sensor.init())
     {
         LOG_ERROR("init failed!");
         _is_initialized = false;
         return false;
     }
 
-    _sensor.setOperatingMode(SFE_ENS160_RESET);
-    _sensor.setOperatingMode(SFE_ENS160_STANDARD);
+    _sensor.startStandardMeasure();
 
     _is_initialized = true;
 
@@ -112,32 +116,36 @@ void ENS160_CO2Sensor::_check_data()
         return;
     }
 
-    if (_sensor.checkDataStatus())
-    {
-        _data.co2 = static_cast<float>(_sensor.getECO2());
-        if (_data.co2 >= getCO2Max())
-        {
-            _data.co2 = getCO2Max();
-        }
-        if (_data.co2 <= getCO2Min())
-        {
-            _data.co2 = getCO2Min();
-        }
+    _sensor.wait();
 
-        _data.tvoc = static_cast<float>(_sensor.getTVOC());
-        if (_data.tvoc >= getTVOCMax())
-        {
-            _data.tvoc = getTVOCMax();
-        }
-        if (_data.tvoc <= getTVOCMin())
-        {
-            _data.tvoc = getTVOCMin();
-        }
-
-        _print_data();
-    }
-    else
+    if (_sensor.update() == RESULT_OK)
     {
+        if (_sensor.hasNewData())
+        {
+            _data.co2 = static_cast<float>(_sensor.getEco2());
+            if (_data.co2 >= getCO2Max())
+            {
+                _data.co2 = getCO2Max();
+            }
+            if (_data.co2 <= getCO2Min())
+            {
+                _data.co2 = getCO2Min();
+            }
+
+            _data.tvoc = static_cast<float>(_sensor.getTvoc());
+            if (_data.tvoc >= getTVOCMax())
+            {
+                _data.tvoc = getTVOCMax();
+            }
+            if (_data.tvoc <= getTVOCMin())
+            {
+                _data.tvoc = getTVOCMin();
+            }
+
+            _data.aqi = static_cast<uint8_t>(_sensor.getAirQualityIndex_UBA());
+
+            _print_data();
+        }
     }
 }
 
