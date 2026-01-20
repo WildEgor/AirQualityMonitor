@@ -8,9 +8,8 @@ BME280_TPHSensor::BME280_TPHSensor(uint32_t ms, SettingsDB &settingsDb)
     _data.pressure = 0.0;
     _data.temp = 0.0;
     _data.humidity = 0.0;
-    _is_initialized = _enable_test;
 
-    if (!_enable_test && !_init())
+    if (!_enable_test && !_is_initialized)
     {
         LOG_ERROR("init failed! please check your wiring.");
         this->addLoop();

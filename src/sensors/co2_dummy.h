@@ -21,6 +21,8 @@ public:
     float getTVOCMax();
     float getTVOC();
 
+    float getAQI();
+
     bool begin() override;
     void exec() override;
     const char *getType() const override;

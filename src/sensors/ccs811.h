@@ -68,6 +68,11 @@ public:
      */
     float getTVOC();
     /**
+     * @name getAQI
+     * @return float - current AQI value
+     */
+    float getAQI();
+    /**
      * @name getType
      * @return const char* - sensor type
      */

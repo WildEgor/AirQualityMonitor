@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include <Wire.h>
-#include <ScioSense_ENS16x.h>
+#include <SparkFun_ENS160.h>
 
 #include "co2_base.h"
 #include "sensor_base.h"
@@ -22,6 +22,8 @@ public:
     float getTVOCMin();
     float getTVOCMax();
     float getTVOC();
+    
+    float getAQI();
 
     bool begin() override;
     void exec() override;
@@ -53,7 +55,7 @@ public:
     };
 
 private:
-    ENS160 _sensor = ENS160();
+    SparkFun_ENS160 _sensor = SparkFun_ENS160();
 
     /**
      * @name _init

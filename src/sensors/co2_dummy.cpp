@@ -43,6 +43,7 @@ void Dummy_CO2Sensor::exec()
 
 float Dummy_CO2Sensor::getCO2() { return _data.co2; }
 float Dummy_CO2Sensor::getTVOC() { return _data.tvoc; }
+float Dummy_CO2Sensor::getAQI() { return _data.aqi; }
 
 const char *Dummy_CO2Sensor::getType() const
 {

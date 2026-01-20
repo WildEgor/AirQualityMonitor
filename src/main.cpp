@@ -27,6 +27,8 @@
  */
 void setup()
 {
+  Wire.begin();
+
   /**
    * @note Logging initialization
    */
@@ -62,35 +64,28 @@ void setup()
   /**
    * @note Sensors initialization
    */
-  Wire.begin();
-  CO2SensorBase *co2 = new Dummy_CO2Sensor();
-  TPHSensorBase *tph = new Dummy_TPHSensor();
-  CCS811_CO2Sensor *ccs811 = new CCS811_CO2Sensor(SEC_30);
-  ENS160_CO2Sensor *ens160 = new ENS160_CO2Sensor(SEC_30);
+  // CO2SensorBase *co2 = new Dummy_CO2Sensor();
+  // CCS811_CO2Sensor *co2 = new CCS811_CO2Sensor(SEC_15);
+  ENS160_CO2Sensor *co2 = new ENS160_CO2Sensor(SEC_15);
 
-  if (ens160->begin())
+  if (co2->begin())
   {
-    delete co2;
-    co2 = ens160;
     LOG_INFO("ENS160 setup success");
-  }
-  else if (ccs811->begin())
-  {
-    delete co2;
-    co2 = ccs811;
-    LOG_INFO("CCS811 setup success");
   }
   else
   {
-    LOG_ERROR("co2 sensor not working! Try restart board...");
+    LOG_ERROR("co2 sensor not working");
   }
 
-  BME280_TPHSensor *bme280 = new BME280_TPHSensor(SEC_30, *sdb);
-  if (bme280->begin())
+  // TPHSensorBase *tph = new Dummy_TPHSensor();
+  BME280_TPHSensor *tph = new BME280_TPHSensor(SEC_15, *sdb);
+
+  if (tph->begin())
   {
-    delete tph;
-    tph = bme280;
-  } else {
+    LOG_INFO("BME280 setup success");
+  }
+  else
+  {
     LOG_ERROR("tph sensor not working");
   }
 
@@ -109,35 +104,42 @@ void setup()
   /**
    * @note Configure CO2 value publishing to topic [device_id]/co2
    */
-  MQTTPublisher *co2p = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_CO2_TOPIC);
+  MQTTPublisher *co2p = new MQTTPublisher(SEC_15, *mqtt, MQTT_DEFAULT_CO2_TOPIC);
   co2p->setValueCb([co2]() -> float
                    { return co2->getCO2(); });
 
   /**
    * @note Configure TVOC value publishing to topic [device_id]/tvoc
    */
-  MQTTPublisher *tvocp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TVOC_TOPIC);
+  MQTTPublisher *tvocp = new MQTTPublisher(SEC_15, *mqtt, MQTT_DEFAULT_TVOC_TOPIC);
   tvocp->setValueCb([co2]() -> float
+                    { return co2->getTVOC(); });
+
+  /**
+   * @note Configure AQI value publishing to topic [device_id]/aqi
+   */
+  MQTTPublisher *aqip = new MQTTPublisher(SEC_15, *mqtt, MQTT_DEFAULT_AQI_TOPIC);
+  aqip->setValueCb([co2]() -> float
                     { return co2->getTVOC(); });
 
   /**
    * @note Configure temperature publishing to topic [device_id]/temp
    */
-  MQTTPublisher *tempp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_TEMP_TOPIC);
+  MQTTPublisher *tempp = new MQTTPublisher(SEC_15, *mqtt, MQTT_DEFAULT_TEMP_TOPIC);
   tempp->setValueCb([tph]() -> float
                     { return tph->getTemperature(); });
 
   /**
    * @note Configure pressure publishing to topic [device_id]/pressure
    */
-  MQTTPublisher *pp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_PRESSURE_TOPIC);
+  MQTTPublisher *pp = new MQTTPublisher(SEC_15, *mqtt, MQTT_DEFAULT_PRESSURE_TOPIC);
   pp->setValueCb([tph]() -> float
                  { return tph->getPressure(); });
 
   /**
    * @note Configure humidity publishing to topic [device_id]/humidity
    */
-  MQTTPublisher *hp = new MQTTPublisher(SEC_30, *mqtt, MQTT_DEFAULT_HUMIDITY_TOPIC);
+  MQTTPublisher *hp = new MQTTPublisher(SEC_15, *mqtt, MQTT_DEFAULT_HUMIDITY_TOPIC);
   hp->setValueCb([tph]() -> float
                  { return tph->getHumidity(); });
 #endif

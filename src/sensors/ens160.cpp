@@ -6,9 +6,8 @@ ENS160_CO2Sensor::ENS160_CO2Sensor(uint32_t ms) : CO2SensorBase(), SensorBase(ms
     _state = Sensor_INIT;
     _data.co2 = 400.0f;
     _data.tvoc = 0.0;
-    _is_initialized = _enable_test;
 
-    if (!_enable_test && !_init())
+    if (!_enable_test && _is_initialized)
     {
         LOG_ERROR("init failed! please check your wiring.");
         this->addLoop();
@@ -29,7 +28,7 @@ bool ENS160_CO2Sensor::begin()
     {
         if (_init())
         {
-            return true;
+            return _is_initialized;
         }
         LOG_DEBUG("try retry init...");
         delay(500);
@@ -54,6 +53,7 @@ void ENS160_CO2Sensor::exec()
 
 float ENS160_CO2Sensor::getCO2() { return _data.co2; }
 float ENS160_CO2Sensor::getTVOC() { return _data.tvoc; }
+float ENS160_CO2Sensor::getAQI() { return _data.aqi; }
 
 const char *ENS160_CO2Sensor::getType() const
 {
@@ -84,27 +84,42 @@ bool ENS160_CO2Sensor::_init()
 {
     if (_enable_test || _is_initialized)
     {
-        return true;
+        LOG_DEBUG("initialized!");
+        _is_initialized = true;
+        return _is_initialized;
     }
 
     LOG_DEBUG("init...");
 
-    _sensor.begin(&Wire, ENS160_ADDR);
-
-    if (!_sensor.init())
+    if (!_sensor.begin())
     {
         LOG_ERROR("init failed!");
         _is_initialized = false;
-        return false;
+        return _is_initialized;
+    } else {
+        LOG_DEBUG("begin success");
     }
 
-    _sensor.startStandardMeasure();
+    if (_sensor.setOperatingMode(SFE_ENS160_RESET))
+    {
+        LOG_INFO("ready");
+        delay(100);
+        _sensor.setOperatingMode(SFE_ENS160_STANDARD);
+    }
+    else
+    {
+        LOG_ERROR("set operation mode fail");
+        _is_initialized = false;
+        return _is_initialized;
+    }
+
+    int ensStatus = _sensor.getFlags();
+    LOG_INFO("gas sensor status flags (0 - Standard, 1 - Warm up, 2 - Initial Start Up): " + String(ensStatus));
 
     _is_initialized = true;
-
     LOG_INFO("initialized!");
 
-    return true;
+    return _is_initialized;
 }
 
 void ENS160_CO2Sensor::_check_data()
@@ -116,36 +131,34 @@ void ENS160_CO2Sensor::_check_data()
         return;
     }
 
-    _sensor.wait();
-
-    if (_sensor.update() == RESULT_OK)
+    if (_sensor.checkDataStatus())
     {
-        if (_sensor.hasNewData())
+        LOG_DEBUG("data is ready");
+        _data.co2 = static_cast<float>(_sensor.getECO2());
+        if (_data.co2 >= getCO2Max())
         {
-            _data.co2 = static_cast<float>(_sensor.getEco2());
-            if (_data.co2 >= getCO2Max())
-            {
-                _data.co2 = getCO2Max();
-            }
-            if (_data.co2 <= getCO2Min())
-            {
-                _data.co2 = getCO2Min();
-            }
-
-            _data.tvoc = static_cast<float>(_sensor.getTvoc());
-            if (_data.tvoc >= getTVOCMax())
-            {
-                _data.tvoc = getTVOCMax();
-            }
-            if (_data.tvoc <= getTVOCMin())
-            {
-                _data.tvoc = getTVOCMin();
-            }
-
-            _data.aqi = static_cast<uint8_t>(_sensor.getAirQualityIndex_UBA());
-
-            _print_data();
+            _data.co2 = getCO2Max();
         }
+        if (_data.co2 <= getCO2Min())
+        {
+            _data.co2 = getCO2Min();
+        }
+
+        _data.tvoc = static_cast<float>(_sensor.getTVOC());
+        if (_data.tvoc >= getTVOCMax())
+        {
+            _data.tvoc = getTVOCMax();
+        }
+        if (_data.tvoc <= getTVOCMin())
+        {
+            _data.tvoc = getTVOCMin();
+        }
+
+        _data.aqi = static_cast<uint8_t>(_sensor.getAQI());
+
+        _print_data();
+    } else {
+        LOG_DEBUG("data not ready");
     }
 }
 

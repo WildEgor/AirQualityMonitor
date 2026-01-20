@@ -9,7 +9,7 @@ struct CO2Data
     uint16_t current_baseline; ///< Current sensor baseline
     float co2;                 ///< CO2 value in ppm
     float tvoc;                ///< TVOC value in ppb
-    uint8_t aqi;              ///< AQI value
+    float aqi;              ///< AQI value
 };
 
 /**

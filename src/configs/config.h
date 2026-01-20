@@ -42,6 +42,7 @@
 #define SEC_3 3000
 #define SEC_5 5000
 #define SEC_10 10000
+#define SEC_15 15000
 #define SEC_30 30000
 #define EMPTY_SECRET "*****"
 // system
@@ -53,6 +54,7 @@
 #define MQTT_DEFAULT_DEVICE_ID "common/aqm" // Used as topic prefix for uniqueness
 #define MQTT_DEFAULT_CO2_TOPIC "co2"
 #define MQTT_DEFAULT_TVOC_TOPIC "tvoc"
+#define MQTT_DEFAULT_AQI_TOPIC "aqi"
 #define MQTT_DEFAULT_TEMP_TOPIC "temp"
 #define MQTT_DEFAULT_PRESSURE_TOPIC "pressure"
 #define MQTT_DEFAULT_HUMIDITY_TOPIC "humidity"

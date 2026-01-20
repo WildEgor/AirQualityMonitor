@@ -19,6 +19,8 @@ public:
     virtual float getTVOCMax() = 0;
     virtual float getTVOC() = 0;
 
+    virtual float getAQI() = 0;
+
     virtual void startCalibration() = 0;
     virtual void forceStopCalibration() = 0;
 
